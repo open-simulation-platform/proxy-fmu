@@ -24,8 +24,6 @@ if(MSVC)
     add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
 endif()
 
-set(BOOST_COMPONENTS filesystem)
-
 if (FMU_PROXY_BUILD_TOOL)
     list(APPEND BOOST_COMPONENTS program_options)
 endif()
@@ -37,7 +35,6 @@ find_package(THRIFT REQUIRED)
 
 # add subdiretories
 add_subdirectory(FMI4cpp)
-
 add_subdirectory(src)
 
 if (FMU_PROXY_BUILD_EXAMPLES)
@@ -46,7 +43,6 @@ if (FMU_PROXY_BUILD_EXAMPLES)
     if (FMU_PROXY_BUILD_EXAMPLES)
         add_subdirectory(examples)
     endif()
-
 endif()
 
 if (FMU_PROXY_BUILD_TOOL)
