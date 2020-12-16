@@ -1,4 +1,5 @@
 
+option(BUILD_SHARED_LIBS OFF)
 option(FMU_PROXY_BUILD_EXAMPLES "Build examples" ON)
 option(FMU_PROXY_BUILD_TOOL "Build the server executable" ON)
 
