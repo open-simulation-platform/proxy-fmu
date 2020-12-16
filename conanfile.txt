@@ -1,0 +1,15 @@
+[requires]
+boost/1.71.0
+libzip/1.7.3
+thrift/0.13.0
+
+[generators]
+cmake
+
+[options]
+boost:shared=True
+libzip:shared=True
+
+[imports]
+bin, *.dll -> ./bin
+lib, *.dll -> ./bin

@@ -1,0 +1,4 @@
+[submodule "FMI4cpp"]
+	path = FMI4cpp
+	url = git@github.com:NTNU-IHB/FMI4cpp.git
+	branch = master
