@@ -1,5 +1,4 @@
 
-#include <ctime>
 #include <iostream>
 
 #include <fmuproxy/thrift/common/fmu_service.h>
