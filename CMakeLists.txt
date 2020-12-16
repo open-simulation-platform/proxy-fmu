@@ -16,8 +16,6 @@ else()
     message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
 endif()
 
-add_compile_definitions(BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE)
-
 if(MSVC)
     set(CMAKE_DEBUG_POSTFIX "d")
     add_definitions("-DNOMINMAX" "-D_WIN32_WINNT=0x600" "-D_CRT_SECURE_NO_WARNINGS")
@@ -29,11 +27,9 @@ if (FMU_PROXY_BUILD_TOOL)
 endif()
 
 find_package(Boost 1.66 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
 find_package(THRIFT REQUIRED)
 
-# add subdiretories
+# add subdirectories
 add_subdirectory(FMI4cpp)
 add_subdirectory(src)
 
