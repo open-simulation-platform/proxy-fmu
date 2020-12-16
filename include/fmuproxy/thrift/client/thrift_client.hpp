@@ -1,26 +1,3 @@
-/*
- * The MIT License
- *
- * Copyright 2017-2018 Norwegian University of Technology
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING  FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 
 #ifndef FMU_PROXY_THRIFTCLIENT_H
 #define FMU_PROXY_THRIFTCLIENT_H
@@ -58,12 +35,9 @@ namespace fmuproxy::thrift::client {
         std::shared_ptr<fmu_service_client> client_;
         std::shared_ptr<apache::thrift::transport::TTransport> transport_;
 
-
     public:
 
         thrift_client(const std::string &host, unsigned int port);
-
-        remote_thrift_fmu from_url(const std::string &url);
 
         remote_thrift_fmu from_file(const std::string &file);
 

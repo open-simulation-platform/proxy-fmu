@@ -31,7 +31,6 @@ thrift_client::thrift_client(const string& host, const unsigned int port)
 
 remote_thrift_fmu thrift_client::from_file(const std::string& file)
 {
-
     fs::path p(file);
     std::string name = p.stem().string();
 
