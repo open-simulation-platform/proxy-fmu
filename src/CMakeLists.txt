@@ -21,7 +21,6 @@ add_library(thrift-client ${THRIFT_CLIENT_SRC})
 target_link_libraries(thrift-client PUBLIC thrift-common fmi4cpp::fmi4cpp)
 
 add_library(thrift-server ${THRIFT_SERVER_SRC})
-target_include_directories(thrift-server PRIVATE ${JSON_INCLUDE_DIRS})
 target_link_libraries(thrift-server PUBLIC thrift-common fmi4cpp::fmi4cpp)
 if (UNIX)
     target_link_libraries(thrift-server PRIVATE pthread)
