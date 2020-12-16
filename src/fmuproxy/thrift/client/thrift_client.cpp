@@ -3,14 +3,9 @@
 #include "thrift_client_helper.hpp"
 
 #include <fmuproxy/thrift/client/thrift_client.hpp>
-#include <fmuproxy/thrift/common/fmu_service.h>
 
-#include <boost/filesystem.hpp>
 #include <thrift/protocol/TCompactProtocol.h>
-#include <thrift/transport/TSocket.h>
-#include <thrift/transport/TTransportUtils.h>
 
-#include <iostream>
 #include <utility>
 
 using namespace std;

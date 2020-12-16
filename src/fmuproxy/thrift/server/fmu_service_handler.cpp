@@ -5,8 +5,6 @@
 
 #include <fmuproxy/thrift/server/fmu_service_handler.hpp>
 
-#include <boost/filesystem.hpp>
-
 #include <cstring>
 #include <iostream>
 #include <utility>
