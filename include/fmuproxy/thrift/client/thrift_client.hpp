@@ -1,6 +1,6 @@
 
-#ifndef FMU_PROXY_THRIFTCLIENT_H
-#define FMU_PROXY_THRIFTCLIENT_H
+#ifndef FMU_PROXY_THRIFT_THRIFTCLIENT_HPP
+#define FMU_PROXY_THRIFT_THRIFTCLIENT_HPP
 
 #include <thrift/transport/TSocket.h>
 #include <thrift/protocol/TBinaryProtocol.h>
@@ -15,12 +15,12 @@ namespace fmuproxy::thrift::client {
     private:
 
         const FmuId fmuId_;
-        std::shared_ptr<fmu_service_client> client_;
+        std::shared_ptr<FmuServiceClient> client_;
         std::shared_ptr<const fmi4cpp::fmi2::cs_model_description> modelDescription_;
 
     public:
 
-        remote_thrift_fmu(FmuId fmuId, std::shared_ptr<fmu_service_client> client);
+        remote_thrift_fmu(FmuId fmuId, std::shared_ptr<FmuServiceClient> client);
 
         std::shared_ptr<const fmi4cpp::fmi2::cs_model_description> &getModelDescription();
 
@@ -32,7 +32,7 @@ namespace fmuproxy::thrift::client {
 
     private:
 
-        std::shared_ptr<fmu_service_client> client_;
+        std::shared_ptr<FmuServiceClient> client_;
         std::shared_ptr<apache::thrift::transport::TTransport> transport_;
 
     public:

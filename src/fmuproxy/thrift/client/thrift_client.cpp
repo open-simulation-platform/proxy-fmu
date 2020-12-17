@@ -20,7 +20,7 @@ thrift_client::thrift_client(const string& host, const unsigned int port)
     shared_ptr<TTransport> socket(new TSocket(host, port));
     transport_ = std::make_shared<TFramedTransport>(socket);
     shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport_));
-    client_ = std::make_shared<fmu_service_client>(protocol);
+    client_ = std::make_shared<FmuServiceClient>(protocol);
     transport_->open();
 }
 
@@ -54,7 +54,7 @@ thrift_client::~thrift_client()
     close();
 }
 
-remote_thrift_fmu::remote_thrift_fmu(FmuId  fmuId, shared_ptr<fmu_service_client> client)
+remote_thrift_fmu::remote_thrift_fmu(FmuId fmuId, shared_ptr<FmuServiceClient> client)
     : fmuId_(std::move(fmuId))
     , client_(std::move(client))
 {
@@ -62,7 +62,7 @@ remote_thrift_fmu::remote_thrift_fmu(FmuId  fmuId, shared_ptr<fmu_service_client
 
 shared_ptr<const fmi4cpp::fmi2::cs_model_description>& remote_thrift_fmu::getModelDescription()
 {
-    if(modelDescription_ == nullptr) {
+    if (modelDescription_ == nullptr) {
         ModelDescription desc;
         client_->get_model_description(desc, fmuId_);
         modelDescription_ = convert(desc);

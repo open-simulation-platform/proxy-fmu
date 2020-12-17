@@ -13,6 +13,9 @@ mark_as_advanced(THRIFT_INCLUDE_DIR)
 find_library(THRIFT_LIBRARY NAMES thrift thriftmd thriftmdd)
 mark_as_advanced(THRIFT_LIBRARY)
 
+find_program(THRIFT_EXECUTABLE NAMES thrift)
+mark_as_advanced(THRIFT_EXECUTABLE)
+
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(THRIFT
         REQUIRED_VARS THRIFT_LIBRARY THRIFT_INCLUDE_DIR)
@@ -22,7 +25,7 @@ if (THRIFT_FOUND)
     set(THRIFT_INCLUDE_DIRS ${THRIFT_INCLUDE_DIR})
 
     if (NOT THRIFT_LIBRARIES)
-        set(THRIFT_LIBRARIES ${THRIFT_LIBRARY} ${THRIFT_NB_LIBRARY})
+        set(THRIFT_LIBRARIES ${THRIFT_LIBRARY})
     endif ()
 
     if (NOT TARGET thrift::thrift)
