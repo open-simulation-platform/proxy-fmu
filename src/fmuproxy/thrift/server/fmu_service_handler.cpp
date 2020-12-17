@@ -37,7 +37,17 @@ void fmu_service_handler::get_model_description(fmuproxy::thrift::ModelDescripti
     thrift_type(_return, *fmu->get_model_description());
 }
 
-void fmu_service_handler::load_from_file(FmuId& _return, const std::string& name, const std::string& data)
+void fmu_service_handler::load_from_local_file(FmuId& _return, const std::string& fileName)
+{
+    auto fmu = fmi4cpp::fmi2::fmu(fileName).as_cs_fmu();
+    auto guid = fmu->get_model_description()->guid;
+    if (!fmus_.count(guid)) {
+        fmus_[guid] = move(fmu);
+    }
+    _return = guid;
+}
+
+void fmu_service_handler::load_from_remote_file(FmuId& _return, const std::string& name, const std::string& data)
 {
     fs::path tmp(fs::temp_directory_path() /= fs::path(name + "_" + generate_simple_id(8) + ".fmu"));
     const std::string fmuPath = tmp.string();
@@ -205,7 +215,7 @@ void fmu_service_handler::get_directional_derivative(DirectionalDerivativeResult
 {
     auto& slave = slaves_[slave_id];
     if (!slave->get_model_description()->provides_directional_derivative) {
-        auto ex = UnsupportedOperationException();
+        UnsupportedOperationException ex;
         ex.message = "FMU does not have capability 'getDirectionalDerivative'";
         throw ex;
     }

@@ -139,6 +139,10 @@ struct ModelDescription {
     21: i32 max_output_derivative_order
 }
 
+exception NoSuchFileException {
+    1: string message
+}
+
 exception NoSuchFmuException {
     1: string message
 }
@@ -162,7 +166,8 @@ struct DirectionalDerivativeResult {
 
 service FmuService {
 
-    FmuId load_from_file(1: string name, 2: binary data)
+    FmuId load_from_remote_file(1: string name, 2: binary data)
+    FmuId load_from_local_file(1: string fileName) throws (1: NoSuchFileException ex)
 
     ModelDescription get_model_description(1: FmuId fmuId) throws (1: NoSuchFmuException ex)
 

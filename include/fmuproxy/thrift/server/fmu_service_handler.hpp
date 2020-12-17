@@ -22,7 +22,9 @@ private:
 public:
     explicit fmu_service_handler(std::unordered_map<FmuId, std::shared_ptr<fmi4cpp::fmi2::cs_fmu>>& fmus);
 
-    void load_from_file(FmuId& _return, const std::string& name, const std::string& data) override;
+    void load_from_remote_file(FmuId& _return, const std::string& name, const std::string& data) override;
+
+    void load_from_local_file(FmuId& _return, const std::string& fileName) override;
 
     void get_model_description(ModelDescription& _return, const FmuId& fmu_id) override;
 
