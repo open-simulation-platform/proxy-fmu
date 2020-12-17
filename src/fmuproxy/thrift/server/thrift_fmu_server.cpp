@@ -2,15 +2,9 @@
 #include <fmuproxy/thrift/server/thrift_fmu_server.hpp>
 
 #include <thrift/concurrency/ThreadManager.h>
-#include <thrift/protocol/TCompactProtocol.h>
 #include <thrift/protocol/TJSONProtocol.h>
 #include <thrift/server/TNonblockingServer.h>
 #include <thrift/server/TSimpleServer.h>
-#include <thrift/server/TThreadedServer.h>
-#include <thrift/transport/THttpServer.h>
-#include <thrift/transport/THttpTransport.h>
-#include <thrift/transport/TNonblockingServerSocket.h>
-#include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
 #include <iostream>
@@ -29,7 +23,7 @@ thrift_fmu_server::thrift_fmu_server(std::unordered_map<FmuId, std::shared_ptr<f
 {
 
     std::shared_ptr<fmu_service_handler> handler(new fmu_service_handler(fmus));
-    std::shared_ptr<TProcessor> processor(new fmu_service_processor(handler));
+    std::shared_ptr<TProcessor> processor(new FmuServiceProcessor(handler));
 
     std::shared_ptr<TTransportFactory> transportFactory(new TFramedTransportFactory());
     std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());

@@ -2,7 +2,7 @@
 #ifndef FMU_PROXY_THRIFT_SERVER_HELPER_HPP
 #define FMU_PROXY_THRIFT_SERVER_HELPER_HPP
 
-#include <fmuproxy/thrift/common/service_types.h>
+#include <fmuproxy/thrift/service_types.h>
 
 #include <fmi4cpp/fmi4cpp.hpp>
 

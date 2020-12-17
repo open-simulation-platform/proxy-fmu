@@ -2,7 +2,7 @@
 #ifndef FMU_PROXY_THRIFT_REMOTEFMUSLAVE_HPP
 #define FMU_PROXY_THRIFT_REMOTEFMUSLAVE_HPP
 
-#include "fmuproxy/thrift/common/fmu_service.h"
+#include <fmuproxy/thrift/FmuService.h>
 
 #include <fmi4cpp/fmi2/fmi2.hpp>
 
@@ -14,7 +14,7 @@ class remote_fmu_slave : public fmi4cpp::fmu_slave<fmi4cpp::fmi2::cs_model_descr
 
 private:
     const InstanceId instanceId_;
-    fmu_service_client& client_;
+    FmuServiceClient& client_;
     std::shared_ptr<const fmi4cpp::fmi2::cs_model_description> modelDescription_;
 
     bool terminated_ = false;
@@ -23,7 +23,7 @@ private:
     bool update_status_and_return_true_on_ok(Status::type status);
 
 public:
-    remote_fmu_slave(InstanceId instanceId, fmu_service_client& client,
+    remote_fmu_slave(InstanceId instanceId, FmuServiceClient& client,
         std::shared_ptr<const fmi4cpp::fmi2::cs_model_description>& modelDescription);
 
     fmi4cpp::status last_status() const override;
