@@ -38,13 +38,13 @@ jobs:
       - name: Run conan (Linux)
         if: startsWith(runner.os, 'Linux')
         run: |
-          conan install . -s build_type=Release -s compiler.libcxx=libstdc++11 --install-folder=build
+          conan install . -s build_type=Release -s compiler.libcxx=libstdc++11 --install-folder=build --build=missing
         shell: bash
 
       - name: Run conan (Windows)
         if: startsWith(runner.os, 'Windows')
         run: |
-          conan install . -s build_type=Release --install-folder=build
+          conan install . -s build_type=Release --install-folder=build  --build=missing
         shell: bash
 
       - name: Configure (Linux)
