@@ -12,4 +12,3 @@ libzip:shared=True
 
 [imports]
 bin, zip.dll -> ./bin
-lib, boost_program_options* -> ./bin
