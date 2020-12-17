@@ -1,8 +1,7 @@
 
-#ifndef FMU_PROXY_THRIFTSERVER_H
-#define FMU_PROXY_THRIFTSERVER_H
+#ifndef FMU_PROXY_THRIFT_THRIFTFMUSERVER_HPP
+#define FMU_PROXY_THRIFT_THRIFTFMUSERVER_HPP
 
-#include "../common/service_types.h"
 #include "fmu_service_handler.hpp"
 
 #include <fmi4cpp/fmi2/fmu.hpp>
@@ -10,7 +9,6 @@
 
 #include <thread>
 #include <unordered_map>
-
 
 namespace fmuproxy::thrift::server
 {
