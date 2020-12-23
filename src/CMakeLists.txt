@@ -1,31 +1,35 @@
 set(includeDir ${FMU_PROXY_SOURCE_DIR}/include)
 include_directories(${includeDir})
 
-# Generate FMU-proxy classes from Thrift service definitions
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
+set(thriftSourcesDir "${generatedSourcesDir}/fmuproxy/thrift")
+
 file(MAKE_DIRECTORY "${generatedSourcesDir}")
+file(MAKE_DIRECTORY "${thriftSourcesDir}")
 
 if (NOT THRIFT_EXECUTABLE)
     message(FATAL_ERROR "The thrift compiler was not found. Cannot generate Thrift sources.")
 endif ()
 set(thriftServiceDefinition "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/service.thrift")
-set(thriftGenerated
-        "${generatedSourcesDir}/fmuproxy/thrift/FmuService.h"
-        "${generatedSourcesDir}/fmuproxy/thrift/FmuService.cpp"
-        "${generatedSourcesDir}/fmuproxy/thrift/service_types.h"
-        "${generatedSourcesDir}/fmuproxy/thrift/service_types.cpp"
-        )
 
+# Generate FMU-proxy classes from Thrift service definitions
 execute_process(
         COMMAND "${THRIFT_EXECUTABLE}"
         "--gen" "cpp:no_skeleton"
-        "-out" "${generatedSourcesDir}/fmuproxy/thrift"
+        "-out" "${thriftSourcesDir}"
         "${thriftServiceDefinition}"
 )
 
+set(thriftGenerated
+        "${thriftSourcesDir}/FmuService.h"
+        "${thriftSourcesDir}/FmuService.cpp"
+        "${thriftSourcesDir}/service_types.h"
+        "${thriftSourcesDir}/service_types.cpp"
+        )
+
 set(THRIFT_COMMON_SRC
-        ${generatedSourcesDir}/fmuproxy/thrift/FmuService.cpp
-        ${generatedSourcesDir}/fmuproxy/thrift/service_types.cpp)
+        ${thriftSourcesDir}/FmuService.cpp
+        ${thriftSourcesDir}/service_types.cpp)
 
 set(THRIFT_CLIENT_SRC
         fmuproxy/thrift/client/thrift_client_helper.hpp
