@@ -15,7 +15,7 @@ target_link_libraries(benchmark PRIVATE fmi4cpp::fmi4cpp)
 
 add_executable(thrift_client_test
 		thrift/thrift_client_test.cpp)
-target_link_libraries(thrift_client_test PRIVATE thrift-client fmi4cpp::fmi4cpp)
+target_link_libraries(thrift_client_test PRIVATE fmi4cpp::fmi4cpp thrift-client )
 
 add_executable(thrift_server_test
 		thrift/thrift_server_test.cpp)
