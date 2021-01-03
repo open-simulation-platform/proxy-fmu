@@ -24,9 +24,7 @@ private:
     void serve();
 
 public:
-    thrift_fmu_server(std::unordered_map<fmuproxy::thrift::FmuId,
-                          std::shared_ptr<fmi4cpp::fmi2::cs_fmu>>& fmus,
-        unsigned int port);
+    explicit thrift_fmu_server(int port);
 
     void start();
 

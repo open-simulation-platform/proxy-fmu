@@ -18,11 +18,10 @@ using namespace ::apache::thrift::server;
 using namespace ::apache::thrift::protocol;
 using namespace ::apache::thrift::transport;
 
-thrift_fmu_server::thrift_fmu_server(std::unordered_map<FmuId, std::shared_ptr<fmi4cpp::fmi2::cs_fmu>>& fmus, unsigned int port)
+thrift_fmu_server::thrift_fmu_server(int port)
     : port_(port)
 {
-
-    std::shared_ptr<fmu_service_handler> handler(new fmu_service_handler(fmus));
+    std::shared_ptr<fmu_service_handler> handler(new fmu_service_handler());
     std::shared_ptr<TProcessor> processor(new FmuServiceProcessor(handler));
 
     std::shared_ptr<TTransportFactory> transportFactory(new TFramedTransportFactory());
@@ -39,7 +38,7 @@ void thrift_fmu_server::serve()
 
 void thrift_fmu_server::start()
 {
-    std::cout << "Thrift TCP/IP server listening to connections on port: " << std::to_string(port_) << std::endl;
+    std::cout << "FMU-proxy server listening to connections on port: " << std::to_string(port_) << std::endl;
     thread_ = std::make_unique<std::thread>(&thrift_fmu_server::serve, this);
 }
 
@@ -47,5 +46,5 @@ void thrift_fmu_server::stop()
 {
     server_->stop();
     thread_->join();
-    std::cout << "Thrift TCP/IP server stopped.." << std::endl;
+    std::cout << "FMU-proxy stopped.." << std::endl;
 }

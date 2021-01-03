@@ -16,11 +16,11 @@ class fmu_service_handler : virtual public FmuServiceIf
 {
 
 private:
-    std::unordered_map<FmuId, std::shared_ptr<fmi4cpp::fmi2::cs_fmu>>& fmus_;
+    std::unique_ptr<fmi4cpp::fmi2::cs_fmu> fmu_;
     std::unordered_map<InstanceId, std::unique_ptr<fmi4cpp::fmu_slave<fmi4cpp::fmi2::cs_model_description>>> slaves_;
 
 public:
-    explicit fmu_service_handler(std::unordered_map<FmuId, std::shared_ptr<fmi4cpp::fmi2::cs_fmu>>& fmus);
+    fmu_service_handler();
 
     void load_from_remote_file(FmuId& _return, const std::string& name, const std::string& data) override;
 

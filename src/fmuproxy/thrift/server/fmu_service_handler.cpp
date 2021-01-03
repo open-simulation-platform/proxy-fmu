@@ -27,23 +27,17 @@ const char* str_to_char(const std::string& s)
 
 } // namespace
 
-fmu_service_handler::fmu_service_handler(unordered_map<FmuId, shared_ptr<fmi4cpp::fmi2::cs_fmu>>& fmus)
-    : fmus_(fmus)
-{ }
+fmu_service_handler::fmu_service_handler()= default;
 
 void fmu_service_handler::get_model_description(fmuproxy::thrift::ModelDescription& _return, const FmuId& id)
 {
-    const auto& fmu = fmus_.at(id);
-    thrift_type(_return, *fmu->get_model_description());
+    thrift_type(_return, *fmu_->get_model_description());
 }
 
 void fmu_service_handler::load_from_local_file(FmuId& _return, const std::string& fileName)
 {
-    auto fmu = fmi4cpp::fmi2::fmu(fileName).as_cs_fmu();
-    auto guid = fmu->get_model_description()->guid;
-    if (!fmus_.count(guid)) {
-        fmus_[guid] = move(fmu);
-    }
+    fmu_ = fmi4cpp::fmi2::fmu(fileName).as_cs_fmu();
+    auto guid = fmu_->get_model_description()->guid;
     _return = guid;
 }
 
@@ -53,22 +47,17 @@ void fmu_service_handler::load_from_remote_file(FmuId& _return, const std::strin
     const std::string fmuPath = tmp.string();
     write_data(fmuPath, data);
 
-    auto fmu = fmi4cpp::fmi2::fmu(fmuPath).as_cs_fmu();
-
+    fmu_ = fmi4cpp::fmi2::fmu(fmuPath).as_cs_fmu();
     fs::remove_all(tmp);
 
-    auto guid = fmu->get_model_description()->guid;
-    if (!fmus_.count(guid)) {
-        fmus_[guid] = move(fmu);
-    }
+    auto guid = fmu_->get_model_description()->guid;
     _return = guid;
 }
 
 void fmu_service_handler::create_instance(InstanceId& _return, const FmuId& id)
 {
-    auto& fmu = fmus_.at(id);
     _return = generate_simple_id(10);
-    slaves_[_return] = fmu->new_instance();
+    slaves_[_return] = fmu_->new_instance();
     cout << "Created new FMU slave from cs with id=" << _return << endl;
 }
 

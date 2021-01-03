@@ -28,19 +28,10 @@ void wait_for_input()
     cout << "Done." << endl;
 }
 
-int run_application(const vector<shared_ptr<fmi4cpp::fmi2::cs_fmu>>& fmus, unsigned int port)
+int run_application(int port)
 {
-
-    unordered_map<string, shared_ptr<fmi4cpp::fmi2::cs_fmu>> fmu_map;
-    vector<string> modelDescriptions;
-    for (const auto& fmu : fmus) {
-        fmu_map[fmu->get_model_description()->guid] = fmu;
-        modelDescriptions.push_back(fmu->get_model_description_xml());
-    }
-
-    auto thrift_socket_server = make_unique<thrift_fmu_server>(fmu_map, port);
+    auto thrift_socket_server = make_unique<thrift_fmu_server>(port);
     thrift_socket_server->start();
-    std::cout << "Thrift/tcp listening for connections on port " << std::to_string(port) << std::endl;
 
     wait_for_input();
 
@@ -64,8 +55,8 @@ int main(int argc, char** argv)
     namespace po = boost::program_options;
 
     po::options_description desc("Options");
-    desc.add_options()("help,h", "Print this help message and quits.")("fmu,f", po::value<vector<string>>()->multitoken(), "Path to FMUs.");
-    desc.add_options()("port", po::value<unsigned int>(), "Specify the network port to be used by the Thrift (TCP/IP) server.");
+    desc.add_options()("help,h", "Print this help message and quits.");
+    desc.add_options()("port", po::value<int>(), "Specify the network port to be used.");
 
     if (argc == 1) {
         return printHelp(desc);
@@ -91,17 +82,9 @@ int main(int argc, char** argv)
             return COMMANDLINE_ERROR;
         }
 
-        vector<shared_ptr<fmi4cpp::fmi2::cs_fmu>> fmus;
-        if (vm.count("fmu")) {
-            const vector<string> fmu_paths = vm["fmu"].as<vector<string>>();
-            for (const auto& fmu_path : fmu_paths) {
-                fmus.push_back(std::move(fmi4cpp::fmi2::fmu(fmu_path).as_cs_fmu()));
-            }
-        }
+        auto port = vm["port"].as<int>();
 
-        auto port = vm["port"].as<unsigned int>();
-
-        return run_application(fmus, port);
+        return run_application(port);
 
     } catch (std::exception& e) {
         std::cerr << "Unhandled Exception reached the top of main: " << e.what() << ", application will now exit" << std::endl;
