@@ -10,8 +10,6 @@
 
 using fmuproxy::thrift::server::thrift_fmu_server;
 
-using namespace std;
-
 namespace
 {
 
@@ -22,15 +20,15 @@ const int UNHANDLED_ERROR = 2;
 void wait_for_input()
 {
     do {
-        cout << '\n'
+        std::cout << '\n'
              << "Press a key to continue...\n";
-    } while (cin.get() != '\n');
-    cout << "Done." << endl;
+    } while (std::cin.get() != '\n');
+    std::cout << "Done." << std::endl;
 }
 
 int run_application(int port)
 {
-    auto thrift_socket_server = make_unique<thrift_fmu_server>(port);
+    auto thrift_socket_server = std::make_unique<thrift_fmu_server>(port);
     thrift_socket_server->start();
 
     wait_for_input();
@@ -44,8 +42,8 @@ int run_application(int port)
 
 int printHelp( boost::program_options::options_description& desc)
 {
-    cout << "FMU-proxy" << endl
-         << desc << endl;
+    std::cout << "FMU-proxy" << std::endl
+         << desc << std::endl;
     return SUCCESS;
 }
 
@@ -57,6 +55,7 @@ int main(int argc, char** argv)
     po::options_description desc("Options");
     desc.add_options()("help,h", "Print this help message and quits.");
     desc.add_options()("port", po::value<int>(), "Specify the network port to be used.");
+    desc.add_options()("fmu", po::value<std::string>(), "Location of the fmu to load.");
 
     if (argc == 1) {
         return printHelp(desc);
@@ -83,6 +82,7 @@ int main(int argc, char** argv)
         }
 
         auto port = vm["port"].as<int>();
+        auto fmu = vm["fmu"].as<std::string>();
 
         return run_application(port);
 

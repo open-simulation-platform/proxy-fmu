@@ -27,37 +27,62 @@ set(thriftGenerated
         "${thriftSourcesDir}/service_types.cpp"
         )
 
-set(THRIFT_COMMON_SRC
-        ${thriftSourcesDir}/FmuService.cpp
-        ${thriftSourcesDir}/service_types.cpp)
+#set(THRIFT_COMMON_SRC
+#        ${thriftSourcesDir}/FmuService.cpp
+#        ${thriftSourcesDir}/service_types.cpp)
+#
+#set(THRIFT_CLIENT_SRC
+#        fmuproxy/thrift/client/thrift_client_helper.hpp
+#        fmuproxy/thrift/client/remote_fmu_slave.cpp
+#        fmuproxy/thrift/client/thrift_client.cpp)
+#
+#set(THRIFT_CLIENT_HEADERS
+#        ${includeDir}/fmuproxy/thrift/client/remote_fmu_slave.hpp
+#        ${includeDir}/fmuproxy/thrift/client/thrift_client.hpp)
+#
+#set(THRIFT_SERVER_SRC
+#        fmuproxy/thrift/server/thrift_server_helper.hpp
+#        fmuproxy/thrift/server/fmu_service_handler.cpp
+#        fmuproxy/thrift/server/thrift_fmu_server.cpp)
+#
+#set(THRIFT_SERVER_HEADERS
+#        ${includeDir}/fmuproxy/thrift/server/fmu_service_handler.hpp
+#        ${includeDir}/fmuproxy/thrift/server/thrift_fmu_server.hpp)
 
-set(THRIFT_CLIENT_SRC
-        fmuproxy/thrift/client/thrift_client_helper.hpp
-        fmuproxy/thrift/client/remote_fmu_slave.cpp
-        fmuproxy/thrift/client/thrift_client.cpp)
+set(FMI_SRC
+        fmi/fmu.cpp
+        fmi/uuid.cpp
 
-set(THRIFT_CLIENT_HEADERS
-        ${includeDir}/fmuproxy/thrift/client/remote_fmu_slave.hpp
-        ${includeDir}/fmuproxy/thrift/client/thrift_client.hpp)
+        fmi/fmi1/fmi1_fmu.cpp
+        fmi/fmi1/fmi1_slave.cpp
+        fmi/fmi1/fmi1_model_description.cpp
 
-set(THRIFT_SERVER_SRC
-        fmuproxy/thrift/server/thrift_server_helper.hpp
-        fmuproxy/thrift/server/fmu_service_handler.cpp
-        fmuproxy/thrift/server/thrift_fmu_server.cpp)
+        fmi/fmi2/fmi2_fmu.cpp
+        fmi/fmi2/fmi2_slave.cpp
+        fmi/fmi2/fmi2_model_description.cpp
+        )
 
-set(THRIFT_SERVER_HEADERS
-        ${includeDir}/fmuproxy/thrift/server/fmu_service_handler.hpp
-        ${includeDir}/fmuproxy/thrift/server/thrift_fmu_server.hpp)
+add_library(fmi ${FMI_SRC})
+target_compile_features(fmi PUBLIC "cxx_std_17")
+target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
+target_include_directories(fmi PRIVATE ${Boost_INCLUDE_DIRS})
+target_compile_definitions(fmi PRIVATE "BOOST_ALL_DYN_LINK=1" "BOOST_ALL_NO_LIB=1" "BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE=1")
 
-add_library(thrift-common ${THRIFT_COMMON_SRC})
-target_link_libraries(thrift-common PUBLIC thrift::thrift)
-target_include_directories(thrift-common PUBLIC ${generatedSourcesDir})
+if(WIN32)
+    target_link_libraries(fmi PUBLIC "Bcrypt")
+elseif(UNIX)
+    target_link_libraries(fmi PRIVATE stdc++fs dl)
+endif()
 
-add_library(thrift-client ${THRIFT_CLIENT_SRC} ${THRIFT_CLIENT_HEADERS})
-target_link_libraries(thrift-client PUBLIC thrift-common fmi4cpp::fmi4cpp)
-
-add_library(thrift-server ${THRIFT_SERVER_SRC} ${THRIFT_SERVER_HEADERS})
-target_link_libraries(thrift-server PUBLIC thrift-common fmi4cpp::fmi4cpp)
-if (UNIX)
-    target_link_libraries(thrift-server PRIVATE pthread)
-endif ()
+#add_library(thrift-common ${THRIFT_COMMON_SRC})
+#target_link_libraries(thrift-common PUBLIC thrift::thrift)
+#target_include_directories(thrift-common PUBLIC ${generatedSourcesDir})
+#
+#add_library(thrift-client ${THRIFT_CLIENT_SRC} ${THRIFT_CLIENT_HEADERS})
+#target_link_libraries(thrift-client PUBLIC thrift-common ${FMILibrary_LIBRARIES})
+#
+#add_library(thrift-server ${THRIFT_SERVER_SRC} ${THRIFT_SERVER_HEADERS})
+#target_link_libraries(thrift-server PUBLIC thrift-common ${FMILibrary_LIBRARIES})
+#if (UNIX)
+#    target_link_libraries(thrift-server PRIVATE pthread)
+#endif ()

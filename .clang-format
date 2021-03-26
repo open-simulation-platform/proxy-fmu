@@ -26,7 +26,7 @@ BraceWrapping:
   AfterControlStatement: false
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:      '^[<"]fmuproxy[/.]'
+  - Regex:      '^[<"]fmi|fmuproxy[/.]'
     Priority:   20
   - Regex:      '^[<"](boost|fmi4cpp|thrift|zip)[/.]'
     Priority:   30

@@ -4,7 +4,6 @@
 
 #include "fmu_service_handler.hpp"
 
-#include <fmi4cpp/fmi2/fmu.hpp>
 #include <thrift/server/TServer.h>
 
 #include <thread>
@@ -17,14 +16,15 @@ class thrift_fmu_server
 {
 
 private:
-    const unsigned int port_;
+    const int port_;
+    const std::string fmu_;
     std::unique_ptr<std::thread> thread_;
     std::unique_ptr<apache::thrift::server::TServer> server_;
 
     void serve();
 
 public:
-    explicit thrift_fmu_server(int port);
+    thrift_fmu_server(const std::string fmu, int port);
 
     void start();
 

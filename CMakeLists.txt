@@ -29,9 +29,12 @@ endif()
 
 find_package(Boost 1.66 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 find_package(THRIFT REQUIRED)
+find_package(FMILibrary REQUIRED)
+#find_package(LIBZIP REQUIRED)
+
+message(${FMILibrary_LIBRARIES})
 
 # add subdirectories
-add_subdirectory(FMI4cpp)
 add_subdirectory(src)
 
 if (FMU_PROXY_BUILD_EXAMPLES)
