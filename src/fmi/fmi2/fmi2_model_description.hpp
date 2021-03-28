@@ -8,34 +8,7 @@
 namespace fmi
 {
 
-class fmi2_model_description : public model_description
-{
-private:
-    std::string guid_;
-    std::string author_;
-    std::string modelName_;
-    std::string description_;
-    std::string generationTool_;
-    std::string generationDateAndTime_;
-    std::string fmiVersion_ = "2.0";
-
-    model_variables modelVariables_;
-
-public:
-
-    explicit fmi2_model_description(fmi2_import_t* handle);
-
-    std::string get_guid() override;
-    std::string get_author() override;
-    std::string get_model_name() override;
-    std::string get_fmi_version() override;
-    std::string get_description() override;
-    std::string get_generation_tool() override;
-    std::string get_generation_date_and_time() override;
-
-    std::optional<default_experiment> get_default_experiment() override;
-    fmi::model_variables get_model_variables() override;
-};
+model_description create_model_description(fmi2_import_t* handle);
 
 } // namespace fmi
 

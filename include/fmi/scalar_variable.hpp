@@ -27,6 +27,8 @@ struct boolean
     std::optional<bool> start;
 };
 
+using type_attribute = std::variant<real, integer, string, boolean>;
+
 struct scalar_variable
 {
     unsigned int vr;
@@ -34,9 +36,8 @@ struct scalar_variable
     std::optional<std::string> initial;
     std::optional<std::string> causality;
     std::optional<std::string> variability;
-    std::variant<real, integer, string, boolean> typeAttribute;
+    type_attribute typeAttribute;
 };
-
 
 using model_variables = std::vector<scalar_variable>;
 

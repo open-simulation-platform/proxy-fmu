@@ -24,7 +24,7 @@ private:
     void serve();
 
 public:
-    thrift_fmu_server(const std::string fmu, int port);
+    thrift_fmu_server(const std::string& fmu, int port);
 
     void start();
 

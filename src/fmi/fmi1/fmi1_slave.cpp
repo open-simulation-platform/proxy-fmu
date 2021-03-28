@@ -1,17 +1,8 @@
 
 #include "fmi1_slave.hpp"
-
 #include <fmilib.h>
 
 #include <utility>
-
-namespace
-{
-void fmilogger(fmi1_component_t c, fmi1_string_t instanceName, fmi1_status_t status, fmi1_string_t category, fmi1_string_t message, ...)
-{
-    //TODO
-}
-} // namespace
 
 namespace fmi
 {
@@ -19,7 +10,7 @@ namespace fmi
 fmi1_slave::fmi1_slave(
     fmi1_import_t* fmu,
     const std::string& instanceName,
-    std::shared_ptr<fmi1_model_description> md,
+    model_description md,
     std::shared_ptr<temp_dir> tmpDir)
     : fmu_(fmu)
     , md_(std::move(md))
@@ -41,7 +32,7 @@ fmi1_slave::fmi1_slave(
     }
 }
 
-std::shared_ptr<model_description> fmi1_slave::get_model_description()
+model_description fmi1_slave::get_model_description() const
 {
     return md_;
 }
@@ -54,6 +45,7 @@ void fmi1_slave::setup_experiment(double start_time, double stop_time, double /*
 
 void fmi1_slave::enter_initialization_mode()
 {
+    //do nothing
 }
 
 void fmi1_slave::exit_initialization_mode()

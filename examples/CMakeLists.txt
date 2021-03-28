@@ -9,10 +9,6 @@ add_executable(test
 				fmi/test.cpp)
 target_link_libraries(test PUBLIC fmi ${FMILibrary_LIBRARIES})
 
-add_executable(test2
-				fmi/test2.cpp)
-target_link_libraries(test2 PUBLIC fmi ${FMILibrary_LIBRARIES})
-
 ###########################################################
 #########################Thrift############################
 

@@ -89,18 +89,15 @@ struct BooleanRead {
 
 struct ModelDescription {
     1: string guid,
-    2: string fmi_version,
-    3: string modelName,
-    4: optional string license,
-    5: optional string copyright,
-    6: optional string author,
-    7: optional string description,
-    8: optional string generation_tool,
-    9: optional string generation_date_and_time,
-    10: optional DefaultExperiment default_experiment,
-    12: ModelVariables model_variables,
-
-    13: string model_identifier,
+    2: string author,
+    3: string model_name,
+    4: string fmi_version,
+    5: string description,
+    6: string model_identifier,
+    7: string generation_tool,
+    8: string generation_date_and_time,
+    9: optional DefaultExperiment default_experiment,
+    10: ModelVariables model_variables,
 }
 
 exception NoSuchFileException {

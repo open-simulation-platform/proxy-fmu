@@ -1,5 +1,5 @@
 #include "fmi1_fmu.hpp"
-
+#include "fmi1_model_description.hpp"
 #include <fmilib.h>
 #include "fmi1_slave.hpp"
 
@@ -17,11 +17,11 @@ void fmilogger(fmi1_component_t c, fmi1_string_t instanceName, fmi1_status_t sta
 namespace fmi
 {
 
-fmi1_fmu::fmi1_fmu(fmi_import_context_t* ctx, std::shared_ptr<temp_dir> tmpDir)
-    : ctx_(ctx)
-    , handle_(fmi1_import_parse_xml(ctx, tmpDir->path().string().c_str()))
+fmi1_fmu::fmi1_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<temp_dir> tmpDir)
+    : ctx_(std::move(ctx))
+    , handle_(fmi1_import_parse_xml(ctx->ctx_, tmpDir->path().string().c_str()))
     , tmpDir_(std::move(tmpDir))
-    , md_(std::make_shared<fmi1_model_description>(handle_))
+    , md_(create_model_description(handle_))
 {
     auto kind = fmi1_import_get_fmu_kind(handle_);
     if (kind != fmi1_fmu_kind_enu_cs_standalone && kind != fmi1_fmu_kind_enu_cs_tool) {
@@ -38,7 +38,7 @@ fmi1_fmu::fmi1_fmu(fmi_import_context_t* ctx, std::shared_ptr<temp_dir> tmpDir)
     }
 }
 
-std::shared_ptr<model_description> fmi1_fmu::get_model_description()
+const model_description& fmi1_fmu::get_model_description() const
 {
     return md_;
 }
@@ -50,7 +50,9 @@ std::unique_ptr<slave> fmi1_fmu::new_instance(std::string instanceName)
 
 fmi1_fmu::~fmi1_fmu()
 {
-    fmi_import_free_context(ctx_);
+    fmi1_import_destroy_dllfmu(handle_);
+    fmi1_import_free(handle_);
 }
+
 
 } // namespace fmi

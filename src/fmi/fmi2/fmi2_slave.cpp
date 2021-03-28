@@ -4,28 +4,8 @@
 #include <fmilib.h>
 
 #include <exception>
-#include <utility>
 #include <memory>
 
-namespace
-{
-void fmilogger(fmi2_component_t c, fmi2_string_t instanceName, fmi2_status_t status, fmi2_string_t category, fmi2_string_t message, ...)
-{
-    //TODO
-}
-
-
-
-void logger_callback(
-    jm_callbacks* /*callbacks*/,
-    jm_string module,
-    jm_log_level_enu_t logLevel,
-    jm_string message)
-{
-    printf("module = %s, log level = %d: %s\n", module, logLevel, message);
-}
-
-} // namespace
 
 namespace fmi
 {
@@ -33,7 +13,7 @@ namespace fmi
 fmi2_slave::fmi2_slave(
     fmi2_import_t* fmu,
     const std::string& instanceName,
-    std::shared_ptr<fmi2_model_description> md,
+    model_description md,
     std::shared_ptr<temp_dir> tmpDir)
     : fmu_(fmu)
     , md_(std::move(md))
@@ -53,7 +33,7 @@ fmi2_slave::fmi2_slave(
     }
 }
 
-std::shared_ptr<model_description> fmi2_slave::get_model_description()
+model_description fmi2_slave::get_model_description() const
 {
     return md_;
 }
@@ -91,14 +71,12 @@ void fmi2_slave::freeInstance()
     if (!freed) {
         freed = true;
         fmi2_import_free_instance(fmu_);
-        fmi2_import_destroy_dllfmu(fmu_);
-        fmi2_import_free(fmu_);
     }
 }
 
 fmi2_slave::~fmi2_slave()
 {
-    //fmi2_slave::freeInstance();
+    fmi2_slave::freeInstance();
 }
 
 } // namespace fmi

@@ -26,9 +26,9 @@ void wait_for_input()
     std::cout << "Done." << std::endl;
 }
 
-int run_application(int port)
+int run_application(const std::string &fmu, const int port)
 {
-    auto thrift_socket_server = std::make_unique<thrift_fmu_server>(port);
+    auto thrift_socket_server = std::make_unique<thrift_fmu_server>(fmu, port);
     thrift_socket_server->start();
 
     wait_for_input();
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
         auto port = vm["port"].as<int>();
         auto fmu = vm["fmu"].as<std::string>();
 
-        return run_application(port);
+        return run_application(fmu, port);
 
     } catch (std::exception& e) {
         std::cerr << "Unhandled Exception reached the top of main: " << e.what() << ", application will now exit" << std::endl;

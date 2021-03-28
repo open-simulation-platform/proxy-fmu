@@ -15,7 +15,7 @@ public:
         double stop_time = 0,
         double tolerance = 0) = 0;
 
-    virtual std::shared_ptr<model_description> get_model_description() = 0;
+    [[nodiscard]] virtual model_description get_model_description() const = 0;
 
     virtual void enter_initialization_mode() = 0;
 
@@ -26,6 +26,8 @@ public:
     virtual void terminate() = 0;
 
     virtual void freeInstance() = 0;
+
+    virtual ~slave() = default;
 };
 
 } // namespace fmi

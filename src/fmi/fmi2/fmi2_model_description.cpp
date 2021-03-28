@@ -1,14 +1,11 @@
 
 #include "fmi2_model_description.hpp"
 
-#include <iostream>
-
 namespace
 {
 
 std::optional<fmi::scalar_variable> to_scalar_variable(fmi2_import_variable_t* v)
 {
-
     const auto type = fmi2_import_get_variable_base_type(v);
     if (type == fmi2_base_type_enum) {
         return std::nullopt;
@@ -57,16 +54,22 @@ std::optional<fmi::scalar_variable> to_scalar_variable(fmi2_import_variable_t* v
 namespace fmi
 {
 
-fmi2_model_description::fmi2_model_description(fmi2_import_t* handle)
+model_description create_model_description(fmi2_import_t* handle)
 {
-    guid_ = fmi2_import_get_GUID(handle);
-    author_ = fmi2_import_get_author(handle);
-    modelName_ = fmi2_import_get_model_name(handle);
-    description_ = fmi2_import_get_description(handle);
-    generationTool_ = fmi2_import_get_generation_tool(handle);
-    generationDateAndTime_ = fmi2_import_get_generation_date_and_time(handle);
+    model_description md;
+    md.fmi_version = "1.0";
+    md.guid = fmi2_import_get_GUID(handle);
+    md.author = fmi2_import_get_author(handle);
+    md.model_name = fmi2_import_get_model_name(handle);
+    md.model_identifier = fmi2_import_get_model_identifier_CS(handle);
+    md.description = fmi2_import_get_description(handle);
+    md.generation_tool = fmi2_import_get_generation_tool(handle);
+    md.generation_date_and_time = fmi2_import_get_generation_date_and_time(handle);
 
-    modelVariables_ = std::vector<scalar_variable>();
+    md.default_experiment.start_time = fmi2_import_get_default_experiment_start(handle);
+    md.default_experiment.stop_time = fmi2_import_get_default_experiment_stop(handle);
+    md.default_experiment.step_size = fmi2_import_get_default_experiment_step(handle);
+    md.default_experiment.tolerance = fmi2_import_get_default_experiment_tolerance(handle);
 
     const auto varList = fmi2_import_get_variable_list(handle, 0);
     const auto varCount = fmi2_import_get_variable_list_size(varList);
@@ -74,60 +77,13 @@ fmi2_model_description::fmi2_model_description(fmi2_import_t* handle)
         const auto var = fmi2_import_get_variable(varList, i);
         const auto scalar = to_scalar_variable(var);
         if (scalar) {
-            modelVariables_.push_back(scalar.value());
+            md.model_variables.push_back(scalar.value());
         }
     }
 
     fmi2_import_free_variable_list(varList);
+
+    return md;
 }
-
-
-std::string fmi2_model_description::get_guid()
-{
-    return guid_;
-}
-
-std::string fmi2_model_description::get_author()
-{
-    return author_;
-}
-
-
-std::string fmi2_model_description::get_fmi_version()
-{
-    return fmiVersion_;
-}
-
-std::string fmi2_model_description::get_model_name()
-{
-    return modelName_;
-}
-
-
-std::string fmi2_model_description::get_description()
-{
-    return description_;
-}
-
-std::string fmi2_model_description::get_generation_tool()
-{
-    return generationTool_;
-}
-
-std::string fmi2_model_description::get_generation_date_and_time()
-{
-    return generationDateAndTime_;
-}
-
-std::optional<default_experiment> fmi2_model_description::get_default_experiment()
-{
-    return std::optional<default_experiment>();
-}
-
-model_variables fmi2_model_description::get_model_variables()
-{
-    return modelVariables_;
-}
-
 
 } // namespace fmi

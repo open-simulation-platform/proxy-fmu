@@ -6,6 +6,8 @@
 #include <iostream>
 #include <memory>
 
+#include "simple_id.hpp"
+
 namespace fmi
 {
 
@@ -15,20 +17,25 @@ private:
     const std::filesystem::path path_;
 
 public:
-    explicit temp_dir(std::filesystem::path path)
-        : path_(std::move(path))
+    explicit temp_dir(const std::string& name)
+        : path_(std::filesystem::temp_directory_path() /= "fmu_proxy_" + name + "_" + generate_simple_id(6))
     {
+        std::filesystem::create_directories(path_);
+        std::cout << "temp_dir: " << name << std::endl;
     }
 
-    std::filesystem::path path() const
+    [[nodiscard]] std::filesystem::path path()
     {
         return path_;
     }
 
     ~temp_dir()
     {
-        std::cout << "delete temp" << std::endl;
-        std::filesystem::remove_all(path_);
+        std::error_code status;
+        std::filesystem::remove_all(path_, status);
+        if (status) {
+            std::cerr << "Failed to remove temp folder '" << path_.string() << "' " << status.message() << std::endl;
+        }
     }
 };
 

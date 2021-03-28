@@ -15,9 +15,11 @@ class fmu
 {
 
 public:
-    virtual std::shared_ptr<model_description> get_model_description() = 0;
+    [[nodiscard]] virtual const model_description &get_model_description() const = 0;
 
     virtual std::unique_ptr<slave> new_instance(std::string instanceName) = 0;
+
+    virtual ~fmu() = default;
 
 };
 
