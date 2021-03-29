@@ -33,7 +33,8 @@ endif ()
 
 set(thriftServiceDefinitions
         "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/defs.thrift"
-        "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/service.thrift")
+        "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/service.thrift"
+        "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/service_starter.thrift")
 
 # Generate FMU-proxy classes from Thrift service definitions
 foreach (def ${thriftServiceDefinitions})
