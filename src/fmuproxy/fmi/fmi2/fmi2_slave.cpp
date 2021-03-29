@@ -7,14 +7,14 @@
 #include <memory>
 
 
-namespace fmi
+namespace fmuproxy::fmi
 {
 
 fmi2_slave::fmi2_slave(
     fmi2_import_t* fmu,
     const std::string& instanceName,
     model_description md,
-    std::shared_ptr<temp_dir> tmpDir)
+    std::shared_ptr<fmuproxy::util::temp_dir> tmpDir)
     : fmu_(fmu)
     , md_(std::move(md))
     , tmpDir_(std::move(tmpDir))
@@ -100,6 +100,34 @@ void fmi2_slave::get_boolean(const std::vector<value_ref>& vr, std::vector<bool>
     for (auto i = 0; i < tmp.size(); i++) {
         values[i] = tmp[i] != 0;
     }
+}
+
+void fmi2_slave::set_integer(const std::vector<value_ref>& vr, const std::vector<int>& values)
+{
+    fmi2_import_set_integer(fmu_, vr.data(), vr.size(), values.data());
+}
+
+void fmi2_slave::set_real(const std::vector<value_ref>& vr, const std::vector<double>& values)
+{
+    fmi2_import_set_real(fmu_, vr.data(), vr.size(), values.data());
+}
+
+void fmi2_slave::set_string(const std::vector<value_ref>& vr, const std::vector<std::string>& values)
+{
+    std::vector<fmi2_string_t> _values(vr.size());
+    for (auto i = 0; i < vr.size(); i++) {
+        _values[i] = values[i].c_str();
+    }
+    fmi2_import_set_string(fmu_, vr.data(), vr.size(), _values.data());
+}
+
+void fmi2_slave::set_boolean(const std::vector<value_ref>& vr, const std::vector<bool>& values)
+{
+    std::vector<fmi2_boolean_t> _values(vr.size());
+    for (auto i = 0; i < vr.size(); i++) {
+        _values[i] = values[i];
+    }
+    fmi2_import_set_boolean(fmu_, vr.data(), vr.size(), _values.data());
 }
 
 fmi2_slave::~fmi2_slave()

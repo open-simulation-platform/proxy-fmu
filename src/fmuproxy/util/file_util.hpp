@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <string>
 
-namespace {
+namespace fmuproxy::util {
 
     void write_data(std::string const &fileName, std::string const &data) {
 

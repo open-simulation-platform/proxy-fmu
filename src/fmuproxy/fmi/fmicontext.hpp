@@ -3,6 +3,7 @@
 #define FMU_PROXY_FMICONTEXT_HPP
 
 #include "fmilib.h"
+
 #include <memory>
 
 namespace
@@ -35,8 +36,9 @@ std::unique_ptr<jm_callbacks> make_callbacks()
 
 } // namespace
 
-namespace fmi
+namespace fmuproxy::fmi
 {
+
 class fmicontext
 {
 private:
@@ -50,11 +52,12 @@ public:
         , ctx_(fmi_import_allocate_context(callbacks_.get()))
     { }
 
-    ~fmicontext() {
+    ~fmicontext()
+    {
         fmi_import_free_context(ctx_);
     }
-
 };
-} // namespace fmi
+
+} // namespace fmuproxy::fmi
 
 #endif //FMU_PROXY_FMICONTEXT_HPP

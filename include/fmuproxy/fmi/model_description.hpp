@@ -2,12 +2,12 @@
 #ifndef FMU_PROXY_MODEL_DESCRIPTION_HPP
 #define FMU_PROXY_MODEL_DESCRIPTION_HPP
 
-#include <vector>
+#include <fmuproxy/fmi/scalar_variable.hpp>
+
 #include <optional>
+#include <vector>
 
-#include <fmi/scalar_variable.hpp>
-
-namespace fmi
+namespace fmuproxy::fmi
 {
 
 struct default_experiment
@@ -31,9 +31,8 @@ struct model_description
 
     model_variables model_variables;
     default_experiment default_experiment;
-
 };
 
-} // namespace fmi
+} // namespace fmuproxy::fmi
 
 #endif //FMU_PROXY_MODEL_DESCRIPTION_HPP

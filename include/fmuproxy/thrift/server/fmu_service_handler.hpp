@@ -2,7 +2,7 @@
 #ifndef FMU_PROXY_THRIFT_FMUSERVICEHANDLER_HPP
 #define FMU_PROXY_THRIFT_FMUSERVICEHANDLER_HPP
 
-#include <fmi/fmu.hpp>
+#include <fmuproxy/fmi/fmu.hpp>
 #include <fmuproxy/thrift/FmuService.h>
 
 namespace fmuproxy::thrift::server
@@ -12,11 +12,10 @@ class fmu_service_handler : virtual public FmuServiceIf
 {
 
 private:
-    std::unique_ptr<fmi::fmu> fmu_;
-    std::unique_ptr<fmi::slave> slave_;
+    std::unique_ptr<fmuproxy::fmi::fmu> fmu_;
+    std::unique_ptr<fmuproxy::fmi::slave> slave_;
 
 public:
-
     explicit fmu_service_handler(const std::string& fmu);
 
     void get_model_description(ModelDescription& _return) override;
@@ -38,7 +37,6 @@ public:
     Status::type write_real(const ValueReferences& vr, const RealArray& value) override;
     Status::type write_string(const ValueReferences& vr, const StringArray& value) override;
     Status::type write_boolean(const ValueReferences& vr, const BooleanArray& value) override;
-
 };
 
 } // namespace fmuproxy::thrift::server

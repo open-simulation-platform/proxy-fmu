@@ -4,12 +4,12 @@
 
 
 #include "../fmicontext.hpp"
-#include "../temp_dir.hpp"
+#include "../../util/temp_dir.hpp"
 
-#include <fmi/fmu.hpp>
+#include <fmuproxy/fmi/fmu.hpp>
 #include <fmilib.h>
 
-namespace fmi
+namespace fmuproxy::fmi
 {
 
 class fmi2_fmu : public fmu
@@ -20,10 +20,10 @@ private:
     std::unique_ptr<fmicontext> ctx_;
 
     const model_description md_;
-    std::shared_ptr<temp_dir> tmpDir_;
+    std::shared_ptr<fmuproxy::util::temp_dir> tmpDir_;
 
 public:
-    fmi2_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<temp_dir> tmpDir);
+    fmi2_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<fmuproxy::util::temp_dir> tmpDir);
 
     [[nodiscard]] const model_description& get_model_description() const override;
 

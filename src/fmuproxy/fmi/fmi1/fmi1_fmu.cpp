@@ -1,7 +1,8 @@
 #include "fmi1_fmu.hpp"
+
 #include "fmi1_model_description.hpp"
-#include <fmilib.h>
 #include "fmi1_slave.hpp"
+#include <fmilib.h>
 
 namespace
 {
@@ -14,10 +15,10 @@ void fmilogger(fmi1_component_t c, fmi1_string_t instanceName, fmi1_status_t sta
 }
 } // namespace
 
-namespace fmi
+namespace fmuproxy::fmi
 {
 
-fmi1_fmu::fmi1_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<temp_dir> tmpDir)
+fmi1_fmu::fmi1_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<fmuproxy::util::temp_dir> tmpDir)
     : ctx_(std::move(ctx))
     , handle_(fmi1_import_parse_xml(ctx->ctx_, tmpDir->path().string().c_str()))
     , tmpDir_(std::move(tmpDir))

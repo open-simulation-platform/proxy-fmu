@@ -1,15 +1,17 @@
 
-#include <fmi/fmu.hpp>
-#include "fmi/temp_dir.hpp"
+#include <fmuproxy/fmi/fmu.hpp>
+#include "fmuproxy/util//temp_dir.hpp"
 
 #include <exception>
 #include <iostream>
+
+using namespace fmuproxy::fmi;
 
 void run() {
 
     std::string fmuPath("../fmus/2.0/cs/20sim/4.6.4.8004/ControlledTemperature/ControlledTemperature.fmu");
 
-    auto fmu = fmi::loadFmu(fmuPath);
+    auto fmu = loadFmu(fmuPath);
 
     auto md = fmu->get_model_description();
     std::cout << "GUID=" << md.guid << std::endl;
@@ -23,9 +25,9 @@ void run() {
     for (auto& v : mv) {
         auto attr = v.typeAttribute;
         if (v.is_real()) {
-            auto start = std::get<fmi::real>(attr).start;
+            auto start = std::get<real>(attr).start;
             if (start) {
-                std::cout << "start=" << std::get<fmi::real>(attr).start.value() << std::endl;
+                std::cout << "start=" << std::get<real>(attr).start.value() << std::endl;
             }
         }
     }

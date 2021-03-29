@@ -4,9 +4,6 @@
 #include <boost/program_options.hpp>
 
 #include <iostream>
-#include <memory>
-#include <optional>
-#include <unordered_map>
 
 using fmuproxy::thrift::server::thrift_fmu_server;
 

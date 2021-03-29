@@ -4,15 +4,15 @@ include_directories(${includeDir})
 #######################FMI##############################
 
 set(FMI_SRC
-        fmi/fmu.cpp
+        fmuproxy/fmi/fmu.cpp
 
-        fmi/fmi1/fmi1_fmu.cpp
-        fmi/fmi1/fmi1_slave.cpp
-        fmi/fmi1/fmi1_model_description.cpp
+        fmuproxy/fmi/fmi1/fmi1_fmu.cpp
+        fmuproxy/fmi/fmi1/fmi1_slave.cpp
+        fmuproxy/fmi/fmi1/fmi1_model_description.cpp
 
-        fmi/fmi2/fmi2_fmu.cpp
-        fmi/fmi2/fmi2_slave.cpp
-        fmi/fmi2/fmi2_model_description.cpp
+        fmuproxy/fmi/fmi2/fmi2_fmu.cpp
+        fmuproxy/fmi/fmi2/fmi2_slave.cpp
+        fmuproxy/fmi/fmi2/fmi2_model_description.cpp
         )
 
 add_library(fmi ${FMI_SRC})

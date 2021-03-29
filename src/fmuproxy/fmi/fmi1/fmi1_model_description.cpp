@@ -4,41 +4,41 @@
 namespace
 {
 
-std::optional<fmi::scalar_variable> to_scalar_variable(fmi1_import_variable_t* v)
+std::optional<fmuproxy::fmi::scalar_variable> to_scalar_variable(fmi1_import_variable_t* v)
 {
     const auto type = fmi1_import_get_variable_base_type(v);
     if (type == fmi1_base_type_enum) {
         return std::nullopt;
     }
 
-    fmi::scalar_variable var;
+    fmuproxy::fmi::scalar_variable var;
     var.vr = fmi1_import_get_variable_vr(v);
     var.name = fmi1_import_get_variable_name(v);
 
     switch (type) {
         case fmi1_base_type_real: {
-            fmi::real r;
+            fmuproxy::fmi::real r;
             if (fmi1_import_get_variable_has_start(v)) {
                 r.start = fmi1_import_get_real_variable_start(fmi1_import_get_variable_as_real(v));
             }
             var.typeAttribute = r;
         } break;
         case fmi1_base_type_int: {
-            fmi::integer i;
+            fmuproxy::fmi::integer i;
             if (fmi1_import_get_variable_has_start(v)) {
                 i.start = fmi1_import_get_integer_variable_start(fmi1_import_get_variable_as_integer(v));
             }
             var.typeAttribute = i;
         } break;
         case fmi1_base_type_bool: {
-            fmi::boolean b;
+            fmuproxy::fmi::boolean b;
             if (fmi1_import_get_variable_has_start(v)) {
                 b.start = fmi1_import_get_boolean_variable_start(fmi1_import_get_variable_as_boolean(v));
             }
             var.typeAttribute = b;
         } break;
         case fmi1_base_type_str: {
-            fmi::string s;
+            fmuproxy::fmi::string s;
             if (fmi1_import_get_variable_has_start(v)) {
                 s.start = fmi1_import_get_string_variable_start(fmi1_import_get_variable_as_string(v));
             }
@@ -51,7 +51,7 @@ std::optional<fmi::scalar_variable> to_scalar_variable(fmi1_import_variable_t* v
 
 } // namespace
 
-namespace fmi
+namespace fmuproxy::fmi
 {
 
 model_description create_model_description(fmi1_import_t* handle)
@@ -85,4 +85,4 @@ model_description create_model_description(fmi1_import_t* handle)
     return md;
 }
 
-} // namespace fmi
+} // namespace fmuproxy::fmi

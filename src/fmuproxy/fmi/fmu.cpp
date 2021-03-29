@@ -1,5 +1,5 @@
 
-#include "temp_dir.hpp"
+#include "../util/temp_dir.hpp"
 
 #include "fmi1/fmi1_fmu.hpp"
 #include "fmi2/fmi2_fmu.hpp"
@@ -10,8 +10,7 @@
 
 namespace fs = std::filesystem;
 
-
-namespace fmi
+namespace fmuproxy::fmi
 {
 
 std::unique_ptr<fmu> loadFmu(const std::filesystem::path& fmuPath)
@@ -20,7 +19,7 @@ std::unique_ptr<fmu> loadFmu(const std::filesystem::path& fmuPath)
     auto ctx = std::make_unique<fmicontext>();
 
     const std::string fmuName = fs::path(fmuPath).stem().string();
-    auto tmp = std::make_shared<temp_dir>(fmuName);
+    auto tmp = std::make_shared<fmuproxy::util::temp_dir>(fmuName);
 
     fmi_version_enu_t version = fmi_import_get_fmi_version(ctx->ctx_, fmuPath.string().c_str(), tmp->path().string().c_str());
     if (version == fmi_version_1_enu) {
@@ -36,4 +35,4 @@ std::unique_ptr<fmu> loadFmu(const std::filesystem::path& fmuPath)
     return nullptr;
 }
 
-} // namespace fmi
+} // namespace fmuproxy::fmi

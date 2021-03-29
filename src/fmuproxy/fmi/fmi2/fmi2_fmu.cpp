@@ -18,10 +18,10 @@ void fmilogger(fmi2_component_t c, fmi2_string_t instanceName, fmi2_status_t sta
 }
 } // namespace
 
-namespace fmi
+namespace fmuproxy::fmi
 {
 
-fmi2_fmu::fmi2_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<temp_dir> tmpDir)
+fmi2_fmu::fmi2_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<fmuproxy::util::temp_dir> tmpDir)
     : ctx_(std::move(ctx))
     , handle_(fmi2_import_parse_xml(ctx->ctx_, tmpDir->path().string().c_str(), nullptr))
     , md_(create_model_description(handle_))

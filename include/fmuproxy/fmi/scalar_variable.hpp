@@ -2,9 +2,12 @@
 #ifndef FMU_PROXY_SCALAR_VARIABLE_HPP
 #define FMU_PROXY_SCALAR_VARIABLE_HPP
 
+#include <optional>
 #include <variant>
+#include <string>
+#include <vector>
 
-namespace fmi
+namespace fmuproxy::fmi
 {
 
 struct real
@@ -38,26 +41,29 @@ struct scalar_variable
     std::optional<std::string> variability;
     type_attribute typeAttribute;
 
-    bool is_real() {
+    bool is_real()
+    {
         return typeAttribute.index() == 0;
     }
 
-    bool is_integer() {
+    bool is_integer()
+    {
         return typeAttribute.index() == 1;
     }
 
-    bool is_string() {
+    bool is_string()
+    {
         return typeAttribute.index() == 2;
     }
 
-    bool is_boolean() {
+    bool is_boolean()
+    {
         return typeAttribute.index() == 3;
     }
-
 };
 
 using model_variables = std::vector<scalar_variable>;
 
-} // namespace fmi
+} // namespace fmuproxy::fmi
 
 #endif //FMU_PROXY_SCALAR_VARIABLE_HPP

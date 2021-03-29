@@ -25,7 +25,7 @@ std::string generate_simple_id(const int len)
 
 } // namespace
 
-namespace fmi
+namespace fmuproxy::util
 {
 
 class temp_dir

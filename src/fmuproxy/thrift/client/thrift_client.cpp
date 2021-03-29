@@ -13,39 +13,28 @@ using namespace fmuproxy::thrift::client;
 namespace
 {
 
-//ScalarVariableAttribute convert(const fmi::type_attribute &type) {
-//    ScalarVariableAttribute attr;
-//    if (type.)
-//    RealAttribute ra;
-//    auto real = std::get<fmi::real>(_a);
-//    if (real.start) {
-//        a.__set_start(real.start.value());
-//    }
-//    return a;
-//}
-
-void set_attribute(fmi::scalar_variable& v, const ScalarVariableAttribute& attr)
+void set_attribute(fmuproxy::fmi::scalar_variable& v, const ScalarVariableAttribute& attr)
 {
     if (attr.__isset.real_attribute) {
-        fmi::real type;
+        fmuproxy::fmi::real type;
         if (attr.real_attribute.__isset.start) {
             type.start = attr.real_attribute.start;
         }
         v.typeAttribute = type;
     } else if (attr.__isset.integer_attribute) {
-        fmi::integer type;
+        fmuproxy::fmi::integer type;
         if (attr.integer_attribute.__isset.start) {
             type.start = attr.integer_attribute.start;
         }
         v.typeAttribute = type;
     } else if (attr.__isset.string_attribute) {
-        fmi::string type;
+        fmuproxy::fmi::string type;
         if (attr.string_attribute.__isset.start) {
             type.start = attr.string_attribute.start;
         }
         v.typeAttribute = type;
     } else if (attr.__isset.boolean_attribute) {
-        fmi::boolean type;
+        fmuproxy::fmi::boolean type;
         if (attr.boolean_attribute.__isset.start) {
             type.start = attr.boolean_attribute.start;
         }
@@ -55,7 +44,7 @@ void set_attribute(fmi::scalar_variable& v, const ScalarVariableAttribute& attr)
     }
 }
 
-void make_model_description(fmi::model_description& _return, const ModelDescription& md)
+void make_model_description(fmuproxy::fmi::model_description& _return, const ModelDescription& md)
 {
     _return.guid = md.guid;
     _return.author = md.author;
@@ -67,7 +56,7 @@ void make_model_description(fmi::model_description& _return, const ModelDescript
     _return.generation_date_and_time = md.generation_date_and_time;
 
     for (auto& _v : md.model_variables) {
-        fmi::scalar_variable v;
+        fmuproxy::fmi::scalar_variable v;
         v.name = _v.name;
         v.vr = _v.value_reference;
 

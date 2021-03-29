@@ -8,7 +8,7 @@ using namespace fmuproxy::thrift::server;
 namespace
 {
 
-void make_model_description(ModelDescription& _return, const fmi::model_description& md)
+void make_model_description(ModelDescription& _return, const fmuproxy::fmi::model_description& md)
 {
     _return.guid = md.guid;
     _return.author = md.author;
