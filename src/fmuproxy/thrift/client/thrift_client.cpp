@@ -82,7 +82,7 @@ thrift_client::thrift_client(const std::string& host, const int port)
     make_model_description(modelDescription_, md);
 }
 
-const fmi::model_description& thrift_client::get_model_description() const
+const fmuproxy::fmi::model_description& thrift_client::get_model_description() const
 {
     return modelDescription_;
 }

@@ -22,19 +22,19 @@ enum Status {
 }
 
 struct IntegerAttribute {
-    1: i32 start,
+    1: optional i32 start,
 }
 
 struct RealAttribute {
-    1: double start
+    1: optional double start
 }
 
 struct StringAttribute {
-    1: string start
+    1: optional string start
 }
 
 struct BooleanAttribute {
-    1: bool start
+    1: optional bool start
 }
 
 union ScalarVariableAttribute {

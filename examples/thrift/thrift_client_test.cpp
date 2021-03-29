@@ -17,6 +17,19 @@ int main() {
         auto md = client.get_model_description();
         std::cout << "GUID=" << md.guid << std::endl;
 
+        auto mv = md.model_variables;
+        std::cout << mv.size() << std::endl;
+
+        for (const auto& v : mv) {
+            auto attr = v.typeAttribute;
+            if (v.is_real()) {
+                auto start = std::get<fmuproxy::fmi::real>(attr).start;
+                if (start) {
+                    std::cout << "start=" << std::get<fmuproxy::fmi::real>(attr).start.value() << std::endl;
+                }
+            }
+        }
+
         client.close();
 
     } catch (TException& tx) {

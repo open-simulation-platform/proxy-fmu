@@ -41,22 +41,22 @@ struct scalar_variable
     std::optional<std::string> variability;
     type_attribute typeAttribute;
 
-    bool is_real()
+    [[nodiscard]] bool is_real() const
     {
         return typeAttribute.index() == 0;
     }
 
-    bool is_integer()
+    [[nodiscard]] bool is_integer() const
     {
         return typeAttribute.index() == 1;
     }
 
-    bool is_string()
+    [[nodiscard]] bool is_string() const
     {
         return typeAttribute.index() == 2;
     }
 
-    bool is_boolean()
+    [[nodiscard]] bool is_boolean() const
     {
         return typeAttribute.index() == 3;
     }
