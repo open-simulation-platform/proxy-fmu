@@ -37,6 +37,23 @@ struct scalar_variable
     std::optional<std::string> causality;
     std::optional<std::string> variability;
     type_attribute typeAttribute;
+
+    bool is_real() {
+        return typeAttribute.index() == 0;
+    }
+
+    bool is_integer() {
+        return typeAttribute.index() == 1;
+    }
+
+    bool is_string() {
+        return typeAttribute.index() == 2;
+    }
+
+    bool is_boolean() {
+        return typeAttribute.index() == 3;
+    }
+
 };
 
 using model_variables = std::vector<scalar_variable>;

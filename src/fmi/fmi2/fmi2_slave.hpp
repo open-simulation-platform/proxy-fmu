@@ -31,11 +31,19 @@ public:
 
     [[nodiscard]] model_description get_model_description() const override;
     void setup_experiment(double start_time, double stop_time, double tolerance) override;
+
     void enter_initialization_mode() override;
     void exit_initialization_mode() override;
     void step(double current_time, double step_size) override;
+
     void terminate() override;
     void freeInstance() override;
+
+    void get_integer(const std::vector<value_ref> &vr, std::vector<int> &values) override;
+    void get_real(const std::vector<value_ref> &vr, std::vector<double> &values) override;
+    void get_string(const std::vector<value_ref> &vr, std::vector<std::string> &values) override;
+    void get_boolean(const std::vector<value_ref> &vr, std::vector<bool> &values) override;
+
     ~fmi2_slave() override;
 
 };

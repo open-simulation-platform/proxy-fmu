@@ -10,9 +10,53 @@ using namespace apache::thrift::protocol;
 using namespace fmuproxy::thrift;
 using namespace fmuproxy::thrift::client;
 
-namespace {
+namespace
+{
 
-void make_model_description(fmi::model_description &_return, const ModelDescription &md) {
+//ScalarVariableAttribute convert(const fmi::type_attribute &type) {
+//    ScalarVariableAttribute attr;
+//    if (type.)
+//    RealAttribute ra;
+//    auto real = std::get<fmi::real>(_a);
+//    if (real.start) {
+//        a.__set_start(real.start.value());
+//    }
+//    return a;
+//}
+
+void set_attribute(fmi::scalar_variable& v, const ScalarVariableAttribute& attr)
+{
+    if (attr.__isset.real_attribute) {
+        fmi::real type;
+        if (attr.real_attribute.__isset.start) {
+            type.start = attr.real_attribute.start;
+        }
+        v.typeAttribute = type;
+    } else if (attr.__isset.integer_attribute) {
+        fmi::integer type;
+        if (attr.integer_attribute.__isset.start) {
+            type.start = attr.integer_attribute.start;
+        }
+        v.typeAttribute = type;
+    } else if (attr.__isset.string_attribute) {
+        fmi::string type;
+        if (attr.string_attribute.__isset.start) {
+            type.start = attr.string_attribute.start;
+        }
+        v.typeAttribute = type;
+    } else if (attr.__isset.boolean_attribute) {
+        fmi::boolean type;
+        if (attr.boolean_attribute.__isset.start) {
+            type.start = attr.boolean_attribute.start;
+        }
+        v.typeAttribute = type;
+    } else {
+        //TODO
+    }
+}
+
+void make_model_description(fmi::model_description& _return, const ModelDescription& md)
+{
     _return.guid = md.guid;
     _return.author = md.author;
     _return.model_name = md.model_name;
@@ -21,9 +65,19 @@ void make_model_description(fmi::model_description &_return, const ModelDescript
     _return.model_identifier = md.model_identifier;
     _return.generation_tool = md.generation_tool;
     _return.generation_date_and_time = md.generation_date_and_time;
+
+    for (auto& _v : md.model_variables) {
+        fmi::scalar_variable v;
+        v.name = _v.name;
+        v.vr = _v.value_reference;
+
+        set_attribute(v, _v.attribute);
+
+        _return.model_variables.emplace_back(v);
+    }
 }
 
-}
+} // namespace
 
 thrift_client::thrift_client(const std::string& host, const int port)
 {
@@ -37,15 +91,14 @@ thrift_client::thrift_client(const std::string& host, const int port)
     client_->get_model_description(md);
 
     make_model_description(modelDescription_, md);
-
 }
 
-const fmi::model_description &thrift_client::get_model_description() const
+const fmi::model_description& thrift_client::get_model_description() const
 {
     return modelDescription_;
 }
 
-void thrift_client::new_instance(const std::string &name)
+void thrift_client::new_instance(const std::string& name)
 {
     client_->create_instance(name);
 }

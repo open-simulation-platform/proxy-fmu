@@ -74,6 +74,34 @@ void fmi2_slave::freeInstance()
     }
 }
 
+void fmi2_slave::get_integer(const std::vector<value_ref> &vr, std::vector<int> &values)
+{
+    fmi2_import_get_integer(fmu_, vr.data(), vr.size(), values.data());
+}
+
+void fmi2_slave::get_real(const std::vector<value_ref>& vr, std::vector<double>& values)
+{
+    fmi2_import_get_real(fmu_, vr.data(), vr.size(), values.data());
+}
+
+void fmi2_slave::get_string(const std::vector<value_ref>& vr, std::vector<std::string>& values)
+{
+    auto tmp = std::vector<fmi2_string_t>(vr.size());
+    fmi2_import_get_string(fmu_, vr.data(), vr.size(), tmp.data());
+    for (auto i = 0; i < tmp.size(); i++) {
+        values[i] = tmp[i];
+    }
+}
+
+void fmi2_slave::get_boolean(const std::vector<value_ref>& vr, std::vector<bool>& values)
+{
+    auto tmp = std::vector<fmi2_boolean_t>(vr.size());
+    fmi2_import_get_boolean(fmu_, vr.data(), vr.size(), tmp.data());
+    for (auto i = 0; i < tmp.size(); i++) {
+        values[i] = tmp[i] != 0;
+    }
+}
+
 fmi2_slave::~fmi2_slave()
 {
     fmi2_slave::freeInstance();

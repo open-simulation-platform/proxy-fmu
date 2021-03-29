@@ -39,7 +39,14 @@ public:
     void step(double current_time, double step_size) override;
     void terminate() override;
     void freeInstance() override;
+
+    void get_integer(const std::vector<value_ref> &vr, std::vector<int> &values) override;
+    void get_real(const std::vector<value_ref> &vr, std::vector<double> &values) override;
+    void get_string(const std::vector<value_ref> &vr, std::vector<std::string> &values) override;
+    void get_boolean(const std::vector<value_ref> &vr, std::vector<bool> &values) override;
+
     ~fmi1_slave() override;
+
 };
 
 } // namespace fmi

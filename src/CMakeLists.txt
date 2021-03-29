@@ -1,6 +1,26 @@
 set(includeDir ${FMU_PROXY_SOURCE_DIR}/include)
 include_directories(${includeDir})
 
+#######################FMI##############################
+
+set(FMI_SRC
+        fmi/fmu.cpp
+
+        fmi/fmi1/fmi1_fmu.cpp
+        fmi/fmi1/fmi1_slave.cpp
+        fmi/fmi1/fmi1_model_description.cpp
+
+        fmi/fmi2/fmi2_fmu.cpp
+        fmi/fmi2/fmi2_slave.cpp
+        fmi/fmi2/fmi2_model_description.cpp
+        )
+
+add_library(fmi ${FMI_SRC})
+target_compile_features(fmi PUBLIC "cxx_std_17")
+target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
+
+#######################THRIFT##############################
+
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 set(thriftSourcesDir "${generatedSourcesDir}/fmuproxy/thrift")
 
@@ -52,27 +72,7 @@ set(THRIFT_SERVER_HEADERS
         ${includeDir}/fmuproxy/thrift/server/fmu_service_handler.hpp
         ${includeDir}/fmuproxy/thrift/server/thrift_fmu_server.hpp)
 
-set(FMI_SRC
-        fmi/fmu.cpp
-
-        fmi/fmi1/fmi1_fmu.cpp
-        fmi/fmi1/fmi1_slave.cpp
-        fmi/fmi1/fmi1_model_description.cpp
-
-        fmi/fmi2/fmi2_fmu.cpp
-        fmi/fmi2/fmi2_slave.cpp
-        fmi/fmi2/fmi2_model_description.cpp
-        )
-
-add_library(fmi ${FMI_SRC})
-target_compile_features(fmi PUBLIC "cxx_std_17")
-target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
-target_include_directories(fmi PRIVATE ${Boost_INCLUDE_DIRS})
-target_compile_definitions(fmi PRIVATE "BOOST_ALL_DYN_LINK=1" "BOOST_ALL_NO_LIB=1" "BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE=1")
-
-if (WIN32)
-  target_link_libraries(fmi PUBLIC "Bcrypt")
-elseif (UNIX)
+if (UNIX)
   target_link_libraries(fmi PRIVATE stdc++fs dl)
 endif ()
 

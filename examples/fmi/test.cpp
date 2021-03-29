@@ -22,15 +22,12 @@ void run() {
 
     for (auto& v : mv) {
         auto attr = v.typeAttribute;
-        std::visit([](fmi::type_attribute&& attr) {
-                       if (std::holds_alternative<fmi::real>(attr)) {
-                           auto start = std::get<fmi::real>(attr).start;
-                           if (start) {
-                               std::cout << "start=" << std::get<fmi::real>(attr).start.value() << std::endl;
-                           }
-                       }
-                   },
-                   attr);
+        if (v.is_real()) {
+            auto start = std::get<fmi::real>(attr).start;
+            if (start) {
+                std::cout << "start=" << std::get<fmi::real>(attr).start.value() << std::endl;
+            }
+        }
     }
 
     auto slave = fmu->new_instance("instance");
