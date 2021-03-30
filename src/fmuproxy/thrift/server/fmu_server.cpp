@@ -1,4 +1,4 @@
-#include <fmuproxy/thrift/server/thrift_fmu_server.hpp>
+#include <fmuproxy/thrift/server/fmu_server.hpp>
 
 #include <thrift/concurrency/ThreadManager.h>
 #include <thrift/server/TNonblockingServer.h>
@@ -16,7 +16,7 @@ using namespace ::apache::thrift::protocol;
 using namespace ::apache::thrift::transport;
 
 
-thrift_fmu_server::thrift_fmu_server(const std::string& fmu, const int port): port_(port)
+fmu_server::fmu_server(const std::string& fmu, const int port): port_(port)
 {
     std::shared_ptr<fmu_service_handler> handler(new fmu_service_handler(fmu));
     std::shared_ptr<TProcessor> processor(new FmuServiceProcessor(handler));
@@ -28,18 +28,18 @@ thrift_fmu_server::thrift_fmu_server(const std::string& fmu, const int port): po
     server_ = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
 }
 
-void thrift_fmu_server::serve()
+void fmu_server::serve()
 {
     server_->serve();
 }
 
-void thrift_fmu_server::start()
+void fmu_server::start()
 {
     std::cout << "FMU-proxy server listening to connections on port: " << std::to_string(port_) << std::endl;
-    thread_ = std::make_unique<std::thread>(&thrift_fmu_server::serve, this);
+    thread_ = std::make_unique<std::thread>(&fmu_server::serve, this);
 }
 
-void thrift_fmu_server::stop()
+void fmu_server::stop()
 {
     server_->stop();
     thread_->join();

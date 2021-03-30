@@ -20,7 +20,7 @@ public:
         double stop_time = 0,
         double tolerance = 0) = 0;
 
-    [[nodiscard]] virtual const model_description &get_model_description() const = 0;
+    [[nodiscard]] virtual const model_description& get_model_description() const = 0;
 
     virtual void enter_initialization_mode() = 0;
     virtual void exit_initialization_mode() = 0;

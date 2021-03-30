@@ -1,6 +1,6 @@
 
-#ifndef FMU_PROXY_THRIFT_THRIFTFMUSERVER_HPP
-#define FMU_PROXY_THRIFT_THRIFTFMUSERVER_HPP
+#ifndef FMU_PROXY_THRIFTFMUSERVER_HPP
+#define FMU_PROXY_THRIFTFMUSERVER_HPP
 
 #include "fmu_service_handler.hpp"
 
@@ -12,7 +12,7 @@
 namespace fmuproxy::server
 {
 
-class thrift_fmu_server
+class fmu_server
 {
 
 private:
@@ -23,13 +23,13 @@ private:
     void serve();
 
 public:
-    thrift_fmu_server(const std::string& fmu, int port);
+    fmu_server(const std::string& fmu, int port);
 
     void start();
 
     void stop();
 };
 
-} // namespace fmuproxy::thrift::server
+} // namespace fmuproxy::server
 
-#endif //FMU_PROXY_THRIFTSERVER_H
+#endif //FMU_PROXY_THRIFTFMUSERVER_HPP

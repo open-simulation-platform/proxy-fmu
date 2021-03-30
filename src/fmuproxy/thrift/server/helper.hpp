@@ -1,6 +1,6 @@
 
-#ifndef FMU_PROXY_THRIFT_SERVER_HELPER_HPP
-#define FMU_PROXY_THRIFT_SERVER_HELPER_HPP
+#ifndef FMU_PROXY_SERVER_HELPER_HPP
+#define FMU_PROXY_SERVER_HELPER_HPP
 
 #include <fmuproxy/fmi/model_description.hpp>
 #include <fmuproxy/thrift/FmuService.h>
@@ -62,4 +62,4 @@ void make_model_description(ModelDescription& _return, const fmi::model_descript
 } // namespace
 
 
-#endif //FMU_PROXY_THRIFT_SERVER_HELPER_HPP
+#endif //FMU_PROXY_SERVER_HELPER_HPP

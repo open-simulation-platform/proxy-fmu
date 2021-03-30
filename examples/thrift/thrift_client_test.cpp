@@ -1,8 +1,8 @@
 
-#include <iostream>
-#include <exception>
+#include <fmuproxy/thrift/client/proxy_client.hpp>
 
-#include <fmuproxy/thrift/client/thrift_client.hpp>
+#include <exception>
+#include <iostream>
 
 using namespace fmuproxy;
 using namespace fmuproxy::client;
@@ -11,7 +11,7 @@ int main() {
 
     try {
 
-        thrift_client client("localhost", 9090);
+        proxy_client client("localhost", 9090);
 
         auto md = client.get_model_description();
         std::cout << "GUID=" << md.guid << std::endl;

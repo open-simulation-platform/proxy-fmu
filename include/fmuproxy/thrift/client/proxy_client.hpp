@@ -1,16 +1,16 @@
 
-#ifndef FMU_PROXY_THRIFT_CLIENT_HPP
-#define FMU_PROXY_THRIFT_CLIENT_HPP
+#ifndef FMU_PROXY_PROXY_CLIENT_HPP
+#define FMU_PROXY_PROXY_CLIENT_HPP
+
+#include <fmuproxy/fmi/model_description.hpp>
+#include <fmuproxy/fmi/slave.hpp>
 
 #include <memory>
-
-#include <fmuproxy/fmi/slave.hpp>
-#include <fmuproxy/fmi/model_description.hpp>
 
 namespace fmuproxy::client
 {
 
-class thrift_client
+class proxy_client
 {
 
 private:
@@ -18,17 +18,17 @@ private:
     std::unique_ptr<Impl> pimpl_;
 
 public:
-    thrift_client(const std::string& host, int port);
+    proxy_client(const std::string& host, int port);
 
     [[nodiscard]] const fmi::model_description& get_model_description() const;
 
     std::unique_ptr<fmi::slave> new_instance(const std::string& name);
 
     void close();
-    ~thrift_client();
+    ~proxy_client();
 };
 
-} // namespace fmuproxy::thrift::client
+} // namespace fmuproxy::client
 
 
-#endif //FMU_PROXY_THRIFT_CLIENT_HPP
+#endif //FMU_PROXY_PROXY_CLIENT_HPP

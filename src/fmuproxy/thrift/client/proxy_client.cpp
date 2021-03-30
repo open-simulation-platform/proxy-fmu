@@ -1,13 +1,12 @@
 
-#include "fmuproxy/thrift/client/thrift_client.hpp"
-#include <fmuproxy/thrift/FmuService.h>
+#include "fmuproxy/thrift/client/proxy_client.hpp"
+
+#include "helper.hpp"
+#include "remote_slave.hpp"
 
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
-
-#include "thrift_helper.hpp"
-#include "remote_slave.hpp"
 
 using namespace apache::thrift::transport;
 using namespace apache::thrift::protocol;
@@ -16,7 +15,7 @@ using namespace fmuproxy::fmi;
 using namespace fmuproxy::thrift;
 using namespace fmuproxy::client;
 
-struct thrift_client::Impl
+struct proxy_client::Impl
 {
 
     model_description modelDescription_;
@@ -37,30 +36,30 @@ struct thrift_client::Impl
     }
 };
 
-thrift_client::thrift_client(const std::string& host, const int port)
+proxy_client::proxy_client(const std::string& host, const int port)
     : pimpl_(std::make_unique<Impl>(host, port))
 {
 }
 
-const model_description& thrift_client::get_model_description() const
+const model_description& proxy_client::get_model_description() const
 {
     return pimpl_->modelDescription_;
 }
 
-std::unique_ptr<slave> thrift_client::new_instance(const std::string& name)
+std::unique_ptr<slave> proxy_client::new_instance(const std::string& name)
 {
     pimpl_->client_->create_instance(name);
     return std::make_unique<remote_slave>(pimpl_->client_, pimpl_->modelDescription_);
 }
 
-void thrift_client::close()
+void proxy_client::close()
 {
     if (pimpl_->transport_->isOpen()) {
         pimpl_->transport_->close();
     }
 }
 
-thrift_client::~thrift_client()
+proxy_client::~proxy_client()
 {
     close();
 }

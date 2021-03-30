@@ -1,6 +1,6 @@
 
-#ifndef FMU_PROXY_THRIFT_FMUSERVICEHANDLER_HPP
-#define FMU_PROXY_THRIFT_FMUSERVICEHANDLER_HPP
+#ifndef FMU_PROXY_FMUSERVICEHANDLER_HPP
+#define FMU_PROXY_FMUSERVICEHANDLER_HPP
 
 #include <fmuproxy/fmi/fmu.hpp>
 #include <fmuproxy/thrift/FmuService.h>
@@ -39,6 +39,6 @@ public:
     thrift::Status::type write_boolean(const thrift::ValueReferences& vr, const thrift::BooleanArray& value) override;
 };
 
-} // namespace fmuproxy::thrift::server
+} // namespace fmuproxy::server
 
-#endif //FMU_PROXY_THRIFT_FMUSERVICEHANDLER_HPP
+#endif //FMU_PROXY_FMUSERVICEHANDLER_HPP

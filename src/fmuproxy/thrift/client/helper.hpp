@@ -1,6 +1,6 @@
 
-#ifndef FMU_PROXY_THRIFT_CLIENT_HELPER_HPP
-#define FMU_PROXY_THRIFT_CLIENT_HELPER_HPP
+#ifndef FMU_PROXY_CLIENT_HELPER_HPP
+#define FMU_PROXY_CLIENT_HELPER_HPP
 
 #include <fmuproxy/fmi/model_description.hpp>
 #include <fmuproxy/thrift/FmuService.h>
@@ -65,4 +65,4 @@ void make_model_description(fmuproxy::fmi::model_description& _return, const Mod
 
 } // namespace fmuproxy::client
 
-#endif //FMU_PROXY_THRIFT_CLIENT_HELPER_HPP
+#endif //FMU_PROXY_CLIENT_HELPER_HPP

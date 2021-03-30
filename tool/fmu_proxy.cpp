@@ -1,11 +1,11 @@
 
-#include <fmuproxy/thrift/server/thrift_fmu_server.hpp>
+#include <fmuproxy/thrift/server/fmu_server.hpp>
 
 #include <boost/program_options.hpp>
 
 #include <iostream>
 
-using fmuproxy::server::thrift_fmu_server;
+using fmuproxy::server::fmu_server;
 
 namespace
 {
@@ -22,7 +22,7 @@ void wait_for_input()
 
 int run_application(const std::string &fmu, const int port)
 {
-    auto thrift_socket_server = std::make_unique<thrift_fmu_server>(fmu, port);
+    auto thrift_socket_server = std::make_unique<fmu_server>(fmu, port);
     thrift_socket_server->start();
 
     wait_for_input();

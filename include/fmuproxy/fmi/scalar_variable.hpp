@@ -3,8 +3,8 @@
 #define FMU_PROXY_SCALAR_VARIABLE_HPP
 
 #include <optional>
-#include <variant>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace fmuproxy::fmi

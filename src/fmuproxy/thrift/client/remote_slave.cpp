@@ -6,7 +6,8 @@
 
 using namespace fmuproxy::thrift;
 
-namespace fmuproxy::client {
+namespace fmuproxy::client
+{
 
 remote_slave::remote_slave(std::shared_ptr<FmuServiceClient> client, fmi::model_description modelDescription)
     : client_(std::move(client))
@@ -123,5 +124,4 @@ remote_slave::~remote_slave()
     remote_slave::freeInstance();
 }
 
-}
-
+} // namespace fmuproxy::client
