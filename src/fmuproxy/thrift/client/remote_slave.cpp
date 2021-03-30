@@ -1,18 +1,53 @@
 
 #include "remote_slave.hpp"
 
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/transport/TSocket.h>
+#include <thrift/transport/TTransportUtils.h>
+
+#include <iostream>
 #include <utility>
 #include <vector>
 
+using namespace ::apache::thrift;
+using namespace ::apache::thrift::protocol;
+using namespace ::apache::thrift::transport;
+
 using namespace fmuproxy::thrift;
+
+namespace
+{
+
+void start_process(const std::filesystem::path& fmu, const std::string& instanceName, const int port)
+{
+    std::string cmd(
+        "fmu_proxy"
+        " --port " +
+        std::to_string(port) +
+        " --fmu " + fmu.string() +
+        " --instanceName " + instanceName);
+    auto status = system(cmd.c_str());
+    std::cout << "External proxy process returned with status " << std::to_string(status) << std::endl;
+}
+
+} // namespace
+
 
 namespace fmuproxy::client
 {
 
-remote_slave::remote_slave(std::shared_ptr<FmuServiceClient> client, fmi::model_description modelDescription)
-    : client_(std::move(client))
-    , modelDescription_(std::move(modelDescription))
+remote_slave::remote_slave(const std::filesystem::path& fmu, const std::string& instanceName, fmi::model_description modelDescription)
+    : modelDescription_(std::move(modelDescription))
 {
+
+    const int port = 9090;
+    thread_ = std::make_unique<std::thread>(&start_process, fmu, instanceName, port);
+
+    std::shared_ptr<TTransport> socket(new TSocket("localhost", port));
+    transport_ = std::make_shared<TFramedTransport>(socket);
+    std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport_));
+    client_ = std::make_shared<FmuServiceClient>(protocol);
+    transport_->open();
 }
 
 void remote_slave::setup_experiment(double start_time, double stop_time, double tolerance)
@@ -48,7 +83,11 @@ void remote_slave::terminate()
 
 void remote_slave::freeInstance()
 {
-    client_->freeInstance();
+    if (!freed) {
+        freed = true;
+        client_->freeInstance();
+        thread_->join();
+    }
 }
 
 void remote_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values)

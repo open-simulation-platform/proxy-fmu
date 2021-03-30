@@ -1,26 +1,18 @@
+
 #include <fmuproxy/thrift/server/fmu_service_handler.hpp>
+
+#include <chrono>
+#include <thread>
+
+#include <iostream>
+#include <utility>
 
 using namespace fmuproxy::thrift;
 using namespace fmuproxy::server;
 
-#include "helper.hpp"
-
-#include <iostream>
-
-fmu_service_handler::fmu_service_handler(const std::string& fmu)
+fmu_service_handler::fmu_service_handler(const std::string& fmu, const std::string& instanceName, std::function<void()> stop)
+: fmu_(fmi::loadFmu(fmu)), slave_(fmu_->new_instance(instanceName)), instanceName_(instanceName), stop_(std::move(stop))
 {
-    fmu_ = fmi::loadFmu(fmu);
-}
-
-void fmu_service_handler::get_model_description(ModelDescription& _return)
-{
-    auto md = fmu_->get_model_description();
-    make_model_description(_return, md);
-}
-
-void fmu_service_handler::create_instance(const std::string& instanceName)
-{
-    slave_ = fmu_->new_instance(instanceName);
 }
 
 Status::type fmu_service_handler::setup_experiment(const double start, const double stop, const double tolerance)
@@ -54,6 +46,10 @@ Status::type fmu_service_handler::terminate()
 void fmu_service_handler::freeInstance()
 {
     slave_->freeInstance();
+    auto modelName = fmu_->get_model_description().model_name;
+    std::cout << "Shutting down proxy for " << modelName << "::" << instanceName_ << std::endl;
+    stop_();
+    std::cout << "done.." << std::endl;
 }
 
 

@@ -5,10 +5,6 @@ include "defs.thrift"
 
 service FmuService {
 
-    defs.ModelDescription get_model_description() throws (1: defs.NoSuchFmuException ex)
-
-    void create_instance(1: string instanceName) throws (1: defs.UnsupportedOperationException ex1, 2: defs.NoSuchFmuException ex2)
-
     defs.Status setup_experiment(1: double start, 2: double stop, 3: double tolerance) throws (1: defs.NoSuchInstanceException ex)
     defs.Status enter_initialization_mode() throws (1: defs.NoSuchInstanceException ex)
     defs.Status exit_initialization_mode() throws (1: defs.NoSuchInstanceException ex)

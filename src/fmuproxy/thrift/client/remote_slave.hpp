@@ -5,6 +5,11 @@
 #include <fmuproxy/fmi/slave.hpp>
 #include <fmuproxy/thrift/FmuService.h>
 
+#include <filesystem>
+
+using namespace apache::thrift;
+using namespace apache::thrift::transport;
+
 namespace fmuproxy::client
 {
 
@@ -12,11 +17,15 @@ class remote_slave : public fmi::slave
 {
 
 private:
-    fmi::model_description modelDescription_;
-    std::shared_ptr<fmuproxy::thrift::FmuServiceClient> client_;
+    const fmi::model_description modelDescription_;
+    std::shared_ptr<thrift::FmuServiceClient> client_;
+    std::shared_ptr<TTransport> transport_;
+    std::unique_ptr<std::thread> thread_;
+
+    bool freed = false;
 
 public:
-    remote_slave(std::shared_ptr<fmuproxy::thrift::FmuServiceClient> client, fmi::model_description modelDescription);
+    remote_slave(const std::filesystem::path& fmu, const std::string& instanceName, fmi::model_description modelDescription);
 
     [[nodiscard]] const fmi::model_description& get_model_description() const override;
 

@@ -58,11 +58,10 @@ set(generatedSources
 
 set(THRIFT_CLIENT_SRC
         fmuproxy/thrift/client/remote_slave.cpp
-        fmuproxy/thrift/client/proxy_client.cpp)
+        fmuproxy/thrift/client/proxy_fmu.cpp)
 
 set(THRIFT_SERVER_SRC
-        fmuproxy/thrift/server/fmu_service_handler.cpp
-        fmuproxy/thrift/server/fmu_server.cpp)
+        fmuproxy/thrift/server/fmu_service_handler.cpp)
 
 if (UNIX)
   target_link_libraries(fmi PRIVATE stdc++fs dl)

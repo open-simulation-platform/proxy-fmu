@@ -4,6 +4,7 @@
 
 #include <fmuproxy/fmi/fmu.hpp>
 #include <fmuproxy/thrift/FmuService.h>
+#include <functional>
 
 namespace fmuproxy::server
 {
@@ -12,14 +13,14 @@ class fmu_service_handler : virtual public thrift::FmuServiceIf
 {
 
 private:
-    std::unique_ptr<fmuproxy::fmi::fmu> fmu_;
-    std::unique_ptr<fmuproxy::fmi::slave> slave_;
+    const std::string& instanceName_;
+    std::unique_ptr<fmi::fmu> fmu_;
+    std::unique_ptr<fmi::slave> slave_;
+
+    std::function<void()> stop_;
 
 public:
-    explicit fmu_service_handler(const std::string& fmu);
-
-    void get_model_description(thrift::ModelDescription& _return) override;
-    void create_instance(const std::string& instanceName) override;
+    fmu_service_handler(const std::string& fmu, const std::string& instanceName, std::function<void()> stop);
 
     thrift::Status::type setup_experiment(double start, double stop, double tolerance) override;
     thrift::Status::type enter_initialization_mode() override;
@@ -37,6 +38,7 @@ public:
     thrift::Status::type write_real(const thrift::ValueReferences& vr, const thrift::RealArray& value) override;
     thrift::Status::type write_string(const thrift::ValueReferences& vr, const thrift::StringArray& value) override;
     thrift::Status::type write_boolean(const thrift::ValueReferences& vr, const thrift::BooleanArray& value) override;
+
 };
 
 } // namespace fmuproxy::server
