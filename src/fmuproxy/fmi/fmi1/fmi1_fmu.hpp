@@ -2,11 +2,11 @@
 #ifndef FMU_PROXY_FMI1_FMU_HPP
 #define FMU_PROXY_FMI1_FMU_HPP
 
-#include "../fmicontext.hpp"
 #include "../../util/temp_dir.hpp"
+#include "../fmicontext.hpp"
 
-#include <fmuproxy/fmi/fmu.hpp>
 #include <fmilib.h>
+#include <fmuproxy/fmi/fmu.hpp>
 
 namespace fmuproxy::fmi
 {
@@ -31,6 +31,6 @@ public:
     ~fmi1_fmu() override;
 };
 
-} // namespace fmi
+} // namespace fmuproxy::fmi
 
 #endif //FMU_PROXY_FMI2_FMU_HPP

@@ -3,7 +3,7 @@
 
 #include <fmuproxy/thrift/server/thrift_fmu_server.hpp>
 
-using namespace fmuproxy::thrift::server;
+using namespace fmuproxy::server;
 
 int main() {
 

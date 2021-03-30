@@ -29,7 +29,7 @@ public:
         model_description md,
         std::shared_ptr<fmuproxy::util::temp_dir> tmpDir);
 
-    [[nodiscard]] model_description get_model_description() const override;
+    [[nodiscard]] const model_description& get_model_description() const override;
     void setup_experiment(double start_time, double stop_time, double tolerance) override;
 
     void enter_initialization_mode() override;
@@ -52,6 +52,6 @@ public:
     ~fmi2_slave() override;
 };
 
-} // namespace fmi
+} // namespace fmuproxy::fmi
 
 #endif //FMU_PROXY_FMI2_SLAVE_HPP

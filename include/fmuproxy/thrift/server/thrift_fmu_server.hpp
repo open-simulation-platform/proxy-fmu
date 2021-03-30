@@ -9,7 +9,7 @@
 #include <thread>
 #include <unordered_map>
 
-namespace fmuproxy::thrift::server
+namespace fmuproxy::server
 {
 
 class thrift_fmu_server

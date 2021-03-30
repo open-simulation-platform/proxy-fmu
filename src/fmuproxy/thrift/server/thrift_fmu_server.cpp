@@ -8,7 +8,7 @@
 #include <iostream>
 
 using namespace fmuproxy::thrift;
-using namespace fmuproxy::thrift::server;
+using namespace fmuproxy::server;
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::server;

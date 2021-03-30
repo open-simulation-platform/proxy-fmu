@@ -33,7 +33,7 @@ fmi1_slave::fmi1_slave(
     }
 }
 
-model_description fmi1_slave::get_model_description() const
+const model_description& fmi1_slave::get_model_description() const
 {
     return md_;
 }

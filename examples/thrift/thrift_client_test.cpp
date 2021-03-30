@@ -1,12 +1,10 @@
 
 #include <iostream>
+#include <exception>
 
 #include <fmuproxy/thrift/client/thrift_client.hpp>
 
-using namespace apache::thrift;
-
-using namespace fmuproxy::thrift;
-using namespace fmuproxy::thrift::client;
+using namespace fmuproxy::client;
 
 int main() {
 
@@ -30,9 +28,13 @@ int main() {
             }
         }
 
+        auto slave = client.new_instance("instance");
+        auto md2 = slave->get_model_description();
+        std::cout << "GUID=" << md2.guid << std::endl;
+
         client.close();
 
-    } catch (TException& tx) {
+    } catch (std::exception& tx) {
         std::cout << "ERROR: " << tx.what() << std::endl;
     }
 
