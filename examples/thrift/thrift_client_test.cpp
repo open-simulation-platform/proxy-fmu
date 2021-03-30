@@ -4,6 +4,7 @@
 
 #include <fmuproxy/thrift/client/thrift_client.hpp>
 
+using namespace fmuproxy;
 using namespace fmuproxy::client;
 
 int main() {
@@ -28,9 +29,18 @@ int main() {
             }
         }
 
-        auto slave = client.new_instance("instance");
-        auto md2 = slave->get_model_description();
-        std::cout << "GUID=" << md2.guid << std::endl;
+        {
+            auto slave = client.new_instance("instance");
+            auto md2 = slave->get_model_description();
+            std::cout << "GUID=" << md2.guid << std::endl;
+            slave->setup_experiment();
+            slave->enter_initialization_mode();
+            slave->exit_initialization_mode();
+            std::vector<fmi::value_ref> vr{47};
+            std::vector<double> ref(1);
+            slave->get_real(vr, ref);
+            std::cout << "value=" << ref[0] << std::endl;
+        }
 
         client.close();
 

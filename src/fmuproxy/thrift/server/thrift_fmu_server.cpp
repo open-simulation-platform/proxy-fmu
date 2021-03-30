@@ -37,7 +37,6 @@ void thrift_fmu_server::start()
 {
     std::cout << "FMU-proxy server listening to connections on port: " << std::to_string(port_) << std::endl;
     thread_ = std::make_unique<std::thread>(&thrift_fmu_server::serve, this);
-
 }
 
 void thrift_fmu_server::stop()

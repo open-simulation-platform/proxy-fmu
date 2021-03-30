@@ -1,20 +1,13 @@
 
-#include "../example_util.hpp"
+#include <cstdlib>
 
-#include <fmuproxy/thrift/server/thrift_fmu_server.hpp>
-
-using namespace fmuproxy::server;
-
-int main() {
-
-    auto fmu = "../fmus/2.0/cs/20sim/4.6.4.8004/ControlledTemperature/ControlledTemperature.fmu";
-
-    thrift_fmu_server socket_server(fmu, 9090);
-    socket_server.start();
-
-    fmuproxy::wait_for_input();
-
-    socket_server.stop();
+int main()
+{
+    system(
+        "fmu_proxy "
+        "--port 9090 "
+        "--fmu "
+        "../fmus/2.0/cs/20sim/4.6.4.8004/ControlledTemperature/ControlledTemperature.fmu");
 
     return 0;
 }

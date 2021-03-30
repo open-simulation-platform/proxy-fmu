@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-using fmuproxy::thrift::server::thrift_fmu_server;
+using fmuproxy::server::thrift_fmu_server;
 
 namespace
 {
@@ -16,11 +16,8 @@ const int UNHANDLED_ERROR = 2;
 
 void wait_for_input()
 {
-    do {
-        std::cout << '\n'
-             << "Press a key to continue...\n";
-    } while (std::cin.get() != '\n');
-    std::cout << "Done." << std::endl;
+    std::cout << "Press a key to continue...\n";
+    while (std::cin.get() != '\n');
 }
 
 int run_application(const std::string &fmu, const int port)

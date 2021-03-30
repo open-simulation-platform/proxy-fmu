@@ -38,7 +38,6 @@ public:
         : path_(std::filesystem::temp_directory_path() /= "fmu_proxy_" + name + "_" + generate_simple_id(6))
     {
         std::filesystem::create_directories(path_);
-        std::cout << "temp_dir: " << name << std::endl;
     }
 
     [[nodiscard]] std::filesystem::path path()

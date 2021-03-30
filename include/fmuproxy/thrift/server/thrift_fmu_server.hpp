@@ -17,7 +17,6 @@ class thrift_fmu_server
 
 private:
     const int port_;
-    const std::string fmu_;
     std::unique_ptr<std::thread> thread_;
     std::unique_ptr<apache::thrift::server::TServer> server_;
 
