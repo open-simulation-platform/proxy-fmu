@@ -72,22 +72,12 @@ void remote_slave::exit_initialization_mode()
 
 void remote_slave::step(double current_time, double step_size)
 {
-    StepResult result;
-    client_->step(result, current_time, step_size);
+    client_->step(current_time, step_size);
 }
 
 void remote_slave::terminate()
 {
     client_->terminate();
-}
-
-void remote_slave::freeInstance()
-{
-    if (!freed) {
-        freed = true;
-        client_->freeInstance();
-        thread_->join();
-    }
 }
 
 void remote_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values)
@@ -156,6 +146,15 @@ void remote_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std:
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
     client_->write_boolean(_vr, values);
+}
+
+void remote_slave::freeInstance()
+{
+    if (!freed) {
+        freed = true;
+        client_->freeInstance();
+        thread_->join();
+    }
 }
 
 remote_slave::~remote_slave()

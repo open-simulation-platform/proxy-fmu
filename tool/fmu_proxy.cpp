@@ -2,9 +2,8 @@
 #include <fmuproxy/thrift/server/fmu_service_handler.hpp>
 
 #include <boost/program_options.hpp>
-#include <thrift/concurrency/ThreadManager.h>
-#include <thrift/server/TNonblockingServer.h>
 #include <thrift/server/TSimpleServer.h>
+#include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
 #include <iostream>

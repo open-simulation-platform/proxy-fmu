@@ -48,13 +48,11 @@ endforeach ()
 
 set(generatedHeaders
         "${thriftSourcesDir}/defs_types.h"
-        "${thriftSourcesDir}/FmuService.h"
-        "${thriftSourcesDir}/FmuServiceStarter.h")
+        "${thriftSourcesDir}/FmuService.h")
 
 set(generatedSources
         "${thriftSourcesDir}/defs_types.cpp"
-        "${thriftSourcesDir}/FmuService.cpp"
-        "${thriftSourcesDir}/FmuServiceStarter.cpp")
+        "${thriftSourcesDir}/FmuService.cpp")
 
 set(THRIFT_CLIENT_SRC
         fmuproxy/thrift/client/remote_slave.cpp

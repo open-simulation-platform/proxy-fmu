@@ -25,7 +25,7 @@ public:
     thrift::Status::type setup_experiment(double start, double stop, double tolerance) override;
     thrift::Status::type enter_initialization_mode() override;
     thrift::Status::type exit_initialization_mode() override;
-    void step(thrift::StepResult& _return, double currentTime, double stepSize) override;
+    thrift::Status::type step(double currentTime, double stepSize) override;
     thrift::Status::type terminate() override;
     void freeInstance() override;
 

@@ -9,7 +9,7 @@ service FmuService {
     defs.Status enter_initialization_mode() throws (1: defs.NoSuchInstanceException ex)
     defs.Status exit_initialization_mode() throws (1: defs.NoSuchInstanceException ex)
     
-    defs.StepResult step(1: double currentTime, 2: double stepSize) throws (1: defs.NoSuchInstanceException ex)
+    defs.Status step(1: double currentTime, 2: double stepSize) throws (1: defs.NoSuchInstanceException ex)
     defs.Status terminate() throws (1: defs.NoSuchInstanceException ex)
     void freeInstance() throws (1: defs.NoSuchInstanceException ex)
 

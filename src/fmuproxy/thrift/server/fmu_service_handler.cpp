@@ -32,9 +32,10 @@ Status::type fmu_service_handler::exit_initialization_mode()
     slave_->exit_initialization_mode();
     return Status::OK_STATUS;
 }
-void fmu_service_handler::step(StepResult& _return, const double currentTime, const double stepSize)
+Status::type fmu_service_handler::step(const double currentTime, const double stepSize)
 {
     slave_->step(currentTime, stepSize);
+    return Status::OK_STATUS;
 }
 
 Status::type fmu_service_handler::terminate()
@@ -47,9 +48,9 @@ void fmu_service_handler::freeInstance()
 {
     slave_->freeInstance();
     auto modelName = fmu_->get_model_description().model_name;
-    std::cout << "Shutting down proxy for " << modelName << "::" << instanceName_ << std::endl;
+    std::cout << "Shutting down proxy for " << modelName << "::" << instanceName_;
     stop_();
-    std::cout << "done.." << std::endl;
+    std::cout << " done.." << std::endl;
 }
 
 

@@ -62,11 +62,6 @@ struct DefaultExperiment {
     4: double stepSize
 }
 
-struct StepResult {
-    1: Status status,
-    2: double simulation_time
-}
-
 struct IntegerRead {
     1: list<i32> value,
     2: Status status

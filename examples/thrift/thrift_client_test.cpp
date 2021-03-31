@@ -64,8 +64,6 @@ int main() {
             slave->freeInstance();
         }
 
-//        fmu.close();
-
     } catch (std::exception& tx) {
         std::cout << "ERROR: " << tx.what() << std::endl;
     }

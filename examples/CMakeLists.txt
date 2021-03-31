@@ -15,8 +15,3 @@ target_link_libraries(test PUBLIC fmi ${FMILibrary_LIBRARIES})
 add_executable(thrift_client_test
 		thrift/thrift_client_test.cpp)
 target_link_libraries(thrift_client_test PRIVATE ${FMILibrary_LIBRARIES} thrift-client)
-
-add_executable(thrift_server_test
-		thrift/thrift_server_test.cpp)
-target_link_libraries(thrift_server_test PRIVATE ${FMILibrary_LIBRARIES} thrift-server)
-
