@@ -1,16 +1,20 @@
 
-#include <fmuproxy/thrift/server/thrift_fmu_server.hpp>
+#include <fmuproxy/thrift/server/fmu_service_handler.hpp>
 
 #include <boost/program_options.hpp>
+#include <thrift/server/TSimpleServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TTransportUtils.h>
 
 #include <iostream>
-#include <memory>
-#include <optional>
-#include <unordered_map>
 
-using fmuproxy::thrift::server::thrift_fmu_server;
+using namespace fmuproxy::thrift;
+using namespace fmuproxy::server;
 
-using namespace std;
+using namespace ::apache::thrift;
+using namespace ::apache::thrift::server;
+using namespace ::apache::thrift::protocol;
+using namespace ::apache::thrift::transport;
 
 namespace
 {
@@ -19,33 +23,31 @@ const int SUCCESS = 0;
 const int COMMANDLINE_ERROR = 1;
 const int UNHANDLED_ERROR = 2;
 
-void wait_for_input()
+int run_application(const std::string& fmu, const std::string& instanceName, const int port)
 {
-    do {
-        cout << '\n'
-             << "Press a key to continue...\n";
-    } while (cin.get() != '\n');
-    cout << "Done." << endl;
-}
+    std::unique_ptr<TSimpleServer> server;
+    auto stop = [&]() {
+        server->stop();
+    };
+    std::shared_ptr<fmu_service_handler> handler(new fmu_service_handler(fmu, instanceName, stop));
+    std::shared_ptr<TProcessor> processor(new FmuServiceProcessor(handler));
 
-int run_application(int port)
-{
-    auto thrift_socket_server = make_unique<thrift_fmu_server>(port);
-    thrift_socket_server->start();
+    std::shared_ptr<TTransportFactory> transportFactory(new TFramedTransportFactory());
+    std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
-    wait_for_input();
-
-    thrift_socket_server->stop();
+    std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+    server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
+    server->serve();
 
     return 0;
 }
 
 } // namespace
 
-int printHelp( boost::program_options::options_description& desc)
+int printHelp(boost::program_options::options_description& desc)
 {
-    cout << "FMU-proxy" << endl
-         << desc << endl;
+    std::cout << "FMU-proxy" << '\n'
+              << desc << std::endl;
     return SUCCESS;
 }
 
@@ -57,6 +59,8 @@ int main(int argc, char** argv)
     po::options_description desc("Options");
     desc.add_options()("help,h", "Print this help message and quits.");
     desc.add_options()("port", po::value<int>(), "Specify the network port to be used.");
+    desc.add_options()("fmu", po::value<std::string>(), "Location of the fmu to load.");
+    desc.add_options()("instanceName", po::value<std::string>(), "Name of the slave instance.");
 
     if (argc == 1) {
         return printHelp(desc);
@@ -83,12 +87,13 @@ int main(int argc, char** argv)
         }
 
         auto port = vm["port"].as<int>();
+        auto fmu = vm["fmu"].as<std::string>();
+        auto instanceName = vm["instanceName"].as<std::string>();
 
-        return run_application(port);
+        return run_application(fmu, instanceName, port);
 
     } catch (std::exception& e) {
         std::cerr << "Unhandled Exception reached the top of main: " << e.what() << ", application will now exit" << std::endl;
         return UNHANDLED_ERROR;
     }
-
 }

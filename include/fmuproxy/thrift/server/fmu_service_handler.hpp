@@ -1,80 +1,46 @@
 
-#ifndef FMU_PROXY_THRIFT_FMUSERVICEHANDLER_HPP
-#define FMU_PROXY_THRIFT_FMUSERVICEHANDLER_HPP
+#ifndef FMU_PROXY_FMUSERVICEHANDLER_HPP
+#define FMU_PROXY_FMUSERVICEHANDLER_HPP
 
+#include <fmuproxy/fmi/fmu.hpp>
 #include <fmuproxy/thrift/FmuService.h>
+#include <functional>
 
-#include <fmi4cpp/fmi2/fmi2.hpp>
-
-#include <unordered_map>
-#include <vector>
-
-namespace fmuproxy::thrift::server
+namespace fmuproxy::server
 {
 
-class fmu_service_handler : virtual public FmuServiceIf
+class fmu_service_handler : virtual public thrift::FmuServiceIf
 {
 
 private:
-    std::unique_ptr<fmi4cpp::fmi2::cs_fmu> fmu_;
-    std::unordered_map<InstanceId, std::unique_ptr<fmi4cpp::fmu_slave<fmi4cpp::fmi2::cs_model_description>>> slaves_;
+    const std::string& instanceName_;
+    std::unique_ptr<fmi::fmu> fmu_;
+    std::unique_ptr<fmi::slave> slave_;
+
+    std::function<void()> stop_;
 
 public:
-    fmu_service_handler();
+    fmu_service_handler(const std::string& fmu, const std::string& instanceName, std::function<void()> stop);
 
-    void load_from_remote_file(FmuId& _return, const std::string& name, const std::string& data) override;
+    thrift::Status::type setup_experiment(double start, double stop, double tolerance) override;
+    thrift::Status::type enter_initialization_mode() override;
+    thrift::Status::type exit_initialization_mode() override;
+    thrift::Status::type step(double currentTime, double stepSize) override;
+    thrift::Status::type terminate() override;
+    void freeInstance() override;
 
-    void load_from_local_file(FmuId& _return, const std::string& fileName) override;
+    void read_integer(thrift::IntegerRead& _return, const thrift::ValueReferences& vr) override;
+    void read_real(thrift::RealRead& _return, const thrift::ValueReferences& vr) override;
+    void read_string(thrift::StringRead& _return, const thrift::ValueReferences& vr) override;
+    void read_boolean(thrift::BooleanRead& _return, const thrift::ValueReferences& vr) override;
 
-    void get_model_description(ModelDescription& _return, const FmuId& fmu_id) override;
+    thrift::Status::type write_integer(const thrift::ValueReferences& vr, const thrift::IntArray& value) override;
+    thrift::Status::type write_real(const thrift::ValueReferences& vr, const thrift::RealArray& value) override;
+    thrift::Status::type write_string(const thrift::ValueReferences& vr, const thrift::StringArray& value) override;
+    thrift::Status::type write_boolean(const thrift::ValueReferences& vr, const thrift::BooleanArray& value) override;
 
-    void create_instance(InstanceId& _return, const FmuId& fmu_id) override;
-
-    Status::type setup_experiment(const InstanceId& instanceId, double start, double stop,
-        double tolerance) override;
-
-    Status::type enter_initialization_mode(const InstanceId& instanceId) override;
-
-    Status::type exit_initialization_mode(const InstanceId& instanceId) override;
-
-    void step(::fmuproxy::thrift::StepResult& _return, const InstanceId& instance_id,
-        double step_size) override;
-
-    Status::type reset(const InstanceId& instance_id) override;
-
-    Status::type terminate(const InstanceId& instance_id) override;
-
-    void freeInstance(const InstanceId& instanceId) override;
-
-    void read_integer(::fmuproxy::thrift::IntegerRead& _return, const InstanceId& instance_id,
-        const ValueReferences& vr) override;
-
-    void read_real(::fmuproxy::thrift::RealRead& _return, const InstanceId& instance_id,
-        const ValueReferences& vr) override;
-
-    void read_string(::fmuproxy::thrift::StringRead& _return, const InstanceId& instance_id,
-        const ValueReferences& vr) override;
-
-    void read_boolean(::fmuproxy::thrift::BooleanRead& _return, const InstanceId& instance_id,
-        const ValueReferences& vr) override;
-
-    Status::type write_integer(const InstanceId& instance_id, const ValueReferences& vr,
-        const IntArray& value) override;
-
-    Status::type write_real(const InstanceId& instance_id, const ValueReferences& vr,
-        const RealArray& value) override;
-
-    Status::type write_string(const InstanceId& instance_id, const ValueReferences& vr,
-        const StringArray& values) override;
-
-    Status::type write_boolean(const InstanceId& instance_id, const ValueReferences& vr,
-        const BooleanArray& value) override;
-
-    void get_directional_derivative(DirectionalDerivativeResult& _return, const InstanceId& slave_id,
-        const ValueReferences& vUnknownRef, const ValueReferences& vKnownRef,
-        const std::vector<double>& dvKnownRef) override;
 };
 
-} // namespace fmuproxy::thrift::server
+} // namespace fmuproxy::server
 
-#endif //FMU_PROXY_THRIFT_FMUSERVICEHANDLER_HPP
+#endif //FMU_PROXY_FMUSERVICEHANDLER_HPP
