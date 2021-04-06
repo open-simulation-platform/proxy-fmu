@@ -32,13 +32,22 @@ void run() {
         }
     }
 
-    auto slave = fmu->new_instance("instance");
-    slave->setup_experiment();
-    slave->enter_initialization_mode();
-    slave->exit_initialization_mode();
-    slave->step(0.0, 0.1);
-    slave->terminate();
-    slave->freeInstance();
+    auto v = std::vector<std::unique_ptr<slave>>();
+    for (auto i = 0; i < 10; i++) {
+        auto slave = fmu->new_instance("instance_" + std::to_string(i));
+        slave->setup_experiment();
+        slave->enter_initialization_mode();
+        slave->exit_initialization_mode();
+        slave->step(0.0, 0.1);
+
+        v.push_back(std::move(slave));
+    }
+
+    for (auto& slave : v) {
+        slave->terminate();
+        slave->freeInstance();
+    }
+
 }
 
 int main()

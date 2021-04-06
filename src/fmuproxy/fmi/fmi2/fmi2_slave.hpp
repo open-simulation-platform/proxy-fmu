@@ -2,6 +2,7 @@
 #ifndef FMU_PROXY_FMI2_SLAVE_HPP
 #define FMU_PROXY_FMI2_SLAVE_HPP
 
+#include "../fmicontext.hpp"
 #include "../../util/temp_dir.hpp"
 
 #include "fmi2_model_description.hpp"
@@ -16,15 +17,16 @@ namespace fmuproxy::fmi
 class fmi2_slave : public slave
 {
 private:
-    fmi2_import_t* fmu_;
+    fmi2_import_t* handle_;
     model_description md_;
+    std::shared_ptr<fmicontext> ctx_;
     std::shared_ptr<fmuproxy::util::temp_dir> tmpDir_;
 
     bool freed = false;
 
 public:
     fmi2_slave(
-        fmi2_import_t* fmu,
+        const std::shared_ptr<fmicontext>& ctx,
         const std::string& instanceName,
         model_description md,
         std::shared_ptr<fmuproxy::util::temp_dir> tmpDir);

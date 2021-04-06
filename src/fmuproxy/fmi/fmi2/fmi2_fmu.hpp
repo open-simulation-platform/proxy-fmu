@@ -17,13 +17,13 @@ class fmi2_fmu : public fmu
 
 private:
     fmi2_import_t* handle_;
-    std::unique_ptr<fmicontext> ctx_;
+    std::shared_ptr<fmicontext> ctx_;
 
     const model_description md_;
     std::shared_ptr<fmuproxy::util::temp_dir> tmpDir_;
 
 public:
-    fmi2_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<fmuproxy::util::temp_dir> tmpDir);
+    fmi2_fmu(std::shared_ptr<fmicontext> ctx, std::shared_ptr<fmuproxy::util::temp_dir> tmpDir);
 
     [[nodiscard]] const model_description& get_model_description() const override;
 
