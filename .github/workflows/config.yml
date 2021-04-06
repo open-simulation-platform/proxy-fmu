@@ -40,7 +40,7 @@ jobs:
           conan install . -s build_type=Release --install-folder=build
         shell: bash
 
-      - name: Configure (Linux)
+      - name: Configure and build (Linux)
         if: startsWith(runner.os, 'Linux')
         run: |
           cmake -H. -Bbuild -DPROXY_FMU_BUILD_EXAMPLES=ON
