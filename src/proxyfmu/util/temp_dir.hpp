@@ -2,7 +2,8 @@
 #ifndef PROXY_FMU_TEMP_DIR_HPP
 #define PROXY_FMU_TEMP_DIR_HPP
 
-#include <filesystem>
+#include <proxyfmu/fs_portability.hpp>
+
 #include <iostream>
 #include <memory>
 #include <random>
@@ -31,16 +32,16 @@ namespace proxyfmu::util
 class temp_dir
 {
 private:
-    const std::filesystem::path path_;
+    const filesystem::path path_;
 
 public:
     explicit temp_dir(const std::string& name)
-        : path_(std::filesystem::temp_directory_path() /= "proxy_fmu_" + name + "_" + generate_simple_id(6))
+        : path_(filesystem::temp_directory_path() /= "proxy_fmu_" + name + "_" + generate_simple_id(6))
     {
-        std::filesystem::create_directories(path_);
+        filesystem::create_directories(path_);
     }
 
-    [[nodiscard]] std::filesystem::path path()
+    [[nodiscard]] filesystem::path path()
     {
         return path_;
     }
@@ -48,7 +49,7 @@ public:
     ~temp_dir()
     {
         std::error_code status;
-        std::filesystem::remove_all(path_, status);
+        filesystem::remove_all(path_, status);
         if (status) {
             std::cerr << "Failed to remove temp folder '" << path_.string() << "' " << status.message() << std::endl;
         }

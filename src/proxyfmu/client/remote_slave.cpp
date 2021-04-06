@@ -1,6 +1,8 @@
 
 #include "remote_slave.hpp"
 
+#include <proxyfmu/fs_portability.hpp>
+
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
@@ -18,7 +20,7 @@ using namespace proxyfmu::thrift;
 namespace
 {
 
-void start_process(const std::filesystem::path& fmu, const std::string& instanceName, const int port)
+void start_process(const proxyfmu::filesystem::path& fmu, const std::string& instanceName, const int port)
 {
     std::string cmd(
         "proxy_server"
@@ -37,7 +39,7 @@ void start_process(const std::filesystem::path& fmu, const std::string& instance
 namespace proxyfmu::client
 {
 
-remote_slave::remote_slave(const std::filesystem::path& fmu, const std::string& instanceName, fmi::model_description modelDescription)
+remote_slave::remote_slave(const filesystem::path& fmu, const std::string& instanceName, fmi::model_description modelDescription)
     : modelDescription_(std::move(modelDescription))
 {
 

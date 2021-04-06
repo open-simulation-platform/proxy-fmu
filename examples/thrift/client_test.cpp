@@ -4,7 +4,6 @@
 #include <exception>
 #include <iostream>
 
-#include <filesystem>
 
 using namespace proxyfmu;
 using namespace proxyfmu::client;
@@ -13,7 +12,7 @@ int main() {
 
     try {
 
-        std::filesystem::path fmuLocation("../fmus/2.0/cs/20sim/4.6.4.8004/ControlledTemperature/ControlledTemperature.fmu");
+        proxyfmu::filesystem::path fmuLocation("../fmus/2.0/cs/20sim/4.6.4.8004/ControlledTemperature/ControlledTemperature.fmu");
 
         proxy_fmu fmu(fmuLocation);
 

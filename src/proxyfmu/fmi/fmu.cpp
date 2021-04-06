@@ -5,20 +5,15 @@
 #include "fmi2/fmi2_fmu.hpp"
 #include <fmilib.h>
 
-#include <filesystem>
-#include <fstream>
-
-namespace fs = std::filesystem;
-
 namespace proxyfmu::fmi
 {
 
-std::unique_ptr<fmu> loadFmu(const std::filesystem::path& fmuPath)
+std::unique_ptr<fmu> loadFmu(const filesystem::path& fmuPath)
 {
 
     auto ctx = std::make_unique<fmicontext>();
 
-    const std::string fmuName = fs::path(fmuPath).stem().string();
+    const std::string fmuName = proxyfmu::filesystem::path(fmuPath).stem().string();
     auto tmp = std::make_shared<util::temp_dir>(fmuName);
 
     fmi_version_enu_t version = fmi_import_get_fmi_version(ctx->ctx_, fmuPath.string().c_str(), tmp->path().string().c_str());

@@ -2,9 +2,10 @@
 #ifndef PROXY_FMU_FMU_HPP
 #define PROXY_FMU_FMU_HPP
 
-#include <filesystem>
 #include <proxyfmu/fmi/model_description.hpp>
 #include <proxyfmu/fmi/slave.hpp>
+#include <proxyfmu/fs_portability.hpp>
+
 #include <memory>
 
 namespace proxyfmu::fmi
@@ -22,7 +23,7 @@ public:
 };
 
 
-std::unique_ptr<fmu> loadFmu(const std::filesystem::path& fmuPath);
+std::unique_ptr<fmu> loadFmu(const proxyfmu::filesystem::path& fmuPath);
 
 } // namespace proxyfmu::fmi
 

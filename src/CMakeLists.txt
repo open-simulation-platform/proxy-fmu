@@ -18,6 +18,10 @@ set(FMI_SRC
 add_library(fmi ${FMI_SRC})
 target_compile_features(fmi PUBLIC "cxx_std_17")
 target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
+if (UNIX)
+  target_link_libraries(fmi PRIVATE stdc++fs dl)
+endif ()
+
 
 #######################THRIFT##############################
 
@@ -59,11 +63,6 @@ set(THRIFT_CLIENT_SRC
 
 set(THRIFT_SERVER_SRC
         proxyfmu/server/fmu_service_handler.cpp)
-
-if (UNIX)
-  target_link_libraries(fmi PRIVATE stdc++fs dl)
-endif ()
-
 
 add_library(proxy-client ${generatedSources} ${THRIFT_CLIENT_SRC})
 target_link_libraries(proxy-client PUBLIC fmi PRIVATE thrift::thrift)

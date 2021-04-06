@@ -3,9 +3,8 @@
 #define PROXY_FMU_REMOTE_SLAVE_HPP
 
 #include <proxyfmu/fmi/slave.hpp>
+#include <proxyfmu/fs_portability.hpp>
 #include <proxyfmu/thrift/FmuService.h>
-
-#include <filesystem>
 
 using namespace apache::thrift;
 using namespace apache::thrift::transport;
@@ -25,7 +24,7 @@ private:
     bool freed = false;
 
 public:
-    remote_slave(const std::filesystem::path& fmu, const std::string& instanceName, fmi::model_description modelDescription);
+    remote_slave(const filesystem::path& fmu, const std::string& instanceName, fmi::model_description modelDescription);
 
     [[nodiscard]] const fmi::model_description& get_model_description() const override;
 

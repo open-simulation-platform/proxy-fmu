@@ -4,8 +4,7 @@
 
 #include <proxyfmu/fmi/model_description.hpp>
 #include <proxyfmu/fmi/slave.hpp>
-
-#include <filesystem>
+#include <proxyfmu/fs_portability.hpp>
 
 namespace proxyfmu::client
 {
@@ -14,11 +13,11 @@ class proxy_fmu
 {
 
 private:
-    const std::filesystem::path& fmu_;
+    const filesystem::path& fmu_;
     const fmi::model_description modelDescription_;
 
 public:
-    explicit proxy_fmu(const std::filesystem::path& fmu);
+    explicit proxy_fmu(const filesystem::path& fmu);
 
     [[nodiscard]] const fmi::model_description& get_model_description() const;
 
