@@ -67,6 +67,9 @@ set(THRIFT_SERVER_SRC
 add_library(proxy-client ${generatedSources} ${THRIFT_CLIENT_SRC})
 target_link_libraries(proxy-client PUBLIC fmi PRIVATE thrift::thrift)
 target_include_directories(proxy-client PRIVATE ${generatedSourcesDir})
+if (UNIX)
+  target_link_libraries(proxy-client PRIVATE pthread)
+endif ()
 
 add_library(proxy-lib ${generatedSources} ${THRIFT_SERVER_SRC})
 target_link_libraries(proxy-lib PUBLIC fmi thrift::thrift)

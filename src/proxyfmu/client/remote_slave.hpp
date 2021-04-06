@@ -6,6 +6,8 @@
 #include <proxyfmu/fs_portability.hpp>
 #include <proxyfmu/thrift/FmuService.h>
 
+#include <thread>
+
 using namespace apache::thrift;
 using namespace apache::thrift::transport;
 
