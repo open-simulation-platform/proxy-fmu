@@ -1,13 +1,13 @@
 
-#include <fmuproxy/thrift/client/proxy_fmu.hpp>
+#include <proxyfmu/client/proxy_fmu.hpp>
 
 #include <exception>
 #include <iostream>
 
 #include <filesystem>
 
-using namespace fmuproxy;
-using namespace fmuproxy::client;
+using namespace proxyfmu;
+using namespace proxyfmu::client;
 
 int main() {
 
@@ -26,9 +26,9 @@ int main() {
         for (const auto& v : mv) {
             auto attr = v.typeAttribute;
             if (v.is_real()) {
-                auto start = std::get<fmuproxy::fmi::real>(attr).start;
+                auto start = std::get<proxyfmu::fmi::real>(attr).start;
                 if (start) {
-                    std::cout << "start=" << std::get<fmuproxy::fmi::real>(attr).start.value() << std::endl;
+                    std::cout << "start=" << std::get<proxyfmu::fmi::real>(attr).start.value() << std::endl;
                 }
             }
         }

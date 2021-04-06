@@ -1,11 +1,11 @@
 
-#include <fmuproxy/fmi/fmu.hpp>
-#include "fmuproxy/util//temp_dir.hpp"
+#include <proxyfmu/fmi/fmu.hpp>
+#include "proxyfmu/util//temp_dir.hpp"
 
 #include <exception>
 #include <iostream>
 
-using namespace fmuproxy::fmi;
+using namespace proxyfmu::fmi;
 
 void run() {
 

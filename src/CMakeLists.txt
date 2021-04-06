@@ -4,15 +4,15 @@ include_directories(${includeDir})
 #######################FMI##############################
 
 set(FMI_SRC
-        fmuproxy/fmi/fmu.cpp
+        proxyfmu/fmi/fmu.cpp
 
-        fmuproxy/fmi/fmi1/fmi1_fmu.cpp
-        fmuproxy/fmi/fmi1/fmi1_slave.cpp
-        fmuproxy/fmi/fmi1/fmi1_model_description.cpp
+        proxyfmu/fmi/fmi1/fmi1_fmu.cpp
+        proxyfmu/fmi/fmi1/fmi1_slave.cpp
+        proxyfmu/fmi/fmi1/fmi1_model_description.cpp
 
-        fmuproxy/fmi/fmi2/fmi2_fmu.cpp
-        fmuproxy/fmi/fmi2/fmi2_slave.cpp
-        fmuproxy/fmi/fmi2/fmi2_model_description.cpp
+        proxyfmu/fmi/fmi2/fmi2_fmu.cpp
+        proxyfmu/fmi/fmi2/fmi2_slave.cpp
+        proxyfmu/fmi/fmi2/fmi2_model_description.cpp
         )
 
 add_library(fmi ${FMI_SRC})
@@ -22,7 +22,7 @@ target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
 #######################THRIFT##############################
 
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
-set(thriftSourcesDir "${generatedSourcesDir}/fmuproxy/thrift")
+set(thriftSourcesDir "${generatedSourcesDir}/proxyfmu/thrift")
 
 file(MAKE_DIRECTORY "${generatedSourcesDir}")
 file(MAKE_DIRECTORY "${thriftSourcesDir}")
@@ -32,10 +32,10 @@ if (NOT THRIFT_EXECUTABLE)
 endif ()
 
 set(thriftServiceDefinitions
-        "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/defs.thrift"
-        "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/service.thrift")
+        "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift/defs.thrift"
+        "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift/service.thrift")
 
-# Generate FMU-proxy classes from Thrift service definitions
+# Generate PROXY-FMU classes from Thrift service definitions
 foreach (def ${thriftServiceDefinitions})
   execute_process(
           COMMAND "${THRIFT_EXECUTABLE}"
@@ -54,11 +54,11 @@ set(generatedSources
         "${thriftSourcesDir}/FmuService.cpp")
 
 set(THRIFT_CLIENT_SRC
-        fmuproxy/thrift/client/remote_slave.cpp
-        fmuproxy/thrift/client/proxy_fmu.cpp)
+        proxyfmu/client/remote_slave.cpp
+        proxyfmu/client/proxy_fmu.cpp)
 
 set(THRIFT_SERVER_SRC
-        fmuproxy/thrift/server/fmu_service_handler.cpp)
+        proxyfmu/server/fmu_service_handler.cpp)
 
 if (UNIX)
   target_link_libraries(fmi PRIVATE stdc++fs dl)
@@ -86,6 +86,6 @@ install(
         ${PROXY_FMU_INSTALL_DESTINATIONS}
 )
 install(
-        DIRECTORY "${includeDir}/fmuproxy"
+        DIRECTORY "${includeDir}/proxyfmu"
         DESTINATION include
 )

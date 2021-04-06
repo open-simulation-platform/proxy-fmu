@@ -1,6 +1,6 @@
 
-#ifndef FMU_PROXY_EXAMPLE_UTIL_HPP
-#define FMU_PROXY_EXAMPLE_UTIL_HPP
+#ifndef PROXY_FMU_EXAMPLE_UTIL_HPP
+#define PROXY_FMU_EXAMPLE_UTIL_HPP
 
 #include <chrono>
 #include <iostream>
@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace fmuproxy
+namespace proxyfmu
 {
 
 void wait_for_input()
@@ -29,6 +29,6 @@ inline float measure_time_sec(function&& fun)
     return std::chrono::duration<float>(t_stop - t_start).count();
 }
 
-} // namespace fmuproxy
+} // namespace proxyfmu
 
-#endif //FMU_PROXY_EXAMPLE_UTIL_HPP
+#endif //PROXY_FMU_EXAMPLE_UTIL_HPP
