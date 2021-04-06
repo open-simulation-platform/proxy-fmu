@@ -1,10 +1,10 @@
 
 option(BUILD_SHARED_LIBS OFF)
-option(PROXY_SERVER_BUILD_EXAMPLES "Build examples" OFF)
-option(PROXY_SERVER_BUILD_TOOL "Build the server executable(s)" ON)
+option(PROXY_FMU_BUILD_EXAMPLES "Build examples" OFF)
+option(PROXY_FMU_BUILD_TOOL "Build the server executable(s)" ON)
 
 cmake_minimum_required(VERSION 3.11)
-project(PROXY_SERVER)
+project(PROXY_FMU)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -23,7 +23,13 @@ if(MSVC)
     add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
 endif()
 
-if (PROXY_SERVER_BUILD_TOOL)
+set(PROXY_FMU_INSTALL_DESTINATIONS
+        ARCHIVE DESTINATION "lib"
+        LIBRARY DESTINATION "lib"
+        RUNTIME DESTINATION "bin"
+        INCLUDES DESTINATION include)
+
+if (PROXY_FMU_BUILD_TOOL)
     list(APPEND BOOST_COMPONENTS program_options)
 endif()
 
@@ -34,14 +40,16 @@ find_package(FMILibrary REQUIRED)
 # add subdirectories
 add_subdirectory(src)
 
-if (PROXY_SERVER_BUILD_EXAMPLES)
+if (PROXY_FMU_BUILD_EXAMPLES)
     file(COPY data/fmus DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-    if (PROXY_SERVER_BUILD_EXAMPLES)
+    if (PROXY_FMU_BUILD_EXAMPLES)
         add_subdirectory(examples)
     endif()
 endif()
 
-if (PROXY_SERVER_BUILD_TOOL)
+if (PROXY_FMU_BUILD_TOOL)
     add_subdirectory(tool)
 endif()
+
+

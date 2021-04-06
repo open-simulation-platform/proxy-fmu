@@ -1,4 +1,4 @@
-set(includeDir ${PROXY_SERVER_SOURCE_DIR}/include)
+set(includeDir ${PROXY_FMU_SOURCE_DIR}/include)
 include_directories(${includeDir})
 
 #######################FMI##############################
@@ -75,3 +75,17 @@ target_include_directories(proxy-lib PUBLIC ${generatedSourcesDir})
 if (UNIX)
   target_link_libraries(proxy-lib PRIVATE pthread)
 endif ()
+
+
+# ==============================================================================
+# Installation rules
+# ==============================================================================
+
+install(
+        TARGETS fmi proxy-client
+        ${PROXY_FMU_INSTALL_DESTINATIONS}
+)
+install(
+        DIRECTORY "${includeDir}/fmuproxy"
+        DESTINATION include
+)

@@ -3,8 +3,8 @@ import os
 from conans import ConanFile, CMake, tools
 
 
-class FmuProxyConan(ConanFile):
-    name = "proxy-server"
+class ProxyFmuConan(ConanFile):
+    name = "proxy-fmu"
     author = "osp"
     version = "0.1.0"
     scm = {
@@ -43,4 +43,4 @@ class FmuProxyConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["proxy-server"]
+        self.cpp_info.libs = ["proxy-fmu"]

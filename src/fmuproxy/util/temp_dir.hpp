@@ -35,7 +35,7 @@ private:
 
 public:
     explicit temp_dir(const std::string& name)
-        : path_(std::filesystem::temp_directory_path() /= "proxy_server_" + name + "_" + generate_simple_id(6))
+        : path_(std::filesystem::temp_directory_path() /= "proxy_fmu_" + name + "_" + generate_simple_id(6))
     {
         std::filesystem::create_directories(path_);
     }
