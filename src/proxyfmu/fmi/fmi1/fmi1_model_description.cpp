@@ -14,6 +14,11 @@ std::optional<proxyfmu::fmi::scalar_variable> to_scalar_variable(fmi1_import_var
     proxyfmu::fmi::scalar_variable var;
     var.vr = fmi1_import_get_variable_vr(v);
     var.name = fmi1_import_get_variable_name(v);
+    //var.description = fmi1_import_get_variable_description(v);
+    var.causality = fmi1_causality_to_string(fmi1_import_get_causality(v));
+    var.variability = fmi1_variability_to_string(fmi1_import_get_variability(v));
+
+    fmi1_import_get_causality(v);
 
     switch (type) {
         case fmi1_base_type_real: {

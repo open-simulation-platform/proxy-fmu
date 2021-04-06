@@ -36,7 +36,6 @@ struct scalar_variable
 {
     unsigned int vr;
     std::string name;
-    std::optional<std::string> initial;
     std::optional<std::string> causality;
     std::optional<std::string> variability;
     type_attribute typeAttribute;

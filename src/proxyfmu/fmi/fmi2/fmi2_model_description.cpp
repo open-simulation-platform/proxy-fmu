@@ -14,6 +14,9 @@ std::optional<proxyfmu::fmi::scalar_variable> to_scalar_variable(fmi2_import_var
     proxyfmu::fmi::scalar_variable var;
     var.vr = fmi2_import_get_variable_vr(v);
     var.name = fmi2_import_get_variable_name(v);
+//    var.description = fmi2_import_get_variable_description(v);
+    var.causality = fmi2_causality_to_string(fmi2_import_get_causality(v));
+    var.variability = fmi2_variability_to_string(fmi2_import_get_variability(v));
 
     switch (type) {
         case fmi2_base_type_real: {
@@ -57,7 +60,7 @@ namespace proxyfmu::fmi
 model_description create_model_description(fmi2_import_t* handle)
 {
     model_description md;
-    md.fmi_version = "1.0";
+    md.fmi_version = "2.0";
     md.guid = fmi2_import_get_GUID(handle);
     md.author = fmi2_import_get_author(handle);
     md.model_name = fmi2_import_get_model_name(handle);
