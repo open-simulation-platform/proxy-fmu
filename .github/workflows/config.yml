@@ -13,10 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install prerequisites
+      - name: Install prerequisites (Linux)
+        if: startsWith(runner.os, 'Linux')
         run: |
           sudo pip3 install --upgrade setuptools pip
           sudo pip3 install conan
+
+      - name: Install prerequisites (Windows)
+        if: startsWith(runner.os, 'Windows')
+        run: |
+          pip3 install --upgrade setuptools pip
+          pip3 install conan
 
       - name: Configure Conan
         run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
