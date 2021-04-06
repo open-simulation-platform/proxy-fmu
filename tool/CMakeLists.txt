@@ -1,12 +1,11 @@
 
-include_directories(${FMU_PROXY_SOURCE_DIR}/include)
+include_directories(${PROXY_SERVER_SOURCE_DIR}/include)
 
-add_executable(fmu_proxy fmu_proxy.cpp)
-target_link_libraries(fmu_proxy PRIVATE thrift-server Boost::program_options)
-target_include_directories(fmu_proxy PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(fmu_proxy PRIVATE )
+add_executable(proxy_server fmu_proxy.cpp)
+target_link_libraries(proxy_server PRIVATE proxy-lib Boost::program_options)
+target_include_directories(proxy_server PRIVATE ${Boost_INCLUDE_DIRS})
 if (UNIX)
-    target_link_libraries(fmu_proxy PRIVATE pthread)
+    target_link_libraries(proxy_server PRIVATE pthread)
 endif()
 
-install(TARGETS fmu_proxy DESTINATION bin)
+install(TARGETS proxy_server DESTINATION bin)

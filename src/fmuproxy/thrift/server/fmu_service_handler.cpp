@@ -1,7 +1,6 @@
 
 #include <fmuproxy/thrift/server/fmu_service_handler.hpp>
 
-#include <chrono>
 #include <thread>
 
 #include <iostream>

@@ -1,4 +1,4 @@
-set(includeDir ${FMU_PROXY_SOURCE_DIR}/include)
+set(includeDir ${PROXY_SERVER_SOURCE_DIR}/include)
 include_directories(${includeDir})
 
 #######################FMI##############################
@@ -33,8 +33,7 @@ endif ()
 
 set(thriftServiceDefinitions
         "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/defs.thrift"
-        "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/service.thrift"
-        "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/service_starter.thrift")
+        "${CMAKE_CURRENT_SOURCE_DIR}/fmuproxy/thrift/service.thrift")
 
 # Generate FMU-proxy classes from Thrift service definitions
 foreach (def ${thriftServiceDefinitions})
@@ -66,13 +65,13 @@ if (UNIX)
 endif ()
 
 
-add_library(thrift-client ${generatedSources} ${THRIFT_CLIENT_SRC})
-target_link_libraries(thrift-client PUBLIC fmi PRIVATE thrift::thrift)
-target_include_directories(thrift-client PRIVATE ${generatedSourcesDir})
+add_library(proxy-client ${generatedSources} ${THRIFT_CLIENT_SRC})
+target_link_libraries(proxy-client PUBLIC fmi PRIVATE thrift::thrift)
+target_include_directories(proxy-client PRIVATE ${generatedSourcesDir})
 
-add_library(thrift-server ${generatedSources} ${THRIFT_SERVER_SRC})
-target_link_libraries(thrift-server PUBLIC fmi thrift::thrift)
-target_include_directories(thrift-server PUBLIC ${generatedSourcesDir})
+add_library(proxy-lib ${generatedSources} ${THRIFT_SERVER_SRC})
+target_link_libraries(proxy-lib PUBLIC fmi thrift::thrift)
+target_include_directories(proxy-lib PUBLIC ${generatedSourcesDir})
 if (UNIX)
-  target_link_libraries(thrift-server PRIVATE pthread)
+  target_link_libraries(proxy-lib PRIVATE pthread)
 endif ()

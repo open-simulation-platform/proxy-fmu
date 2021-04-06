@@ -21,10 +21,10 @@ namespace
 void start_process(const std::filesystem::path& fmu, const std::string& instanceName, const int port)
 {
     std::string cmd(
-        "fmu_proxy"
+        "proxy_server"
         " --port " +
         std::to_string(port) +
-        " --fmu " + fmu.string() +
+        " --fmu \"" + fmu.string() + + "\""
         " --instanceName " + instanceName);
     auto status = system(cmd.c_str());
     std::cout << "External proxy process returned with status " << std::to_string(status) << std::endl;
