@@ -16,9 +16,9 @@ void run() {
     auto md = fmu->get_model_description();
     std::cout << "GUID=" << md.guid << std::endl;
     std::cout << "description=" << md.description << std::endl;
-    std::cout << "generationTool=" << md.generation_tool << std::endl;
+    std::cout << "generationTool=" << md.generationTool << std::endl;
 
-    auto mv = md.model_variables;
+    auto mv = md.modelVariables;
     std::cout << mv.size() << std::endl;
     std::cout << mv[0].name << std::endl;
 

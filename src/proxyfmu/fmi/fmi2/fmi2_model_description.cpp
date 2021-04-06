@@ -60,19 +60,19 @@ namespace proxyfmu::fmi
 model_description create_model_description(fmi2_import_t* handle)
 {
     model_description md;
-    md.fmi_version = "2.0";
+    md.fmiVersion = "2.0";
     md.guid = fmi2_import_get_GUID(handle);
     md.author = fmi2_import_get_author(handle);
-    md.model_name = fmi2_import_get_model_name(handle);
-    md.model_identifier = fmi2_import_get_model_identifier_CS(handle);
+    md.modelName = fmi2_import_get_model_name(handle);
+    md.modelIdentifier = fmi2_import_get_model_identifier_CS(handle);
     md.description = fmi2_import_get_description(handle);
-    md.generation_tool = fmi2_import_get_generation_tool(handle);
-    md.generation_date_and_time = fmi2_import_get_generation_date_and_time(handle);
+    md.generationTool = fmi2_import_get_generation_tool(handle);
+    md.generationDateAndTime = fmi2_import_get_generation_date_and_time(handle);
 
-    md.default_experiment.start_time = fmi2_import_get_default_experiment_start(handle);
-    md.default_experiment.stop_time = fmi2_import_get_default_experiment_stop(handle);
-    md.default_experiment.step_size = fmi2_import_get_default_experiment_step(handle);
-    md.default_experiment.tolerance = fmi2_import_get_default_experiment_tolerance(handle);
+    md.defaultExperiment.startTime = fmi2_import_get_default_experiment_start(handle);
+    md.defaultExperiment.stopTime = fmi2_import_get_default_experiment_stop(handle);
+    md.defaultExperiment.stepSize = fmi2_import_get_default_experiment_step(handle);
+    md.defaultExperiment.tolerance = fmi2_import_get_default_experiment_tolerance(handle);
 
     const auto varList = fmi2_import_get_variable_list(handle, 0);
     const auto varCount = fmi2_import_get_variable_list_size(varList);
@@ -80,7 +80,7 @@ model_description create_model_description(fmi2_import_t* handle)
         const auto var = fmi2_import_get_variable(varList, i);
         const auto scalar = to_scalar_variable(var);
         if (scalar) {
-            md.model_variables.push_back(scalar.value());
+            md.modelVariables.push_back(scalar.value());
         }
     }
 

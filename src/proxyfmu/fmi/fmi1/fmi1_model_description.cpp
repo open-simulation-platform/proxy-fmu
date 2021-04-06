@@ -62,18 +62,18 @@ namespace proxyfmu::fmi
 model_description create_model_description(fmi1_import_t* handle)
 {
     model_description md;
-    md.fmi_version = "1.0";
+    md.fmiVersion = "1.0";
     md.guid = fmi1_import_get_GUID(handle);
     md.author = fmi1_import_get_author(handle);
-    md.model_name = fmi1_import_get_model_name(handle);
-    md.model_identifier = fmi1_import_get_model_identifier(handle);
+    md.modelName = fmi1_import_get_model_name(handle);
+    md.modelIdentifier = fmi1_import_get_model_identifier(handle);
     md.description = fmi1_import_get_description(handle);
-    md.generation_tool = fmi1_import_get_generation_tool(handle);
-    md.generation_date_and_time = fmi1_import_get_generation_date_and_time(handle);
+    md.generationTool = fmi1_import_get_generation_tool(handle);
+    md.generationDateAndTime = fmi1_import_get_generation_date_and_time(handle);
 
-    md.default_experiment.start_time = fmi1_import_get_default_experiment_start(handle);
-    md.default_experiment.stop_time = fmi1_import_get_default_experiment_stop(handle);
-    md.default_experiment.tolerance = fmi1_import_get_default_experiment_tolerance(handle);
+    md.defaultExperiment.startTime = fmi1_import_get_default_experiment_start(handle);
+    md.defaultExperiment.stopTime = fmi1_import_get_default_experiment_stop(handle);
+    md.defaultExperiment.tolerance = fmi1_import_get_default_experiment_tolerance(handle);
 
     const auto varList = fmi1_import_get_variable_list(handle);
     const auto varCount = fmi1_import_get_variable_list_size(varList);
@@ -81,7 +81,7 @@ model_description create_model_description(fmi1_import_t* handle)
         const auto var = fmi1_import_get_variable(varList, i);
         const auto scalar = to_scalar_variable(var);
         if (scalar) {
-            md.model_variables.push_back(scalar.value());
+            md.modelVariables.push_back(scalar.value());
         }
     }
 

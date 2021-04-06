@@ -19,7 +19,7 @@ int main() {
         auto md = fmu.get_model_description();
         std::cout << "GUID=" << md.guid << std::endl;
 
-        auto mv = md.model_variables;
+        auto mv = md.modelVariables;
         std::cout << mv.size() << std::endl;
 
         for (const auto& v : mv) {

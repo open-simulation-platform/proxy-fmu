@@ -12,25 +12,25 @@ namespace proxyfmu::fmi
 
 struct default_experiment
 {
-    double start_time;
-    double stop_time;
+    double startTime;
+    double stopTime;
     double tolerance;
-    double step_size;
+    double stepSize;
 };
 
 struct model_description
 {
     std::string guid;
     std::string author;
-    std::string model_name;
-    std::string model_identifier;
-    std::string fmi_version;
+    std::string modelName;
+    std::string modelIdentifier;
+    std::string fmiVersion;
     std::string description;
-    std::string generation_tool;
-    std::string generation_date_and_time;
+    std::string generationTool;
+    std::string generationDateAndTime;
 
-    model_variables model_variables;
-    default_experiment default_experiment;
+    model_variables modelVariables;
+    default_experiment defaultExperiment;
 };
 
 } // namespace proxyfmu::fmi
