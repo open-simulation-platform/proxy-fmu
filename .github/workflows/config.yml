@@ -13,27 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v1
-        with:
-          python-version: '3.x'
-
-      - name: Install tools (Linux)
-        if: startsWith(runner.os, 'Linux')
+      - name: Install prerequisites
         run: |
-          sudo apt-get install python3-setuptools python3-wheel python3-pip
-        shell: bash
+          sudo pip3 install --upgrade setuptools pip
+          sudo pip3 install conan
 
-      - name: Install conan (Linux)
-        if: startsWith(runner.os, 'Linux')
-        run: |
-          sudo pip3 install conan --upgrade
-        shell: bash
-
-      - name: Install conan (Windows)
-        if: startsWith(runner.os, 'Windows')
-        run: |
-          pip3 install conan --upgrade
-        shell: bash
+      - name: Configure Conan
+        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
 
       - name: Run conan (Linux)
         if: startsWith(runner.os, 'Linux')
