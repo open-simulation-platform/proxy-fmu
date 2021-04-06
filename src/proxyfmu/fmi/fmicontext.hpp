@@ -5,6 +5,7 @@
 #include "fmilib.h"
 
 #include <memory>
+#include <cstring>
 
 namespace
 {
