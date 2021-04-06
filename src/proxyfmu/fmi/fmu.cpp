@@ -23,10 +23,8 @@ std::unique_ptr<fmu> loadFmu(const std::filesystem::path& fmuPath)
 
     fmi_version_enu_t version = fmi_import_get_fmi_version(ctx->ctx_, fmuPath.string().c_str(), tmp->path().string().c_str());
     if (version == fmi_version_1_enu) {
-        std::cout << "FMI version 1.0 detected" << std::endl;
         return std::make_unique<fmi1_fmu>(std::move(ctx), tmp);
     } else if (version == fmi_version_2_0_enu) {
-        std::cout << "FMI version 2.0 detected" << std::endl;
         return std::make_unique<fmi2_fmu>(std::move(ctx), tmp);
     } else {
         //TODO
