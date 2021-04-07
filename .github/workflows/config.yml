@@ -34,32 +34,6 @@ jobs:
       - name: Configure Conan
         run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
 
-      - name: Run conan (Linux)
-        if: startsWith(runner.os, 'Linux')
-        run: |
-          conan install . -s build_type=Release -s compiler.libcxx=libstdc++11 --install-folder=build
-        shell: bash
-
-      - name: Run conan (Windows)
-        if: startsWith(runner.os, 'Windows')
-        run: |
-          conan install . -s build_type=Release --install-folder=build
-        shell: bash
-
-      - name: Configure and build (Linux)
-        if: startsWith(runner.os, 'Linux')
-        run: |
-          cmake -H. -Bbuild -DPROXY_FMU_BUILD_EXAMPLES=ON
-          cmake --build build
-        shell: bash
-
-      - name: Configure and build (Windows)
-        if: startsWith(runner.os, 'Windows')
-        run: |
-          cmake . -G "Visual Studio 15 2017 Win64" -Bbuild -DPROXY_FMU_BUILD_EXAMPLES=ON
-          cmake --build build --config Release
-        shell: bash
-
       - name: Conan create (Linux)
         if: startsWith(runner.os, 'Linux')
         shell: bash
@@ -95,6 +69,36 @@ jobs:
       - name: Conan upload (Windows)
         if: startsWith(runner.os, 'Windows')
         run: conan upload --all --confirm --remote osp 'proxy-fmu*'
+
+      - name: Run conan (Linux)
+        if: startsWith(runner.os, 'Linux')
+        run: |
+          conan install . -s build_type=Release -s compiler.libcxx=libstdc++11 --install-folder=build
+        shell: bash
+
+      - name: Run conan (Windows)
+        if: startsWith(runner.os, 'Windows')
+        run: |
+          conan install . -s build_type=Release --install-folder=build
+        shell: bash
+
+      - name: Configure and build (Linux)
+        if: startsWith(runner.os, 'Linux')
+        run: |
+          cmake -H. -Bbuild -DPROXY_FMU_BUILD_EXAMPLES=ON
+          cmake --build build
+        shell: bash
+
+      - name: Configure and build (Windows)
+        if: startsWith(runner.os, 'Windows')
+        run: |
+          cmake . -G "Visual Studio 15 2017 Win64" -Bbuild -DPROXY_FMU_BUILD_EXAMPLES=ON
+          cmake --build build --config Release
+        shell: bash
+
+
+
+
 
 
 #      - name: Test (Linux)
