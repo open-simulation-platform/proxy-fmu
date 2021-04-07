@@ -1,6 +1,5 @@
 
 #include <proxyfmu/fmi/fmu.hpp>
-#include "proxyfmu/util//temp_dir.hpp"
 
 #include <exception>
 #include <iostream>

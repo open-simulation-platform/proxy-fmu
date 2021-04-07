@@ -100,7 +100,7 @@ jobs:
         shell: bash
       - name: Configure and build
         run: |
-          cmake -H. -Bbuild -DPROXY_FMU_BUILD_EXAMPLES=ON
+          cmake -H. -Bbuild -DPROXYFMU_BUILD_EXAMPLES=ON
           cmake --build build
         shell: bash
 
@@ -126,7 +126,7 @@ jobs:
         shell: bash
       - name: Configure and build
         run: |
-          cmake . -G "Visual Studio 15 2017 Win64" -Bbuild -DPROXY_FMU_BUILD_EXAMPLES=ON
+          cmake . -G "Visual Studio 15 2017 Win64" -Bbuild -DPROXYFMU_BUILD_EXAMPLES=ON
           cmake --build build --config Release
         shell: bash
 
