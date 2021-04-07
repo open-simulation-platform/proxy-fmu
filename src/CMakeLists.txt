@@ -51,7 +51,7 @@ foreach (header IN LISTS fmiPublicHeaders)
   list(APPEND fmiPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(fmi ${commonPublicHeadersFull} ${fmiPublicHeadersFull} ${fmiPrivateHeaders} ${fmiSources} )
+add_library(fmi ${commonPublicHeadersFull} ${fmiPublicHeadersFull} ${fmiPrivateHeaders} ${fmiSources})
 add_library(proxyfmu::fmi ALIAS fmi)
 target_compile_features(fmi PUBLIC "cxx_std_17")
 target_include_directories(fmi
@@ -154,7 +154,6 @@ target_include_directories(proxy-lib
         "${generatedSourcesDir}"
         )
 target_link_libraries(proxy-lib PUBLIC fmi thrift::thrift)
-target_include_directories(proxy-lib PUBLIC ${generatedSourcesDir})
 if (UNIX)
   target_link_libraries(proxy-lib PRIVATE pthread)
 endif ()
