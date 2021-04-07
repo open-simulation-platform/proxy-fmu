@@ -72,7 +72,7 @@ jobs:
             SHORT_REFNAME="${REFNAME:0:40}"
             CHANNEL="testing-${SHORT_REFNAME//\//_}"
           fi
-          conan create -s build_type=Release -s compiler.version=9 -s compiler.libcxx=libstdc++11 -b missing . osp/${CHANNEL}
+          conan create -s build_type=Release -s compiler.version=7 -s compiler.libcxx=libstdc++11 -b missing . osp/${CHANNEL}
 
       - name: Conan upload (Linux)
         if: startsWith(runner.os, 'Linux')
