@@ -60,6 +60,24 @@ jobs:
           cmake --build build --config Release
         shell: bash
 
+      - name: Conan create (Linux)
+        if: startsWith(runner.os, 'Linux')
+        run: |
+          REFNAME="${GITHUB_REF#refs/*/}"
+          VERSION="v$(<version.txt)"
+          if [[ $GITHUB_REF == refs/tags/* ]] && [[ $REFNAME == $VERSION ]]; then CHANNEL="stable"
+          elif [[ $REFNAME == master ]]; then CHANNEL="testing"
+          else
+            SHORT_REFNAME="${REFNAME:0:40}"
+            CHANNEL="testing-${SHORT_REFNAME//\//_}"
+          fi
+          conan create -s build_type=${{ matrix.build_type }} -s compiler.version=9 -s compiler.libcxx=libstdc++11 -b missing . osp/${CHANNEL}
+
+        - name: Conan upload (Linux)
+          if: startsWith(runner.os, 'Linux')
+          run: |
+          conan upload --all -c -r osp '*'
+
       - name: Conan create (Windows)
         if: startsWith(runner.os, 'Windows')
         shell: bash
@@ -72,7 +90,7 @@ jobs:
             SHORT_REFNAME="${REFNAME:0:40}"
             CHANNEL="testing-${SHORT_REFNAME//\//_}"
           fi
-          conan create -s build_type=Release -b missing . osp/${CHANNEL}
+          conan create -s build_type=Release -s compiler.version=15 -b missing . osp/${CHANNEL}
 
       - name: Conan upload (Windows)
         if: startsWith(runner.os, 'Windows')
