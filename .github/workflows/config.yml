@@ -47,7 +47,7 @@ jobs:
     name: Conan
     runs-on: ${{matrix.os}}
     strategy:
-    fail-fast: false
+      fail-fast: false
       matrix:
         os: [windows-2016]
         build_type: [Debug, Release]
