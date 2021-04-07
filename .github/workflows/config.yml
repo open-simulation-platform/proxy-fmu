@@ -1,6 +1,10 @@
 name: Build
 
-on: [push]
+env:
+  CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
+  CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
+
+on: [push, workflow_dispatch]
 
 jobs:
   build:
@@ -53,6 +57,10 @@ jobs:
           cmake . -G "Visual Studio 15 2017 Win64" -Bbuild -DPROXY_FMU_BUILD_EXAMPLES=ON
           cmake --build build --config Release
         shell: bash
+
+      - name: Conan upload
+        run: conan upload --all --confirm --remote osp '*'
+
 
 #      - name: Test (Linux)
 #        if: startsWith(runner.os, 'Linux')
