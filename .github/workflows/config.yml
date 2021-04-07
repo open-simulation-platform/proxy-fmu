@@ -19,7 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04]
-        build_type: [Debug, Release]
+#        build_type: [Debug, Release]
+        build_type: [Release]
         compiler_version: [7]
         compiler_libcxx: [libstdc++11]
 
