@@ -149,9 +149,9 @@ target_compile_features(proxy-lib PUBLIC "cxx_std_17")
 target_include_directories(proxy-lib
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+        "${generatedSourcesDir}"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
-        "${generatedSourcesDir}"
         )
 target_link_libraries(proxy-lib PUBLIC fmi thrift::thrift)
 if (UNIX)
