@@ -62,6 +62,7 @@ jobs:
 
       - name: Conan create (Linux)
         if: startsWith(runner.os, 'Linux')
+        shell: bash
         run: |
           REFNAME="${GITHUB_REF#refs/*/}"
           VERSION="v$(<version.txt)"
@@ -76,7 +77,7 @@ jobs:
         - name: Conan upload (Linux)
           if: startsWith(runner.os, 'Linux')
           run: |
-          conan upload --all -c -r osp '*'
+          conan upload --all -c -r osp 'proxy-fmu*'
 
       - name: Conan create (Windows)
         if: startsWith(runner.os, 'Windows')
@@ -94,7 +95,7 @@ jobs:
 
       - name: Conan upload (Windows)
         if: startsWith(runner.os, 'Windows')
-        run: conan upload --all --confirm --remote osp '*'
+        run: conan upload --all --confirm --remote osp 'proxy-fmu*'
 
 
 #      - name: Test (Linux)
