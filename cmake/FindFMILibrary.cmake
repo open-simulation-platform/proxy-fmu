@@ -28,7 +28,6 @@
 #    FMILibrary_LIBRARY         - Path to static library.
 #    FMILibrary_SHARED_LIBRARY  - Path to shared/import library.
 #
-cmake_minimum_required (VERSION 2.8.11)
 
 # Find static library, and use its path prefix to provide a HINTS option to the
 # other find_*() commands.
