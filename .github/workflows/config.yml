@@ -3,6 +3,8 @@ name: Build
 env:
   CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
   CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
+  CONAN_REVISIONS_ENABLED: 1
+  CONAN_NON_INTERACTIVE: True
 
 on: [push, workflow_dispatch]
 
