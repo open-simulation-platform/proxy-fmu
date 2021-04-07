@@ -2,8 +2,8 @@
 #ifndef PROXY_FMU_FMI2_SLAVE_HPP
 #define PROXY_FMU_FMI2_SLAVE_HPP
 
-#include "../../util/temp_dir.hpp"
 #include "../fmicontext.hpp"
+#include "../temp_dir.hpp"
 
 #include "fmi2_model_description.hpp"
 #include <fmilib.h>

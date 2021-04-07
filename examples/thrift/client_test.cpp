@@ -4,7 +4,6 @@
 #include <exception>
 #include <iostream>
 
-
 using namespace proxyfmu;
 using namespace proxyfmu::client;
 
