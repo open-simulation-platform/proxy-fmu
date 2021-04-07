@@ -1,6 +1,7 @@
 import os
 
 from conans import ConanFile, CMake, tools
+from os import path
 
 
 class ProxyFmuConan(ConanFile):
