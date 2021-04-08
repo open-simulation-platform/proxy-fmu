@@ -5,7 +5,12 @@ include(CMakeFindDependencyMacro)
 
 list(APPEND CMAKE_MODULE_PATH "${PACKAGE_PREFIX_DIR}/@PROXYFMU_CMAKE_INSTALL_DIR@")
 
-find_dependency(Boost REQUIRED)
+if(@PROXYFMU_BUILD_TOOL@)
+  find_dependency(Boost REQUIRED COMPONENTS program_options)
+else()
+  find_dependency(Boost REQUIRED)
+endif()
+
 find_dependency(FMILibrary REQUIRED)
 find_dependency(THRIFT REQUIRED)
 
