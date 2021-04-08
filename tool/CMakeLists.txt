@@ -8,4 +8,4 @@ if (UNIX)
     target_link_libraries(proxy_server PRIVATE pthread)
 endif()
 
-install(TARGETS proxy_server DESTINATION ${PROXY_FMU_INSTALL_DESTINATIONS})
+install(TARGETS proxy_server DESTINATION ${PROXYFMU_INSTALL_DESTINATIONS})
