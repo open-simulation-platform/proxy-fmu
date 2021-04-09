@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <string>
+#include <thread>
 
 using namespace proxyfmu::server;
 
