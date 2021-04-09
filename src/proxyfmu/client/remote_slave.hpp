@@ -2,11 +2,10 @@
 #ifndef PROXY_FMU_REMOTE_SLAVE_HPP
 #define PROXY_FMU_REMOTE_SLAVE_HPP
 
-#include <proxyfmu/remote.hpp>
-
 #include <proxyfmu/fixed_range_random_generator.hpp>
 #include <proxyfmu/fmi/slave.hpp>
 #include <proxyfmu/fs_portability.hpp>
+#include <proxyfmu/remote_info.hpp>
 #include <proxyfmu/thrift/FmuService.h>
 
 #include <optional>
@@ -36,7 +35,7 @@ public:
         const filesystem::path& fmuPath,
         const std::string& instanceName,
         fmi::model_description modelDescription,
-        const std::optional<remote>& remote);
+        const std::optional<remote_info>& remote);
 
     [[nodiscard]] const fmi::model_description& get_model_description() const override;
 

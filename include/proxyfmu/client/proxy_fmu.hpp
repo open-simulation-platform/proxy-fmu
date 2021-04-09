@@ -5,7 +5,7 @@
 #include <proxyfmu/fmi/model_description.hpp>
 #include <proxyfmu/fmi/slave.hpp>
 #include <proxyfmu/fs_portability.hpp>
-#include <proxyfmu/remote.hpp>
+#include <proxyfmu/remote_info.hpp>
 
 #include <optional>
 
@@ -19,10 +19,10 @@ private:
     const filesystem::path& fmu_;
     const fmi::model_description modelDescription_;
 
-    const std::optional<remote> remote_;
+    const std::optional<remote_info> remote_;
 
 public:
-    explicit proxy_fmu(const filesystem::path& fmu, std::optional<remote>  remote = std::nullopt);
+    explicit proxy_fmu(const filesystem::path& fmu, std::optional<remote_info> remote = std::nullopt);
 
     [[nodiscard]] const fmi::model_description& get_model_description() const;
 

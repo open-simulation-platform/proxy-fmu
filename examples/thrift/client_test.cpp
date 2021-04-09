@@ -66,7 +66,7 @@ int main() {
 
         run(fmu);
 
-        proxy_fmu remoteFmu(fmuLocation, remote("localhost", 9090));
+        proxy_fmu remoteFmu(fmuLocation, remote_info("localhost", 9090));
         run(remoteFmu);
 
     } catch (std::exception& tx) {

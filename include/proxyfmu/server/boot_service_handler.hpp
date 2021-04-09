@@ -23,7 +23,7 @@ private:
 
 public:
     boot_service_handler();
-    int64_t loadFromBinaryData(const std::string& fmuName, const std::string& instanceName, const std::string& data) override;
+    int32_t loadFromBinaryData(const std::string& fmuName, const std::string& instanceName, const std::string& data) override;
 
     ~boot_service_handler() override;
 };

@@ -55,7 +55,7 @@ void read_data(std::string const& fileName, std::string& data)
 namespace proxyfmu::client
 {
 
-remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote>& remote)
+remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
     : rng_(49152, 65535)
     , modelDescription_(std::move(modelDescription))
 {
@@ -78,7 +78,7 @@ remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& i
         read_data(fmuPath.string(), data);
 
         const std::string fmuName = proxyfmu::filesystem::path(fmuPath).stem().string();
-        port = (int) client->loadFromBinaryData(fmuName, instanceName, data);
+        port = client->loadFromBinaryData(fmuName, instanceName, data);
         transport->close();
     }
 

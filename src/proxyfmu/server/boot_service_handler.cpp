@@ -36,7 +36,7 @@ boot_service_handler::boot_service_handler()
 {
 }
 
-int64_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, const std::string& instanceName, const std::string& data)
+int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, const std::string& instanceName, const std::string& data)
 {
     auto tmp = std::make_unique<temp_dir>(fmuName);
     std::string fmuPath(tmp->path().string() + "/" + fmuName + ".fmu");

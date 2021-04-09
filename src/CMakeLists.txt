@@ -7,7 +7,7 @@ set(commonPublicHeaders
         "proxyfmu/fs_portability.hpp"
         "proxyfmu/temp_dir.hpp"
         "proxyfmu/fixed_range_random_generator.hpp"
-        "proxyfmu/remote.hpp"
+        "proxyfmu/remote_info.hpp"
         )
 
 set(commonPublicHeadersFull)

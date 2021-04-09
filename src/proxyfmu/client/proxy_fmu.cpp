@@ -11,7 +11,7 @@
 namespace proxyfmu::client
 {
 
-proxy_fmu::proxy_fmu(const filesystem::path& fmu, std::optional<remote> remote)
+proxy_fmu::proxy_fmu(const filesystem::path& fmu, std::optional<remote_info> remote)
     : fmu_(fmu)
     , remote_(std::move(remote))
     , modelDescription_(fmi::loadFmu(fmu)->get_model_description())
