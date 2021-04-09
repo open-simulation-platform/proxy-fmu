@@ -62,7 +62,7 @@ target_include_directories(fmi
         )
 target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
 if (UNIX)
-  target_link_libraries(fmi PRIVATE stdc++fs dl)
+  target_link_libraries(fmi PRIVATE stdc++fs)
 endif ()
 
 #######################THRIFT##############################
@@ -184,7 +184,7 @@ target_include_directories(proxy-booter-lib
         )
 target_link_libraries(proxy-booter-lib PUBLIC thrift::thrift)
 if (UNIX)
-  target_link_libraries(proxy-booter-lib PRIVATE pthread)
+  target_link_libraries(proxy-booter-lib PRIVATE pthread stdc++fs)
 endif ()
 
 # ==============================================================================
