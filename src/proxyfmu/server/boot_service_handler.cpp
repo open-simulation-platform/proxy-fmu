@@ -38,7 +38,7 @@ int64_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
     write_data(fmuPath, data);
 
     auto port = 9090;
-    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, port);
+    auto t = std::thread(&start_process, fmuPath, instanceName, port);
 
     dirs_.emplace_back(std::move(tmp));
 
