@@ -27,7 +27,7 @@ const int UNHANDLED_ERROR = 2;
 void wait_for_input()
 {
     std::cout << '\n'
-              << "Press a key to continue...\n";
+              << "Press any key to quit...\n";
     while (std::cin.get() != '\n');
     std::cout << "Done." << std::endl;
 }

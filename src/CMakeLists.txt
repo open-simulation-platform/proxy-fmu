@@ -6,6 +6,8 @@ set(privateHeaderDir "${CMAKE_CURRENT_SOURCE_DIR}")
 set(commonPublicHeaders
         "proxyfmu/fs_portability.hpp"
         "proxyfmu/temp_dir.hpp"
+        "proxyfmu/fixed_range_random_generator.hpp"
+        "proxyfmu/remote.hpp"
         )
 
 set(commonPublicHeadersFull)
