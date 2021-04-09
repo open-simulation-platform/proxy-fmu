@@ -4,6 +4,7 @@
 
 #include <proxyfmu/fmi/model_description.hpp>
 #include <proxyfmu/fmi/slave.hpp>
+#include <proxyfmu/fmi/fmu.hpp>
 #include <proxyfmu/fs_portability.hpp>
 #include <proxyfmu/remote_info.hpp>
 
@@ -12,7 +13,7 @@
 namespace proxyfmu::client
 {
 
-class proxy_fmu
+class proxy_fmu: public fmi::fmu
 {
 
 private:
@@ -24,11 +25,11 @@ private:
 public:
     explicit proxy_fmu(const filesystem::path& fmu, std::optional<remote_info> remote = std::nullopt);
 
-    [[nodiscard]] const fmi::model_description& get_model_description() const;
+    [[nodiscard]] const fmi::model_description& get_model_description() const override;
 
-    std::unique_ptr<fmi::slave> new_instance(const std::string& instanceName);
+    std::unique_ptr<fmi::slave> new_instance(const std::string& instanceName) override;
 
-    ~proxy_fmu() = default;
+    ~proxy_fmu() override = default;
 };
 
 } // namespace proxyfmu::client

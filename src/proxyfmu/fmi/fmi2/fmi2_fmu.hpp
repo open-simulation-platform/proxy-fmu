@@ -26,7 +26,7 @@ public:
 
     [[nodiscard]] const model_description& get_model_description() const override;
 
-    std::unique_ptr<slave> new_instance(std::string instanceName) override;
+    std::unique_ptr<slave> new_instance(const std::string& instanceName) override;
 
     ~fmi2_fmu() override;
 };
