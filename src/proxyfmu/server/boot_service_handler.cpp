@@ -17,8 +17,6 @@ void write_data(std::string const& fileName, std::string const& data)
 
 }
 
-
-
 int64_t boot_service_handler::loadFromBinaryData(const std::string& name, const std::string& data)
 {
     return 0;
