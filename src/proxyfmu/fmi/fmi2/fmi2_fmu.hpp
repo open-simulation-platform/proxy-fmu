@@ -2,9 +2,8 @@
 #ifndef PROXY_FMU_FMI2_FMU_HPP
 #define PROXY_FMU_FMI2_FMU_HPP
 
-
-#include "../../util/temp_dir.hpp"
 #include "../fmicontext.hpp"
+#include "../temp_dir.hpp"
 
 #include <fmilib.h>
 #include <proxyfmu/fmi/fmu.hpp>

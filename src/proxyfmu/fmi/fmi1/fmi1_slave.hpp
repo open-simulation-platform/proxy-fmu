@@ -2,8 +2,8 @@
 #ifndef PROXY_FMU_FMI1_SLAVE_HPP
 #define PROXY_FMU_FMI1_SLAVE_HPP
 
-#include "../../util/temp_dir.hpp"
 #include "../fmicontext.hpp"
+#include "../temp_dir.hpp"
 
 #include "fmi1_model_description.hpp"
 #include <fmilib.h>
@@ -34,7 +34,7 @@ public:
         model_description md,
         std::shared_ptr<util::temp_dir> tmpDir);
 
-    [[nodiscard]] const model_description &get_model_description() const override;
+    [[nodiscard]] const model_description& get_model_description() const override;
     void setup_experiment(double start_time, double stop_time, double /*tolerance*/) override;
     void enter_initialization_mode() override;
     void exit_initialization_mode() override;

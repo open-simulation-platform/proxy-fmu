@@ -1,27 +1,69 @@
-set(includeDir ${PROXY_FMU_SOURCE_DIR}/include)
-include_directories(${includeDir})
+set(publicHeaderDir ${CMAKE_SOURCE_DIR}/include)
+set(privateHeaderDir "${CMAKE_CURRENT_SOURCE_DIR}")
+
+#######################COMMON##############################
+
+set(commonPublicHeaders
+        "proxyfmu/fs_portability.hpp"
+        )
+
+set(commonPublicHeadersFull)
+foreach (header IN LISTS commonPublicHeaders)
+  list(APPEND commonPublicHeadersFull "${publicHeaderDir}/${header}")
+endforeach ()
 
 #######################FMI##############################
 
-set(FMI_SRC
-        proxyfmu/fmi/fmu.cpp
-
-        proxyfmu/fmi/fmi1/fmi1_fmu.cpp
-        proxyfmu/fmi/fmi1/fmi1_slave.cpp
-        proxyfmu/fmi/fmi1/fmi1_model_description.cpp
-
-        proxyfmu/fmi/fmi2/fmi2_fmu.cpp
-        proxyfmu/fmi/fmi2/fmi2_slave.cpp
-        proxyfmu/fmi/fmi2/fmi2_model_description.cpp
+set(fmiPublicHeaders
+        "proxyfmu/fmi/fmu.hpp"
+        "proxyfmu/fmi/slave.hpp"
+        "proxyfmu/fmi/scalar_variable.hpp"
+        "proxyfmu/fmi/model_description.hpp"
         )
 
-add_library(fmi ${FMI_SRC})
+set(fmiPrivateHeaders
+        "proxyfmu/fmi/fmicontext.hpp"
+        "proxyfmu/fmi/temp_dir.hpp"
+
+        "proxyfmu/fmi/fmi1/fmi1_fmu.hpp"
+        "proxyfmu/fmi/fmi1/fmi1_model_description.hpp"
+        "proxyfmu/fmi/fmi1/fmi1_slave.hpp"
+
+        "proxyfmu/fmi/fmi2/fmi2_fmu.hpp"
+        "proxyfmu/fmi/fmi2/fmi2_model_description.hpp"
+        "proxyfmu/fmi/fmi2/fmi2_slave.hpp"
+        )
+
+set(fmiSources
+        "proxyfmu/fmi/fmu.cpp"
+
+        "proxyfmu/fmi/fmi1/fmi1_fmu.cpp"
+        "proxyfmu/fmi/fmi1/fmi1_slave.cpp"
+        "proxyfmu/fmi/fmi1/fmi1_model_description.cpp"
+
+        "proxyfmu/fmi/fmi2/fmi2_fmu.cpp"
+        "proxyfmu/fmi/fmi2/fmi2_slave.cpp"
+        "proxyfmu/fmi/fmi2/fmi2_model_description.cpp"
+        )
+
+set(fmiPublicHeadersFull)
+foreach (header IN LISTS fmiPublicHeaders)
+  list(APPEND fmiPublicHeadersFull "${publicHeaderDir}/${header}")
+endforeach ()
+
+add_library(fmi ${commonPublicHeadersFull} ${fmiPublicHeadersFull} ${fmiPrivateHeaders} ${fmiSources})
+add_library(proxyfmu::fmi ALIAS fmi)
 target_compile_features(fmi PUBLIC "cxx_std_17")
+target_include_directories(fmi
+        PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        )
 target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
 if (UNIX)
   target_link_libraries(fmi PRIVATE stdc++fs dl)
 endif ()
-
 
 #######################THRIFT##############################
 
@@ -49,35 +91,72 @@ foreach (def ${thriftServiceDefinitions})
   )
 endforeach ()
 
-set(generatedHeaders
+set(thriftGenerated
         "${thriftSourcesDir}/defs_types.h"
-        "${thriftSourcesDir}/FmuService.h")
-
-set(generatedSources
         "${thriftSourcesDir}/defs_types.cpp"
-        "${thriftSourcesDir}/FmuService.cpp")
+        "${thriftSourcesDir}/FmuService.h"
+        "${thriftSourcesDir}/FmuService.cpp"
+        )
 
-set(THRIFT_CLIENT_SRC
-        proxyfmu/client/remote_slave.cpp
-        proxyfmu/client/proxy_fmu.cpp)
+add_library(proxyfmu-service OBJECT ${thriftGenerated})
+set_target_properties(proxyfmu-service PROPERTIES POSITION_INDEPENDENT_CODE ON)
+list(APPEND generatedFiles "$<TARGET_OBJECTS:proxyfmu-service>")
 
-set(THRIFT_SERVER_SRC
-        proxyfmu/server/fmu_service_handler.cpp)
+set(clientPublicHeaders
+        "proxyfmu/client/proxy_fmu.hpp")
 
-add_library(proxy-client ${generatedSources} ${THRIFT_CLIENT_SRC})
+set(clientPrivateHeaders
+        "proxyfmu/client/remote_slave.hpp")
+
+set(clientSources
+        "proxyfmu/client/remote_slave.cpp"
+        "proxyfmu/client/proxy_fmu.cpp")
+
+set(clientPublicHeadersFull)
+foreach (header IN LISTS clientPublicHeaders)
+  list(APPEND clientPublicHeadersFull "${publicHeaderDir}/${header}")
+endforeach ()
+
+add_library(proxy-client ${commonPublicHeadersFull} ${clientPublicHeadersFull} ${clientPrivateHeaders} ${clientSources} ${generatedFiles})
+add_library(proxyfmu::proxy-client ALIAS proxy-client)
+target_compile_features(proxy-client PUBLIC "cxx_std_17")
+target_include_directories(proxy-client
+        PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${generatedSourcesDir}"
+        )
 target_link_libraries(proxy-client PUBLIC fmi PRIVATE thrift::thrift)
-target_include_directories(proxy-client PRIVATE ${generatedSourcesDir})
 if (UNIX)
   target_link_libraries(proxy-client PRIVATE pthread)
 endif ()
 
-add_library(proxy-lib ${generatedSources} ${THRIFT_SERVER_SRC})
+set(serverPublicHeaders
+        "proxyfmu/server/fmu_service_handler.hpp")
+
+set(serverSources
+        "proxyfmu/server/fmu_service_handler.cpp")
+
+set(serverPublicHeadersFull)
+foreach (header IN LISTS serverPublicHeaders)
+  list(APPEND serverPublicHeadersFull "${publicHeaderDir}/${header}")
+endforeach ()
+
+add_library(proxy-lib ${serverPublicHeadersFull} ${serverSources} ${generatedFiles})
+add_library(proxyfmu::proxy-lib ALIAS proxy-lib)
+target_compile_features(proxy-lib PUBLIC "cxx_std_17")
+target_include_directories(proxy-lib
+        PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+        "${generatedSourcesDir}"
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        )
 target_link_libraries(proxy-lib PUBLIC fmi thrift::thrift)
-target_include_directories(proxy-lib PUBLIC ${generatedSourcesDir})
 if (UNIX)
   target_link_libraries(proxy-lib PRIVATE pthread)
 endif ()
-
 
 # ==============================================================================
 # Installation rules
@@ -85,9 +164,10 @@ endif ()
 
 install(
         TARGETS fmi proxy-client
-        ${PROXY_FMU_INSTALL_DESTINATIONS}
+        EXPORT "${PROXYFMU_EXPORT_TARGET}"
+        ${PROXYFMU_INSTALL_DESTINATIONS}
 )
 install(
-        DIRECTORY "${includeDir}/proxyfmu"
-        DESTINATION include
+        DIRECTORY "${publicHeaderDir}/proxyfmu"
+        DESTINATION "${PROXYFMU_HEADER_INSTALL_DIR}"
 )

@@ -1,6 +1,6 @@
 
-include_directories(${PROXY_FMU_SOURCE_DIR}/include)
-include_directories(${PROXY_FMU_SOURCE_DIR}/src)
+include_directories(${PROXYFMU_SOURCE_DIR}/include)
+include_directories(${PROXYFMU_SOURCE_DIR}/src)
 
 ###########################################################
 #########################FMI############################
