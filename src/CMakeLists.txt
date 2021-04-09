@@ -5,6 +5,7 @@ set(privateHeaderDir "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(commonPublicHeaders
         "proxyfmu/fs_portability.hpp"
+        "proxyfmu/temp_dir.hpp"
         )
 
 set(commonPublicHeadersFull)
@@ -23,7 +24,6 @@ set(fmiPublicHeaders
 
 set(fmiPrivateHeaders
         "proxyfmu/fmi/fmicontext.hpp"
-        "proxyfmu/fmi/temp_dir.hpp"
 
         "proxyfmu/fmi/fmi1/fmi1_fmu.hpp"
         "proxyfmu/fmi/fmi1/fmi1_model_description.hpp"
@@ -172,7 +172,7 @@ foreach (header IN LISTS serverBooterPublicHeaders)
   list(APPEND serverBooterPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(proxy-booter-lib ${serverBooterPublicHeadersFull} ${serverBooterSources} ${generatedFiles})
+add_library(proxy-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterSources} ${generatedFiles})
 add_library(proxyfmu::proxy-booter-lib ALIAS proxy-booter-lib)
 target_compile_features(proxy-booter-lib PUBLIC "cxx_std_17")
 target_include_directories(proxy-booter-lib

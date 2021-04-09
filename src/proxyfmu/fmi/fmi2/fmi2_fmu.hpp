@@ -3,10 +3,10 @@
 #define PROXY_FMU_FMI2_FMU_HPP
 
 #include "../fmicontext.hpp"
-#include "../temp_dir.hpp"
 
 #include <fmilib.h>
 #include <proxyfmu/fmi/fmu.hpp>
+#include <proxyfmu/temp_dir.hpp>
 
 namespace proxyfmu::fmi
 {
@@ -19,10 +19,10 @@ private:
     std::shared_ptr<fmicontext> ctx_;
 
     const model_description md_;
-    std::shared_ptr<util::temp_dir> tmpDir_;
+    std::shared_ptr<temp_dir> tmpDir_;
 
 public:
-    fmi2_fmu(std::shared_ptr<fmicontext> ctx, std::shared_ptr<util::temp_dir> tmpDir);
+    fmi2_fmu(std::shared_ptr<fmicontext> ctx, std::shared_ptr<temp_dir> tmpDir);
 
     [[nodiscard]] const model_description& get_model_description() const override;
 

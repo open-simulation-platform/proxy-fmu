@@ -2,7 +2,7 @@
 #ifndef PROXY_FMU_FMI1_FMU_HPP
 #define PROXY_FMU_FMI1_FMU_HPP
 
-#include "../temp_dir.hpp"
+#include <proxyfmu/temp_dir.hpp>
 #include "../fmicontext.hpp"
 
 #include <fmilib.h>
@@ -19,10 +19,10 @@ private:
     std::shared_ptr<fmicontext> ctx_;
 
     const model_description md_;
-    std::shared_ptr<util::temp_dir> tmpDir_;
+    std::shared_ptr<temp_dir> tmpDir_;
 
 public:
-    fmi1_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<util::temp_dir> tmpDir);
+    fmi1_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<temp_dir> tmpDir);
 
     [[nodiscard]] const model_description& get_model_description() const override;
 

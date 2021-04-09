@@ -26,7 +26,7 @@ std::string generate_simple_id(const int len)
 
 } // namespace
 
-namespace proxyfmu::util
+namespace proxyfmu
 {
 
 class temp_dir
@@ -56,7 +56,7 @@ public:
     }
 };
 
-} // namespace proxyfmu::util
+} // namespace proxyfmu
 
 
 #endif //PROXY_FMU_TEMP_DIR_HPP
