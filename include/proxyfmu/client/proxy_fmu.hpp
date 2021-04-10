@@ -17,13 +17,13 @@ class proxy_fmu: public fmi::fmu
 {
 
 private:
-    const filesystem::path& fmu_;
+    const filesystem::path fmuPath_;
     const fmi::model_description modelDescription_;
 
     const std::optional<remote_info> remote_;
 
 public:
-    explicit proxy_fmu(const filesystem::path& fmu, std::optional<remote_info> remote = std::nullopt);
+    explicit proxy_fmu(const filesystem::path& fmuPath, std::optional<remote_info> remote = std::nullopt);
 
     [[nodiscard]] const fmi::model_description& get_model_description() const override;
 
