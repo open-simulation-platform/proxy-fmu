@@ -25,7 +25,7 @@ fmi1_slave::fmi1_slave(
     const std::shared_ptr<fmicontext>& ctx,
     const std::string& instanceName,
     model_description md,
-    std::shared_ptr<util::temp_dir> tmpDir)
+    std::shared_ptr<temp_dir> tmpDir)
     : ctx_(ctx)
     , handle_(fmi1_import_parse_xml(ctx->ctx_, tmpDir->path().string().c_str()))
     , md_(std::move(md))

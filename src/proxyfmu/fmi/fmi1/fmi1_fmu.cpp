@@ -8,7 +8,7 @@
 namespace proxyfmu::fmi
 {
 
-fmi1_fmu::fmi1_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<util::temp_dir> tmpDir)
+fmi1_fmu::fmi1_fmu(std::unique_ptr<fmicontext> ctx, std::shared_ptr<temp_dir> tmpDir)
     : ctx_(std::move(ctx))
     , handle_(fmi1_import_parse_xml(ctx->ctx_, tmpDir->path().string().c_str()))
     , tmpDir_(std::move(tmpDir))
@@ -25,7 +25,7 @@ const model_description& fmi1_fmu::get_model_description() const
     return md_;
 }
 
-std::unique_ptr<slave> fmi1_fmu::new_instance(std::string instanceName)
+std::unique_ptr<slave> fmi1_fmu::new_instance(const std::string& instanceName)
 {
     return std::make_unique<fmi1_slave>(ctx_, instanceName, md_, tmpDir_);
 }

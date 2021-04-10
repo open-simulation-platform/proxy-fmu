@@ -3,11 +3,11 @@
 #define PROXY_FMU_FMI1_SLAVE_HPP
 
 #include "../fmicontext.hpp"
-#include "../temp_dir.hpp"
 
 #include "fmi1_model_description.hpp"
 #include <fmilib.h>
 #include <proxyfmu/fmi/slave.hpp>
+#include <proxyfmu/temp_dir.hpp>
 
 #include <memory>
 
@@ -20,7 +20,7 @@ private:
     fmi1_import_t* handle_;
     const model_description md_;
     std::shared_ptr<fmicontext> ctx_;
-    std::shared_ptr<util::temp_dir> tmpDir_;
+    std::shared_ptr<temp_dir> tmpDir_;
 
     double start_time_;
     double stop_time_;
@@ -32,7 +32,7 @@ public:
         const std::shared_ptr<fmicontext>& ctx,
         const std::string& instanceName,
         model_description md,
-        std::shared_ptr<util::temp_dir> tmpDir);
+        std::shared_ptr<temp_dir> tmpDir);
 
     [[nodiscard]] const model_description& get_model_description() const override;
     void setup_experiment(double start_time, double stop_time, double /*tolerance*/) override;

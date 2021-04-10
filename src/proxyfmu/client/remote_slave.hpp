@@ -2,10 +2,13 @@
 #ifndef PROXY_FMU_REMOTE_SLAVE_HPP
 #define PROXY_FMU_REMOTE_SLAVE_HPP
 
+#include <proxyfmu/fixed_range_random_generator.hpp>
 #include <proxyfmu/fmi/slave.hpp>
 #include <proxyfmu/fs_portability.hpp>
+#include <proxyfmu/remote_info.hpp>
 #include <proxyfmu/thrift/FmuService.h>
 
+#include <optional>
 #include <thread>
 
 using namespace apache::thrift;
@@ -23,10 +26,16 @@ private:
     std::shared_ptr<TTransport> transport_;
     std::unique_ptr<std::thread> thread_;
 
+    fixed_range_random_generator rng_;
+
     bool freed = false;
 
 public:
-    remote_slave(const filesystem::path& fmu, const std::string& instanceName, fmi::model_description modelDescription);
+    remote_slave(
+        const filesystem::path& fmuPath,
+        const std::string& instanceName,
+        fmi::model_description modelDescription,
+        const std::optional<remote_info>& remote);
 
     [[nodiscard]] const fmi::model_description& get_model_description() const override;
 

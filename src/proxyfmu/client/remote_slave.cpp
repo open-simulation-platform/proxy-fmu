@@ -2,6 +2,7 @@
 #include "remote_slave.hpp"
 
 #include <proxyfmu/fs_portability.hpp>
+#include <proxyfmu/thrift/BootService.h>
 
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
@@ -10,6 +11,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <cstdio>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -20,17 +22,31 @@ using namespace proxyfmu::thrift;
 namespace
 {
 
-void start_process(const proxyfmu::filesystem::path& fmu, const std::string& instanceName, const int port)
+void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string& instanceName, const int port)
 {
     std::string cmd(
         "proxy_server"
         " --port " +
         std::to_string(port) +
-        " --fmu \"" + fmu.string() + +"\""
+        " --fmu \"" + fmuPath.string() + +"\""
                                       " --instanceName " +
         instanceName);
     auto status = system(cmd.c_str());
     std::cout << "External proxy process returned with status " << std::to_string(status) << std::endl;
+}
+
+void read_data(std::string const& fileName, std::string& data)
+{
+    FILE* file = fopen(fileName.c_str(), "rb");
+    if (file == nullptr) return;
+    fseek(file, 0, SEEK_END);
+    long int size = ftell(file);
+    fclose(file);
+    file = fopen(fileName.c_str(), "rb");
+
+    data.resize(size);
+    size_t bytes_read = fread(data.data(), sizeof(unsigned char), size, file);
+    fclose(file);
 }
 
 } // namespace
@@ -39,14 +55,34 @@ void start_process(const proxyfmu::filesystem::path& fmu, const std::string& ins
 namespace proxyfmu::client
 {
 
-remote_slave::remote_slave(const filesystem::path& fmu, const std::string& instanceName, fmi::model_description modelDescription)
-    : modelDescription_(std::move(modelDescription))
+remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
+    : rng_(49152, 65535)
+    , modelDescription_(std::move(modelDescription))
 {
+    int port;
+    std::string host;
 
-    const int port = 9090;
-    thread_ = std::make_unique<std::thread>(&start_process, fmu, instanceName, port);
+    if (!remote) {
+        port = rng_.next();
+        host = "localhost";
+        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, port);
+    } else {
+        host = remote->host;
+        std::shared_ptr<TTransport> socket(new TSocket(host, remote->port));
+        auto transport = std::make_shared<TFramedTransport>(socket);
+        std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+        auto client = std::make_shared<BootServiceClient>(protocol);
+        transport->open();
 
-    std::shared_ptr<TTransport> socket(new TSocket("localhost", port));
+        std::string data;
+        read_data(fmuPath.string(), data);
+
+        const std::string fmuName = proxyfmu::filesystem::path(fmuPath).stem().string();
+        port = client->loadFromBinaryData(fmuName, instanceName, data);
+        transport->close();
+    }
+
+    std::shared_ptr<TTransport> socket(new TSocket(host, port));
     transport_ = std::make_shared<TFramedTransport>(socket);
     std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport_));
     client_ = std::make_shared<FmuServiceClient>(protocol);
@@ -156,7 +192,7 @@ void remote_slave::freeInstance()
     if (!freed) {
         freed = true;
         client_->freeInstance();
-        thread_->join();
+        if (thread_) thread_->join();
     }
 }
 

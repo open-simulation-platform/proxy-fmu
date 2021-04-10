@@ -5,6 +5,9 @@ set(privateHeaderDir "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(commonPublicHeaders
         "proxyfmu/fs_portability.hpp"
+        "proxyfmu/temp_dir.hpp"
+        "proxyfmu/fixed_range_random_generator.hpp"
+        "proxyfmu/remote_info.hpp"
         )
 
 set(commonPublicHeadersFull)
@@ -23,7 +26,6 @@ set(fmiPublicHeaders
 
 set(fmiPrivateHeaders
         "proxyfmu/fmi/fmicontext.hpp"
-        "proxyfmu/fmi/temp_dir.hpp"
 
         "proxyfmu/fmi/fmi1/fmi1_fmu.hpp"
         "proxyfmu/fmi/fmi1/fmi1_model_description.hpp"
@@ -62,7 +64,7 @@ target_include_directories(fmi
         )
 target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
 if (UNIX)
-  target_link_libraries(fmi PRIVATE stdc++fs dl)
+  target_link_libraries(fmi PRIVATE stdc++fs)
 endif ()
 
 #######################THRIFT##############################
@@ -79,6 +81,7 @@ endif ()
 
 set(thriftServiceDefinitions
         "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift/defs.thrift"
+        "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift/boot.thrift"
         "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift/service.thrift")
 
 # Generate PROXY-FMU classes from Thrift service definitions
@@ -96,6 +99,8 @@ set(thriftGenerated
         "${thriftSourcesDir}/defs_types.cpp"
         "${thriftSourcesDir}/FmuService.h"
         "${thriftSourcesDir}/FmuService.cpp"
+        "${thriftSourcesDir}/BootService.h"
+        "${thriftSourcesDir}/BootService.cpp"
         )
 
 add_library(proxyfmu-service OBJECT ${thriftGenerated})
@@ -156,6 +161,32 @@ target_include_directories(proxy-lib
 target_link_libraries(proxy-lib PUBLIC fmi thrift::thrift)
 if (UNIX)
   target_link_libraries(proxy-lib PRIVATE pthread)
+endif ()
+
+set(serverBooterPublicHeaders
+        "proxyfmu/server/boot_service_handler.hpp")
+
+set(serverBooterSources
+        "proxyfmu/server/boot_service_handler.cpp")
+
+set(serverBooterPublicHeadersFull)
+foreach (header IN LISTS serverBooterPublicHeaders)
+  list(APPEND serverBooterPublicHeadersFull "${publicHeaderDir}/${header}")
+endforeach ()
+
+add_library(proxy-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterSources} ${generatedFiles})
+add_library(proxyfmu::proxy-booter-lib ALIAS proxy-booter-lib)
+target_compile_features(proxy-booter-lib PUBLIC "cxx_std_17")
+target_include_directories(proxy-booter-lib
+        PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+        "${generatedSourcesDir}"
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        )
+target_link_libraries(proxy-booter-lib PUBLIC thrift::thrift)
+if (UNIX)
+  target_link_libraries(proxy-booter-lib PRIVATE pthread stdc++fs)
 endif ()
 
 # ==============================================================================
