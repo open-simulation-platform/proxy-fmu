@@ -1,8 +1,8 @@
 
 cmake_minimum_required(VERSION 3.9)
 file(STRINGS "${CMAKE_SOURCE_DIR}/version.txt" projectVersion)
-project("PROXYFMU" VERSION ${projectVersion})
-message("Current PROXYFMU version: ${CMAKE_PROJECT_VERSION}\n")
+project("proxyfmu" VERSION ${projectVersion})
+message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
 
 # ==============================================================================
 # Build settings
