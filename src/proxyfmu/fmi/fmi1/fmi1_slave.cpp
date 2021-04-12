@@ -5,7 +5,6 @@
 
 #include <utility>
 
-
 namespace
 {
 void fmilogger(fmi1_component_t c, fmi1_string_t instanceName, fmi1_status_t status, fmi1_string_t category, fmi1_string_t message, ...)
@@ -27,11 +26,10 @@ fmi1_slave::fmi1_slave(
     model_description md,
     std::shared_ptr<temp_dir> tmpDir)
     : ctx_(ctx)
-    , handle_(fmi1_import_parse_xml(ctx->ctx_, tmpDir->path().string().c_str()))
     , md_(std::move(md))
     , tmpDir_(std::move(tmpDir))
+    , handle_(fmi1_import_parse_xml(ctx->ctx_, tmpDir->path().string().c_str()))
 {
-
     fmi1_callback_functions_t callbackFunctions;
     callbackFunctions.allocateMemory = std::calloc;
     callbackFunctions.freeMemory = std::free;
@@ -62,31 +60,99 @@ const model_description& fmi1_slave::get_model_description() const
     return md_;
 }
 
-void fmi1_slave::setup_experiment(double start_time, double stop_time, double /*tolerance*/)
+bool fmi1_slave::setup_experiment(double start_time, double stop_time, double /*tolerance*/)
 {
     start_time_ = start_time;
     stop_time_ = stop_time;
+    return true;
 }
 
-void fmi1_slave::enter_initialization_mode()
+bool fmi1_slave::enter_initialization_mode()
 {
-    //do nothing
+    return true;
 }
 
-void fmi1_slave::exit_initialization_mode()
+bool fmi1_slave::exit_initialization_mode()
 {
-    fmi1_boolean_t stop_defined = stop_time_ > 0;
-    fmi1_import_initialize_slave(handle_, start_time_, stop_defined, stop_time_);
+    fmi1_boolean_t stop_defined = (stop_time_ > 0) ? fmi1_true : fmi1_false;
+    auto status = fmi1_import_initialize_slave(handle_, start_time_, stop_defined, stop_time_);
+    return status == fmi1_status_ok;
 }
 
-void fmi1_slave::step(double current_time, double step_size)
+bool fmi1_slave::step(double current_time, double step_size)
 {
-    fmi1_import_do_step(handle_, current_time, step_size, fmi1_true);
+    auto status = fmi1_import_do_step(handle_, current_time, step_size, fmi1_true);
+    return status == fmi1_status_ok;
 }
 
-void fmi1_slave::terminate()
+bool fmi1_slave::terminate()
 {
-    fmi1_import_terminate(handle_);
+    auto status = fmi1_import_terminate(handle_);
+    return status == fmi1_status_ok;
+}
+
+bool fmi1_slave::get_integer(const std::vector<value_ref>& vr, std::vector<int>& values)
+{
+    auto status = fmi1_import_get_integer(handle_, vr.data(), vr.size(), values.data());
+    return status == fmi1_status_ok;
+}
+
+bool fmi1_slave::get_real(const std::vector<value_ref>& vr, std::vector<double>& values)
+{
+    auto status = fmi1_import_get_real(handle_, vr.data(), vr.size(), values.data());
+    return status == fmi1_status_ok;
+}
+
+bool fmi1_slave::get_string(const std::vector<value_ref>& vr, std::vector<std::string>& values)
+{
+    auto tmp = std::vector<fmi1_string_t>(vr.size());
+    auto status = fmi1_import_get_string(handle_, vr.data(), vr.size(), tmp.data());
+    for (auto i = 0; i < tmp.size(); i++) {
+        values[i] = tmp[i];
+    }
+    return status == fmi1_status_ok;
+}
+
+bool fmi1_slave::get_boolean(const std::vector<value_ref>& vr, std::vector<bool>& values)
+{
+    auto tmp = std::vector<fmi1_boolean_t>(vr.size());
+    auto status = fmi1_import_get_boolean(handle_, vr.data(), vr.size(), tmp.data());
+    for (auto i = 0; i < tmp.size(); i++) {
+        values[i] = tmp[i] != 0;
+    }
+    return status == fmi1_status_ok;
+}
+
+bool fmi1_slave::set_integer(const std::vector<value_ref>& vr, const std::vector<int>& values)
+{
+    auto status = fmi1_import_set_integer(handle_, vr.data(), vr.size(), values.data());
+    return status == fmi1_status_ok;
+}
+
+bool fmi1_slave::set_real(const std::vector<value_ref>& vr, const std::vector<double>& values)
+{
+    auto status = fmi1_import_set_real(handle_, vr.data(), vr.size(), values.data());
+    return status == fmi1_status_ok;
+}
+
+bool fmi1_slave::set_string(const std::vector<value_ref>& vr, const std::vector<std::string>& values)
+{
+    std::vector<fmi1_string_t> _values(vr.size());
+    for (auto i = 0; i < vr.size(); i++) {
+        _values[i] = values[i].c_str();
+    }
+    auto status = fmi1_import_set_string(handle_, vr.data(), vr.size(), _values.data());
+    return status == fmi1_status_ok;
+}
+
+bool fmi1_slave::set_boolean(const std::vector<value_ref>& vr, const std::vector<bool>& values)
+{
+    std::vector<fmi1_boolean_t> _values(vr.size());
+    for (auto i = 0; i < vr.size(); i++) {
+        _values[i] = values[i] ? fmi1_true : fmi1_false;
+    }
+    auto status = fmi1_import_set_boolean(handle_, vr.data(), vr.size(), _values.data());
+    return status == fmi1_status_ok;
 }
 
 void fmi1_slave::freeInstance()
@@ -99,62 +165,6 @@ void fmi1_slave::freeInstance()
     }
 }
 
-
-void fmi1_slave::get_integer(const std::vector<value_ref>& vr, std::vector<int>& values)
-{
-    fmi1_import_get_integer(handle_, vr.data(), vr.size(), values.data());
-}
-
-void fmi1_slave::get_real(const std::vector<value_ref>& vr, std::vector<double>& values)
-{
-    fmi1_import_get_real(handle_, vr.data(), vr.size(), values.data());
-}
-
-void fmi1_slave::get_string(const std::vector<value_ref>& vr, std::vector<std::string>& values)
-{
-    auto tmp = std::vector<fmi1_string_t>(vr.size());
-    fmi1_import_get_string(handle_, vr.data(), vr.size(), tmp.data());
-    for (auto i = 0; i < tmp.size(); i++) {
-        values[i] = tmp[i];
-    }
-}
-
-void fmi1_slave::get_boolean(const std::vector<value_ref>& vr, std::vector<bool>& values)
-{
-    auto tmp = std::vector<fmi1_boolean_t>(vr.size());
-    fmi1_import_get_boolean(handle_, vr.data(), vr.size(), tmp.data());
-    for (auto i = 0; i < tmp.size(); i++) {
-        values[i] = tmp[i] != 0;
-    }
-}
-
-void fmi1_slave::set_integer(const std::vector<value_ref>& vr, const std::vector<int>& values)
-{
-    fmi1_import_set_integer(handle_, vr.data(), vr.size(), values.data());
-}
-
-void fmi1_slave::set_real(const std::vector<value_ref>& vr, const std::vector<double>& values)
-{
-    fmi1_import_set_real(handle_, vr.data(), vr.size(), values.data());
-}
-
-void fmi1_slave::set_string(const std::vector<value_ref>& vr, const std::vector<std::string>& values)
-{
-    std::vector<fmi1_string_t> _values(vr.size());
-    for (auto i = 0; i < vr.size(); i++) {
-        _values[i] = values[i].c_str();
-    }
-    fmi1_import_set_string(handle_, vr.data(), vr.size(), _values.data());
-}
-
-void fmi1_slave::set_boolean(const std::vector<value_ref>& vr, const std::vector<bool>& values)
-{
-    std::vector<fmi1_boolean_t> _values(vr.size());
-    for (auto i = 0; i < vr.size(); i++) {
-        _values[i] = values[i];
-    }
-    fmi1_import_set_boolean(handle_, vr.data(), vr.size(), _values.data());
-}
 
 fmi1_slave::~fmi1_slave()
 {

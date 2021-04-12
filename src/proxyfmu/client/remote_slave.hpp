@@ -39,24 +39,24 @@ public:
 
     [[nodiscard]] const fmi::model_description& get_model_description() const override;
 
-    void setup_experiment(double start_time, double stop_time, double tolerance) override;
-    void enter_initialization_mode() override;
-    void exit_initialization_mode() override;
+    bool setup_experiment(double start_time, double stop_time, double tolerance) override;
+    bool enter_initialization_mode() override;
+    bool exit_initialization_mode() override;
 
-    void step(double current_time, double step_size) override;
+    bool step(double current_time, double step_size) override;
 
-    void terminate() override;
+    bool terminate() override;
     void freeInstance() override;
 
-    void get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values) override;
-    void get_real(const std::vector<fmi::value_ref>& vr, std::vector<double>& values) override;
-    void get_string(const std::vector<fmi::value_ref>& vr, std::vector<std::string>& values) override;
-    void get_boolean(const std::vector<fmi::value_ref>& vr, std::vector<bool>& values) override;
+    bool get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values) override;
+    bool get_real(const std::vector<fmi::value_ref>& vr, std::vector<double>& values) override;
+    bool get_string(const std::vector<fmi::value_ref>& vr, std::vector<std::string>& values) override;
+    bool get_boolean(const std::vector<fmi::value_ref>& vr, std::vector<bool>& values) override;
 
-    void set_integer(const std::vector<fmi::value_ref>& vr, const std::vector<int>& values) override;
-    void set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values) override;
-    void set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values) override;
-    void set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values) override;
+    bool set_integer(const std::vector<fmi::value_ref>& vr, const std::vector<int>& values) override;
+    bool set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values) override;
+    bool set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values) override;
+    bool set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values) override;
 
     ~remote_slave() override;
 };

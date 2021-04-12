@@ -8,10 +8,10 @@
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
+#include <cstdio>
 #include <iostream>
 #include <utility>
 #include <vector>
-#include <cstdio>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -29,7 +29,7 @@ void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string&
         " --port " +
         std::to_string(port) +
         " --fmu \"" + fmuPath.string() + +"\""
-                                      " --instanceName " +
+                                          " --instanceName " +
         instanceName);
     auto status = system(cmd.c_str());
     std::cout << "External proxy process returned with status " << std::to_string(status) << std::endl;
@@ -89,44 +89,50 @@ remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& i
     transport_->open();
 }
 
-void remote_slave::setup_experiment(double start_time, double stop_time, double tolerance)
-{
-    client_->setup_experiment(start_time, stop_time, tolerance);
-}
-
 const fmi::model_description& remote_slave::get_model_description() const
 {
     return modelDescription_;
 }
 
-void remote_slave::enter_initialization_mode()
+bool remote_slave::setup_experiment(double start_time, double stop_time, double tolerance)
 {
-    client_->enter_initialization_mode();
+    auto status = client_->setup_experiment(start_time, stop_time, tolerance);
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::exit_initialization_mode()
+bool remote_slave::enter_initialization_mode()
 {
-    client_->exit_initialization_mode();
+    auto status = client_->enter_initialization_mode();
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::step(double current_time, double step_size)
+bool remote_slave::exit_initialization_mode()
 {
-    client_->step(current_time, step_size);
+    auto status = client_->exit_initialization_mode();
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::terminate()
+bool remote_slave::step(double current_time, double step_size)
 {
-    client_->terminate();
+    auto status = client_->step(current_time, step_size);
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values)
+bool remote_slave::terminate()
+{
+    auto status = client_->terminate();
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
+}
+
+bool remote_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values)
 {
     IntegerRead read;
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
     client_->read_integer(read, _vr);
+    return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::get_real(const std::vector<fmi::value_ref>& vr, std::vector<double>& values)
+bool remote_slave::get_real(const std::vector<fmi::value_ref>& vr, std::vector<double>& values)
 {
     assert(values.size() == vr.size());
     RealRead read;
@@ -135,9 +141,10 @@ void remote_slave::get_real(const std::vector<fmi::value_ref>& vr, std::vector<d
     for (auto i = 0; i < vr.size(); i++) {
         values[i] = read.value[i];
     }
+    return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::get_string(const std::vector<fmi::value_ref>& vr, std::vector<std::string>& values)
+bool remote_slave::get_string(const std::vector<fmi::value_ref>& vr, std::vector<std::string>& values)
 {
     assert(values.size() == vr.size());
     StringRead read;
@@ -146,9 +153,10 @@ void remote_slave::get_string(const std::vector<fmi::value_ref>& vr, std::vector
     for (auto i = 0; i < vr.size(); i++) {
         values[i] = read.value[i];
     }
+    return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::get_boolean(const std::vector<fmi::value_ref>& vr, std::vector<bool>& values)
+bool remote_slave::get_boolean(const std::vector<fmi::value_ref>& vr, std::vector<bool>& values)
 {
     assert(values.size() == vr.size());
     BooleanRead read;
@@ -157,34 +165,39 @@ void remote_slave::get_boolean(const std::vector<fmi::value_ref>& vr, std::vecto
     for (auto i = 0; i < vr.size(); i++) {
         values[i] = read.value[i];
     }
+    return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::set_integer(const std::vector<fmi::value_ref>& vr, const std::vector<int>& values)
+bool remote_slave::set_integer(const std::vector<fmi::value_ref>& vr, const std::vector<int>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
-    client_->write_integer(_vr, values);
+    auto status = client_->write_integer(_vr, values);
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values)
+bool remote_slave::set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
-    client_->write_real(_vr, values);
+    auto status = client_->write_real(_vr, values);
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values)
+bool remote_slave::set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
-    client_->write_string(_vr, values);
+    auto status = client_->write_string(_vr, values);
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values)
+bool remote_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
-    client_->write_boolean(_vr, values);
+    auto status = client_->write_boolean(_vr, values);
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
 void remote_slave::freeInstance()
