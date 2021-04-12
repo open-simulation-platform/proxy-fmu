@@ -1,11 +1,9 @@
-import os
-
 from conans import ConanFile, CMake, tools
 from os import path
 
 
 class ProxyFmuConan(ConanFile):
-    name = "proxy-fmu"
+    name = "proxyfmu"
     author = "osp"
     license = "MIT"
     exports = "version.txt"
@@ -15,16 +13,16 @@ class ProxyFmuConan(ConanFile):
         "revision": "auto"
     }
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake", "virtualrunenv"
+    generators = "cmake"
     requires = (
         "boost/1.71.0",
         "fmilibrary/2.0.3",
         "thrift/0.13.0"
     )
 
-    default_options = (
-        "boost:shared=True"
-    )
+    default_options = {
+        "boost:shared": True
+    }
 
     def set_version(self):
         self.version = tools.load(path.join(self.recipe_folder, "version.txt")).strip()
@@ -43,4 +41,4 @@ class ProxyFmuConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["proxy-fmu"]
+        self.cpp_info.libs = ["proxyfmu"]
