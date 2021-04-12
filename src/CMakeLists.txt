@@ -201,3 +201,8 @@ install(
         DIRECTORY "${publicHeaderDir}/proxyfmu"
         DESTINATION "${PROXYFMU_HEADER_INSTALL_DIR}"
 )
+
+install(
+        DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift"
+        DESTINATION "."
+)
