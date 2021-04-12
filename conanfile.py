@@ -7,6 +7,7 @@ from os import path
 class ProxyFmuConan(ConanFile):
     name = "proxy-fmu"
     author = "osp"
+    license = "MIT"
     exports = "version.txt"
     scm = {
         "type": "git",
@@ -27,11 +28,6 @@ class ProxyFmuConan(ConanFile):
 
     def set_version(self):
         self.version = tools.load(path.join(self.recipe_folder, "version.txt")).strip()
-
-    def imports(self):
-        binDir = os.path.join("output", str(self.settings.build_type).lower(), "bin")
-        self.copy("*.dll", dst=binDir, keep_path=False)
-        self.copy("*.pdb", dst=binDir, keep_path=False)
 
     def configure_cmake(self):
         cmake = CMake(self)
