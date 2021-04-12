@@ -1,5 +1,4 @@
 set(publicHeaderDir ${CMAKE_SOURCE_DIR}/include)
-set(privateHeaderDir "${CMAKE_CURRENT_SOURCE_DIR}")
 
 #######################COMMON##############################
 
