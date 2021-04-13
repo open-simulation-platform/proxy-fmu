@@ -1,4 +1,6 @@
 
+#include "../process_helper.hpp"
+
 #include <proxyfmu/server/boot_service_handler.hpp>
 
 #include <cstdio>
@@ -14,19 +16,6 @@ void write_data(std::string const& fileName, std::string const& data)
     FILE* file = fopen(fileName.c_str(), "wb");
     [[maybe_unused]] size_t bytes_written = fwrite(data.c_str(), sizeof(unsigned char), data.size(), file);
     fclose(file);
-}
-
-void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string& instanceName, const int port)
-{
-    std::string cmd(
-        "proxy_server"
-        " --port " +
-        std::to_string(port) +
-        " --fmu \"" + fmuPath.string() + +"\""
-                                      " --instanceName " +
-        instanceName);
-    auto status = system(cmd.c_str());
-    std::cout << "External proxy process returned with status " << std::to_string(status) << std::endl;
 }
 
 } // namespace

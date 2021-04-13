@@ -1,7 +1,8 @@
 
 #include "remote_slave.hpp"
 
-#include <proxyfmu/fs_portability.hpp>
+#include "../process_helper.hpp"
+
 #include <proxyfmu/thrift/BootService.h>
 
 #include <thrift/protocol/TBinaryProtocol.h>
@@ -9,7 +10,6 @@
 #include <thrift/transport/TTransportUtils.h>
 
 #include <cstdio>
-#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -22,19 +22,6 @@ using namespace proxyfmu::thrift;
 namespace
 {
 
-void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string& instanceName, const int port)
-{
-    std::string cmd(
-        "proxy_server"
-        " --port " +
-        std::to_string(port) +
-        " --fmu \"" + fmuPath.string() + +"\""
-                                          " --instanceName " +
-        instanceName);
-    auto status = system(cmd.c_str());
-    std::cout << "External proxy process returned with status " << std::to_string(status) << std::endl;
-}
-
 void read_data(std::string const& fileName, std::string& data)
 {
     FILE* file = fopen(fileName.c_str(), "rb");
@@ -45,7 +32,7 @@ void read_data(std::string const& fileName, std::string& data)
     file = fopen(fileName.c_str(), "rb");
 
     data.resize(size);
-    size_t bytes_read = fread(data.data(), sizeof(unsigned char), size, file);
+    [[maybe_unused]] size_t bytes_read = fread(data.data(), sizeof(unsigned char), size, file);
     fclose(file);
 }
 

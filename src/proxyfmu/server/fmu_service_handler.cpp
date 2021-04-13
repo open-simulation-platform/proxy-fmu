@@ -110,7 +110,7 @@ void fmu_service_handler::freeInstance()
 {
     slave_->freeInstance();
     auto modelName = fmu_->get_model_description().modelName;
-    std::cout << "Shutting down proxy for " << modelName << "::" << instanceName_;
+    std::cout << "[proxyfmu] Shutting down proxy for " << modelName << "::" << instanceName_;
     stop_();
     std::cout << " done.." << std::endl;
 }

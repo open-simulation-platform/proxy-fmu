@@ -118,6 +118,7 @@ set(clientPublicHeaders
         "proxyfmu/client/proxy_fmu.hpp")
 
 set(clientPrivateHeaders
+        "proxyfmu/process_helper.hpp"
         "proxyfmu/client/remote_slave.hpp")
 
 set(clientSources
@@ -147,6 +148,9 @@ endif ()
 set(serverPublicHeaders
         "proxyfmu/server/fmu_service_handler.hpp")
 
+set(serverPrivateHeaders
+        "proxyfmu/process_helper.hpp")
+
 set(serverSources
         "proxyfmu/server/fmu_service_handler.cpp")
 
@@ -155,7 +159,7 @@ foreach (header IN LISTS serverPublicHeaders)
   list(APPEND serverPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(proxy-lib ${serverPublicHeadersFull} ${serverSources} ${generatedFiles})
+add_library(proxy-lib ${serverPublicHeadersFull} ${serverPrivateHeaders} ${serverSources} ${generatedFiles})
 add_library(proxyfmu::proxy-lib ALIAS proxy-lib)
 target_compile_features(proxy-lib PUBLIC "cxx_std_17")
 target_include_directories(proxy-lib
