@@ -1,4 +1,4 @@
-name: Build
+name: Upload conan recipe
 
 env:
   CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
@@ -44,7 +44,7 @@ jobs:
           fi
           conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} -b missing . osp/${CHANNEL}
       - name: Conan upload
-        run: conan upload --all --confirm --remote osp 'proxy-fmu*'
+        run: conan upload --all --confirm --remote osp 'proxyfmu*'
 
   conan-on-windows:
     name: Conan
@@ -76,69 +76,4 @@ jobs:
           fi
           conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -b missing . osp/${CHANNEL}
       - name: Conan upload
-        run: conan upload --all --confirm --remote osp 'proxy-fmu*'
-
-  cmake-on-linux:
-    name: cmake
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-18.04]
-#        build_type: [Debug, Release]
-#        compiler_version: [7]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install prerequisites
-        run: |
-          sudo pip3 install --upgrade setuptools pip
-          sudo pip3 install conan
-      - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Run conan
-        run: conan install . -s build_type=Release -s compiler.libcxx=libstdc++11 --install-folder=build
-        shell: bash
-      - name: Configure and build
-        run: |
-          cmake -H. -Bbuild -DPROXYFMU_BUILD_EXAMPLES=ON
-          cmake --build build
-        shell: bash
-
-  cmake-on-windows:
-    name: cmake
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-2016]
-#        build_type: [Debug, Release]
-#        compiler_version: [15]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install prerequisites
-        run: |
-          pip3 install --upgrade setuptools pip
-          pip3 install conan
-      - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Run conan
-        run: conan install . -s build_type=Release --install-folder=build
-        shell: bash
-      - name: Configure and build
-        run: |
-          cmake . -G "Visual Studio 15 2017 Win64" -Bbuild -DPROXYFMU_BUILD_EXAMPLES=ON
-          cmake --build build --config Release
-        shell: bash
-
-
-#      - name: Test (Linux)
-#        if: startsWith(runner.os, 'Linux')
-#        run: |
-#          cd build/tests && ctest
-#        shell: bash
-#
-#      - name: Test (Windows)
-#        if: startsWith(runner.os, 'Windows')
-#        run: |
-#          cd build/tests && ctest -C Release
-#        shell: bash
+        run: conan upload --all --confirm --remote osp 'proxyfmu*'
