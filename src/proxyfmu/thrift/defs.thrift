@@ -1,5 +1,5 @@
-
 namespace cpp proxyfmu.thrift
+namespace java com.opensimulationplatform.thrift
 
 typedef string FmuId
 typedef string InstanceId

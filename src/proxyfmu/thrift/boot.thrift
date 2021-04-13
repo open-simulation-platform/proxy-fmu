@@ -1,4 +1,5 @@
 namespace cpp proxyfmu.thrift
+namespace java com.opensimulationplatform.proxyfmu.thrift
 
 service BootService {
 
