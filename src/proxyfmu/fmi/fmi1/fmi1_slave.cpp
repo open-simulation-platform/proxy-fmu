@@ -43,7 +43,7 @@ fmi1_slave::fmi1_slave(
         handle_,
         instanceName.c_str(),
         nullptr,
-        "",
+        nullptr,
         0,
         fmi1_false,
         fmi1_false);
@@ -87,7 +87,7 @@ bool fmi1_slave::step(double current_time, double step_size)
 
 bool fmi1_slave::terminate()
 {
-    auto status = fmi1_import_terminate(handle_);
+    auto status = fmi1_import_terminate_slave(handle_);
     return status == fmi1_status_ok;
 }
 
