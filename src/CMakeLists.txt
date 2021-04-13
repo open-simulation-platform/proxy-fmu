@@ -69,10 +69,12 @@ endif ()
 #######################THRIFT##############################
 
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
-set(thriftSourcesDir "${generatedSourcesDir}/proxyfmu/thrift")
+set(thriftCppSourcesDir "${generatedSourcesDir}/proxyfmu/thrift")
+set(thriftJavaSourcesDir "${generatedSourcesDir}/java")
 
 file(MAKE_DIRECTORY "${generatedSourcesDir}")
-file(MAKE_DIRECTORY "${thriftSourcesDir}")
+file(MAKE_DIRECTORY "${thriftCppSourcesDir}")
+file(MAKE_DIRECTORY "${thriftJavaSourcesDir}")
 
 if (NOT THRIFT_EXECUTABLE)
   message(FATAL_ERROR "The thrift compiler was not found. Cannot generate Thrift sources.")
@@ -88,18 +90,24 @@ foreach (def ${thriftServiceDefinitions})
   execute_process(
           COMMAND "${THRIFT_EXECUTABLE}"
           "--gen" "cpp:no_skeleton"
-          "-out" "${thriftSourcesDir}"
+          "-out" "${thriftCppSourcesDir}"
+          "${def}"
+  )
+  execute_process(
+          COMMAND "${THRIFT_EXECUTABLE}"
+          "--gen" "java:private-members,fullcamel"
+          "-out" "${thriftJavaSourcesDir}"
           "${def}"
   )
 endforeach ()
 
 set(thriftGenerated
-        "${thriftSourcesDir}/defs_types.h"
-        "${thriftSourcesDir}/defs_types.cpp"
-        "${thriftSourcesDir}/FmuService.h"
-        "${thriftSourcesDir}/FmuService.cpp"
-        "${thriftSourcesDir}/BootService.h"
-        "${thriftSourcesDir}/BootService.cpp"
+        "${thriftCppSourcesDir}/defs_types.h"
+        "${thriftCppSourcesDir}/defs_types.cpp"
+        "${thriftCppSourcesDir}/FmuService.h"
+        "${thriftCppSourcesDir}/FmuService.cpp"
+        "${thriftCppSourcesDir}/BootService.h"
+        "${thriftCppSourcesDir}/BootService.cpp"
         )
 
 add_library(proxyfmu-service OBJECT ${thriftGenerated})
@@ -205,4 +213,9 @@ install(
 install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift"
         DESTINATION "."
+)
+
+install(
+        DIRECTORY "${CMAKE_BINARY_DIR}/generated/java"
+        DESTINATION "thrift"
 )
