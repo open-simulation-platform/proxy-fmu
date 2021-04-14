@@ -12,7 +12,7 @@ namespace proxyfmu
 void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string& instanceName, const int port)
 {
     std::string cmd(
-        "proxy_server"
+        "proxyfmu"
         " --port " +
         std::to_string(port) +
         " --fmu \"" + fmuPath.string() + +"\""
