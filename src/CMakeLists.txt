@@ -1,6 +1,9 @@
 set(publicHeaderDir ${CMAKE_SOURCE_DIR}/include)
 
-#######################COMMON##############################
+# ==============================================================================
+# common headers
+# ==============================================================================
+
 
 set(commonPublicHeaders
         "proxyfmu/fs_portability.hpp"
@@ -14,7 +17,10 @@ foreach (header IN LISTS commonPublicHeaders)
   list(APPEND commonPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-#######################FMI##############################
+# ==============================================================================
+# fmilib wrapper
+# ==============================================================================
+
 
 set(fmiPublicHeaders
         "proxyfmu/fmi/fmu.hpp"
@@ -66,7 +72,10 @@ if (UNIX)
   target_link_libraries(fmi PRIVATE stdc++fs)
 endif ()
 
-#######################THRIFT##############################
+# ==============================================================================
+# thrift
+# ==============================================================================
+
 
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 set(thriftCppSourcesDir "${generatedSourcesDir}/proxyfmu/thrift")
@@ -114,6 +123,10 @@ add_library(proxyfmu-service OBJECT ${thriftGenerated})
 set_target_properties(proxyfmu-service PROPERTIES POSITION_INDEPENDENT_CODE ON)
 list(APPEND generatedFiles "$<TARGET_OBJECTS:proxyfmu-service>")
 
+# ==============================================================================
+# proxyfmu client lib
+# ==============================================================================
+
 set(clientPublicHeaders
         "proxyfmu/client/proxy_fmu.hpp")
 
@@ -145,6 +158,10 @@ if (UNIX)
   target_link_libraries(proxy-client PRIVATE pthread)
 endif ()
 
+# ==============================================================================
+# proxyfmu server lib
+# ==============================================================================
+
 set(serverPublicHeaders
         "proxyfmu/server/fmu_service_handler.hpp")
 
@@ -173,6 +190,10 @@ target_link_libraries(proxy-lib PUBLIC fmi thrift::thrift)
 if (UNIX)
   target_link_libraries(proxy-lib PRIVATE pthread)
 endif ()
+
+# ==============================================================================
+# proxyfmu booter lib
+# ==============================================================================
 
 set(serverBooterPublicHeaders
         "proxyfmu/server/boot_service_handler.hpp")
