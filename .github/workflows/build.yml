@@ -14,8 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04]
-#        build_type: [Debug, Release]
-#        compiler_version: [7]
+
     steps:
       - uses: actions/checkout@v2
       - name: Install prerequisites
@@ -29,9 +28,14 @@ jobs:
         shell: bash
       - name: Configure and build
         run: |
-          cmake -H. -Bbuild -DPROXYFMU_BUILD_EXAMPLES=ON
+          cmake . -B build -DPROXYFMU_BUILD_EXAMPLES=ON
           cmake --build build
         shell: bash
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: proxyfmu
+          path: build/bin/proxyfmu*
 
   cmake-on-windows:
     name: cmake
@@ -40,8 +44,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2016]
-#        build_type: [Debug, Release]
-#        compiler_version: [15]
+
     steps:
       - uses: actions/checkout@v2
       - name: Install prerequisites
@@ -55,19 +58,11 @@ jobs:
         shell: bash
       - name: Configure and build
         run: |
-          cmake . -G "Visual Studio 15 2017 Win64" -Bbuild -DPROXYFMU_BUILD_EXAMPLES=ON
+          cmake . -A x64 -B build -DPROXYFMU_BUILD_EXAMPLES=ON
           cmake --build build --config Release
         shell: bash
 
-
-#      - name: Test (Linux)
-#        if: startsWith(runner.os, 'Linux')
-#        run: |
-#          cd build/tests && ctest
-#        shell: bash
-#
-#      - name: Test (Windows)
-#        if: startsWith(runner.os, 'Windows')
-#        run: |
-#          cd build/tests && ctest -C Release
-#        shell: bash
+      - uses: actions/upload-artifact@v2
+        with:
+          name: proxyfmu
+          path: build/bin/proxyfmu*
