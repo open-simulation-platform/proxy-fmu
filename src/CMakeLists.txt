@@ -143,19 +143,19 @@ foreach (header IN LISTS clientPublicHeaders)
   list(APPEND clientPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(proxy-client ${commonPublicHeadersFull} ${clientPublicHeadersFull} ${clientPrivateHeaders} ${clientSources} ${generatedFiles})
-add_library(proxyfmu::proxy-client ALIAS proxy-client)
-target_compile_features(proxy-client PUBLIC "cxx_std_17")
-target_include_directories(proxy-client
+add_library(proxyfmu-client ${commonPublicHeadersFull} ${clientPublicHeadersFull} ${clientPrivateHeaders} ${clientSources} ${generatedFiles})
+add_library(proxyfmu::proxy-client ALIAS proxyfmu-client)
+target_compile_features(proxyfmu-client PUBLIC "cxx_std_17")
+target_include_directories(proxyfmu-client
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         "${generatedSourcesDir}"
         )
-target_link_libraries(proxy-client PUBLIC fmi PRIVATE thrift::thrift)
+target_link_libraries(proxyfmu-client PUBLIC fmi PRIVATE thrift::thrift)
 if (UNIX)
-  target_link_libraries(proxy-client PRIVATE pthread)
+  target_link_libraries(proxyfmu-client PRIVATE pthread)
 endif ()
 
 # ==============================================================================
@@ -176,19 +176,19 @@ foreach (header IN LISTS serverPublicHeaders)
   list(APPEND serverPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(proxy-lib ${serverPublicHeadersFull} ${serverPrivateHeaders} ${serverSources} ${generatedFiles})
-add_library(proxyfmu::proxy-lib ALIAS proxy-lib)
-target_compile_features(proxy-lib PUBLIC "cxx_std_17")
-target_include_directories(proxy-lib
+add_library(proxyfmu-lib ${serverPublicHeadersFull} ${serverPrivateHeaders} ${serverSources} ${generatedFiles})
+add_library(proxyfmu::proxy-lib ALIAS proxyfmu-lib)
+target_compile_features(proxyfmu-lib PUBLIC "cxx_std_17")
+target_include_directories(proxyfmu-lib
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
         "${generatedSourcesDir}"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(proxy-lib PUBLIC fmi thrift::thrift)
+target_link_libraries(proxyfmu-lib PUBLIC fmi thrift::thrift)
 if (UNIX)
-  target_link_libraries(proxy-lib PRIVATE pthread)
+  target_link_libraries(proxyfmu-lib PRIVATE pthread)
 endif ()
 
 # ==============================================================================
@@ -206,19 +206,19 @@ foreach (header IN LISTS serverBooterPublicHeaders)
   list(APPEND serverBooterPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(proxy-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterSources} ${generatedFiles})
-add_library(proxyfmu::proxy-booter-lib ALIAS proxy-booter-lib)
-target_compile_features(proxy-booter-lib PUBLIC "cxx_std_17")
-target_include_directories(proxy-booter-lib
+add_library(proxyfmu-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterSources} ${generatedFiles})
+add_library(proxyfmu::proxyfmu-booter-lib ALIAS proxyfmu-booter-lib)
+target_compile_features(proxyfmu-booter-lib PUBLIC "cxx_std_17")
+target_include_directories(proxyfmu-booter-lib
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
         "${generatedSourcesDir}"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(proxy-booter-lib PUBLIC thrift::thrift)
+target_link_libraries(proxyfmu-booter-lib PUBLIC thrift::thrift)
 if (UNIX)
-  target_link_libraries(proxy-booter-lib PRIVATE pthread stdc++fs)
+  target_link_libraries(proxyfmu-booter-lib PRIVATE pthread stdc++fs)
 endif ()
 
 # ==============================================================================
@@ -226,7 +226,7 @@ endif ()
 # ==============================================================================
 
 install(
-        TARGETS fmi proxy-client
+        TARGETS fmi proxyfmu-client
         EXPORT "${PROXYFMU_EXPORT_TARGET}"
         ${PROXYFMU_INSTALL_DESTINATIONS}
 )

@@ -14,4 +14,4 @@ target_link_libraries(fmi-test PUBLIC fmi ${FMILibrary_LIBRARIES})
 
 add_executable(client_test
         thrift/client_test.cpp)
-target_link_libraries(client_test PRIVATE ${FMILibrary_LIBRARIES} proxy-client)
+target_link_libraries(client_test PRIVATE ${FMILibrary_LIBRARIES} proxyfmu-client)
