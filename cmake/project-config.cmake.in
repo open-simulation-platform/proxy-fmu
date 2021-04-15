@@ -11,7 +11,7 @@ else()
   find_dependency(Boost REQUIRED)
 endif()
 
-find_dependency(FMILibrary REQUIRED)
+find_dependency(FMILibrary_ REQUIRED)
 find_dependency(THRIFT REQUIRED)
 
 list(REMOVE_AT CMAKE_MODULE_PATH -1)

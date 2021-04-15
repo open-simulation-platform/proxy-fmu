@@ -59,7 +59,7 @@ endif ()
 
 find_package(Boost 1.66 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 find_package(THRIFT REQUIRED)
-find_package(FMILibrary REQUIRED)
+find_package(FMILibrary_ REQUIRED)
 
 # ==============================================================================
 # Targets
