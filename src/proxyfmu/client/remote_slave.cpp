@@ -116,6 +116,9 @@ bool remote_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vecto
     IntegerRead read;
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
     client_->read_integer(read, _vr);
+    for (auto i = 0; i < vr.size(); i++) {
+        values[i] = read.value[i];
+    }
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
