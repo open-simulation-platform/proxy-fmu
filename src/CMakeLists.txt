@@ -61,6 +61,7 @@ endforeach ()
 add_library(fmi ${commonPublicHeadersFull} ${fmiPublicHeadersFull} ${fmiPrivateHeaders} ${fmiSources})
 add_library(proxyfmu::fmi ALIAS fmi)
 target_compile_features(fmi PUBLIC "cxx_std_17")
+set_target_properties(fmi PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(fmi
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
