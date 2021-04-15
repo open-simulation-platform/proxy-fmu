@@ -65,10 +65,10 @@ jobs:
           cmake . -A x64 -B build -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
           cmake --build build --config Release
         shell: bash
-       - name: Test
-         run: |
-           cd build
-           ctest -C Release
+      - name: Test
+        run: |
+         cd build
+         ctest -C Release
 
       - uses: actions/upload-artifact@v2
         with:
