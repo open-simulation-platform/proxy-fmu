@@ -146,6 +146,7 @@ endforeach ()
 add_library(proxyfmu-client ${commonPublicHeadersFull} ${clientPublicHeadersFull} ${clientPrivateHeaders} ${clientSources} ${generatedFiles})
 add_library(proxyfmu::proxy-client ALIAS proxyfmu-client)
 target_compile_features(proxyfmu-client PUBLIC "cxx_std_17")
+set_target_properties(proxyfmu-client PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(proxyfmu-client
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
