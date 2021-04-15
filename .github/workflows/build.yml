@@ -33,7 +33,7 @@ jobs:
         shell: bash
       - name: Test
         run: |
-         cd build
+         cd build/tests
          ctest
 
       - uses: actions/upload-artifact@v2
@@ -67,7 +67,7 @@ jobs:
         shell: bash
       - name: Test
         run: |
-         cd build
+         cd build/tests
          ctest -C Release
 
       - uses: actions/upload-artifact@v2
