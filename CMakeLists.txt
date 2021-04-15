@@ -59,7 +59,7 @@ endif ()
 
 find_package(Boost 1.66 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 find_package(THRIFT REQUIRED)
-find_package(FMILibrary_ REQUIRED)
+find_package(FMILIB REQUIRED)
 
 # ==============================================================================
 # Targets
@@ -111,7 +111,7 @@ install(FILES "${versionFile}" DESTINATION "${PROXYFMU_CMAKE_INSTALL_DIR}")
 
 # Install custom find modules
 install(FILES
-        "${CMAKE_SOURCE_DIR}/cmake/FindFMILibrary_.cmake"
+        "${CMAKE_SOURCE_DIR}/cmake/FindFMILIB.cmake"
         "${CMAKE_SOURCE_DIR}/cmake/FindTHRIFT.cmake"
         DESTINATION
         "${PROXYFMU_CMAKE_INSTALL_DIR}"

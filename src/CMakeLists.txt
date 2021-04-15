@@ -67,7 +67,7 @@ target_include_directories(fmi
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(fmi PRIVATE ${FMILibrary_LIBRARIES})
+target_link_libraries(fmi PRIVATE FMILIB::FMILIB)
 if (UNIX)
   target_link_libraries(fmi PRIVATE stdc++fs)
 endif ()
