@@ -69,7 +69,7 @@ target_include_directories(fmi
         )
 target_link_libraries(fmi PRIVATE FMILIB::FMILIB)
 if (UNIX)
-  target_link_libraries(fmi PRIVATE stdc++fs)
+  target_link_libraries(fmi PRIVATE stdc++fs dl)
 endif ()
 
 # ==============================================================================
