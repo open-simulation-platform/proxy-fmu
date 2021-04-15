@@ -9,6 +9,7 @@ message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
 # ==============================================================================
 
 option(BUILD_SHARED_LIBS OFF)
+option(PROXYFMU_BUILD_TESTS "Build tests" OFF)
 option(PROXYFMU_BUILD_EXAMPLES "Build examples" OFF)
 option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
 
@@ -53,8 +54,13 @@ else ()
   message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
 endif ()
 
+set(Boost_COMPONENTS)
 if (PROXYFMU_BUILD_TOOL)
   list(APPEND BOOST_COMPONENTS program_options)
+endif ()
+
+if (PROXYFMU_BUILD_TESTS)
+  list(APPEND BOOST_COMPONENTS unit_test_framework)
 endif ()
 
 find_package(Boost 1.66 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
@@ -72,6 +78,10 @@ if (PROXYFMU_BUILD_EXAMPLES)
   if (PROXYFMU_BUILD_EXAMPLES)
     add_subdirectory(examples)
   endif ()
+endif ()
+
+if (PROXYFMU_BUILD_TESTS)
+  add_subdirectory(tests)
 endif ()
 
 if (PROXYFMU_BUILD_TOOL)
