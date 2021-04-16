@@ -44,4 +44,4 @@ class ProxyFmuConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["proxyfmu"]
+        self.cpp_info.libs = ["proxyfmu-client"]
