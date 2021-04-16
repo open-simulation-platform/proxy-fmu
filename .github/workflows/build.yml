@@ -69,8 +69,9 @@ jobs:
       - name: Test
         run: |
          cd build/tests
-         set PATH=%PATH%;%cd%\..\bin;
+         export PATH=../bin:$PATH
          ctest -C Release
+        shell: bash
 
       - uses: actions/upload-artifact@v2
         with:
