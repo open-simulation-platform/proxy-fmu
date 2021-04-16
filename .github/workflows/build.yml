@@ -69,7 +69,7 @@ jobs:
       - name: Test
         run: |
          cd build/tests
-         set PATH=%PATH%;..\bin;
+         set PATH=%PATH%;%CD%\..\bin;
          ctest -C Release
 
       - uses: actions/upload-artifact@v2
