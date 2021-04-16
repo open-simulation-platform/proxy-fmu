@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE test_identity
 
 #include <proxyfmu/client/proxy_fmu.hpp>
-#include <proxyfmu/fmi/fmu.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -76,7 +75,6 @@ BOOST_AUTO_TEST_CASE(fmi_test_identity)
 
 BOOST_AUTO_TEST_CASE(client_test_identity)
 {
-
     std::string fmuPath("../fmus/1.0/identity.fmu");
     auto fmu = client::proxy_fmu(fmuPath);
     test(fmu);
