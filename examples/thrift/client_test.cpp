@@ -44,7 +44,7 @@ int main() {
 
     try {
 
-        proxyfmu::filesystem::path fmuLocation("../fmus/2.0/cs/20sim/4.6.4.8004/ControlledTemperature/ControlledTemperature.fmu");
+        proxyfmu::filesystem::path fmuLocation("../fmus/2.0/20sim/ControlledTemperature.fmu");
 
         proxy_fmu fmu(fmuLocation);
 

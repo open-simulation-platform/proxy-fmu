@@ -28,9 +28,14 @@ jobs:
         shell: bash
       - name: Configure and build
         run: |
-          cmake . -B build -DPROXYFMU_BUILD_EXAMPLES=ON
+          cmake . -B build -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
           cmake --build build
         shell: bash
+      - name: Test
+        run: |
+         cd build/tests
+         export PATH=../bin:$PATH
+         ctest --output-on-failure
 
       - uses: actions/upload-artifact@v2
         with:
@@ -58,9 +63,15 @@ jobs:
         shell: bash
       - name: Configure and build
         run: |
-          cmake . -A x64 -B build -DPROXYFMU_BUILD_EXAMPLES=ON
+          cmake . -A x64 -B build -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
           cmake --build build --config Release
         shell: bash
+#      - name: Test
+#        run: |
+#         cd build/tests
+#         export PATH=../bin:$PATH
+#         ctest -C Release --output-on-failure
+#        shell: bash
 
       - uses: actions/upload-artifact@v2
         with:

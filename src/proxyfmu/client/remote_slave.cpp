@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <utility>
 #include <vector>
+#include <chrono>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -53,6 +54,7 @@ remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& i
         port = rng_.next();
         host = "localhost";
         thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, port);
+        std::this_thread::sleep_for (std::chrono::seconds(1));
     } else {
         host = remote->host;
         std::shared_ptr<TTransport> socket(new TSocket(host, remote->port));
@@ -116,6 +118,9 @@ bool remote_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vecto
     IntegerRead read;
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
     client_->read_integer(read, _vr);
+    for (auto i = 0; i < vr.size(); i++) {
+        values[i] = read.value[i];
+    }
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 

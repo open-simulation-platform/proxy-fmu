@@ -8,7 +8,7 @@ using namespace proxyfmu::fmi;
 
 void run() {
 
-    std::string fmuPath("../fmus/2.0/cs/20sim/4.6.4.8004/ControlledTemperature/ControlledTemperature.fmu");
+    std::string fmuPath("../fmus/2.0/20sim/ControlledTemperature.fmu");
 
     auto fmu = loadFmu(fmuPath);
 
