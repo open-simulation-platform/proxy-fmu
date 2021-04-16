@@ -68,6 +68,7 @@ jobs:
       - name: Test
         run: |
          cd build/tests
+         export PATH=../bin:$PATH
          ctest -C Release
 
       - uses: actions/upload-artifact@v2
