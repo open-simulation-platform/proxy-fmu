@@ -34,6 +34,7 @@ jobs:
       - name: Test
         run: |
          cd build/tests
+         export PATH=../bin:$PATH
          ctest
 
       - uses: actions/upload-artifact@v2
@@ -68,7 +69,7 @@ jobs:
       - name: Test
         run: |
          cd build/tests
-         export PATH=../bin:$PATH
+         set PATH=%PATH%;..\bin;
          ctest -C Release
 
       - uses: actions/upload-artifact@v2

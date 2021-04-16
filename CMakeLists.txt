@@ -127,11 +127,3 @@ install(FILES
         DESTINATION
         "${PROXYFMU_CMAKE_INSTALL_DIR}"
         )
-#
-#
-#if (PROXYFMU_BUILD_TESTS)
-#  install(FILES
-#          "${CMAKE_BINARY_DIR}/bin/proxyfmu"
-#          DESTINATION
-#          "${CMAKE_BINARY_DIR}/tests")
-#endif ()
