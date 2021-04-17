@@ -160,6 +160,9 @@ if (UNIX)
   target_link_libraries(proxyfmu-client PRIVATE pthread)
 endif ()
 
+# Make sure executable is up to date
+add_dependencies(proxyfmu-client proxyfmu)
+
 # ==============================================================================
 # proxyfmu server lib
 # ==============================================================================
