@@ -73,21 +73,24 @@ find_package(FMILIB REQUIRED)
 
 add_subdirectory(src)
 
-if (PROXYFMU_BUILD_EXAMPLES)
-  file(COPY data/fmus DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-  if (PROXYFMU_BUILD_EXAMPLES)
-    add_subdirectory(examples)
-  endif ()
-endif ()
-
-if (PROXYFMU_BUILD_TESTS)
-  enable_testing()
-  add_subdirectory(tests)
-endif ()
-
 if (PROXYFMU_BUILD_TOOL)
   add_subdirectory(tool)
 endif ()
+
+if (PROXYFMU_BUILD_EXAMPLES OR PROXYFMU_BUILD_TESTS)
+  file(COPY data/fmus DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+  if (PROXYFMU_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+  endif ()
+
+  if (PROXYFMU_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+  endif ()
+
+endif ()
+
 
 # ==============================================================================
 # Exports and remaining installation
