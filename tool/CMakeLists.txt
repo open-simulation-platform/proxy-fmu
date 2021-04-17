@@ -24,6 +24,6 @@ install(
 if (PROXYFMU_BUILD_TESTS)
   # Copy executable to test directory in order for CTest to function
   add_custom_command(TARGET proxyfmu POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:proxyfmu> ${CMAKE_BINARY_DIR}/tests/$<TARGET_FILE_NAME:proxyfmu>
+          COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:proxyfmu> ${CMAKE_CURRENT_BINARY_DIR}/../tests/$<TARGET_FILE_NAME:proxyfmu>
           )
 endif()
