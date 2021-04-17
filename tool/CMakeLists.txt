@@ -14,10 +14,16 @@ if (UNIX)
   target_link_libraries(proxyfmu_booter PRIVATE pthread)
 endif ()
 
-
 install(
         TARGETS
         "proxyfmu"
         "proxyfmu_booter"
         DESTINATION ${PROXYFMU_INSTALL_DESTINATIONS}
 )
+
+if (PROXYFMU_BUILD_TESTS)
+  # Copy executable to test directory in order for CTest to function
+  add_custom_command(TARGET proxyfmu POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:proxyfmu> ${PROJECT_BINARY_DIR}/tests/$<TARGET_FILE_NAME:proxyfmu>
+          )
+endif()
