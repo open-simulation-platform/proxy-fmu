@@ -12,6 +12,12 @@ namespace
 
 void test(fmu& fmu)
 {
+    const auto d = fmu.get_model_description();
+    BOOST_TEST(d.modelName == "no.viproma.demo.identity");
+    BOOST_TEST(d.description ==
+               "Has one input and one output of each type, and outputs are always set equal to inputs");
+    BOOST_TEST(d.author == "Lars Tandle Kyllingstad");
+
     auto slave = fmu.new_instance("instance");
     BOOST_REQUIRE(slave->setup_experiment());
     BOOST_REQUIRE(slave->enter_initialization_mode());
