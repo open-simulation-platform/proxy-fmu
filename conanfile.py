@@ -21,7 +21,7 @@ class ProxyFmuConan(ConanFile):
     )
 
     default_options = {
-        "boost:shared": True
+        "boost:shared": False
     }
 
     def set_version(self):
