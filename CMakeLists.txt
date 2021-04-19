@@ -27,6 +27,8 @@ if (MSVC)
   add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
 endif ()
 
+set(Boost_USE_STATIC_LIBS ON)
+
 # Prepare for export and installation.
 set(PROXYFMU_HEADER_INSTALL_DIR "include")
 if (WIN32)
