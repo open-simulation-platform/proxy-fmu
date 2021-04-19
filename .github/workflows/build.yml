@@ -14,6 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04]
+        build_type: [Debug, Release]
 
     steps:
       - uses: actions/checkout@v2
@@ -24,7 +25,7 @@ jobs:
       - name: Configure Conan
         run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Run conan
-        run: conan install . -s build_type=Release -s compiler.libcxx=libstdc++11 --install-folder=build
+        run: conan install . -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 --install-folder=build
         shell: bash
       - name: Configure and build
         run: |
@@ -49,6 +50,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2016]
+        build_type: [Debug, Release]
 
     steps:
       - uses: actions/checkout@v2
@@ -59,19 +61,18 @@ jobs:
       - name: Configure Conan
         run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Run conan
-        run: conan install . -s build_type=Release --install-folder=build
+        run: conan install . -s build_type=${{ matrix.build_type }} --install-folder=build
         shell: bash
       - name: Configure and build
         run: |
           cmake . -A x64 -B build -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
-          cmake --build build --config Release
+          cmake --build build --config ${{ matrix.build_type }}
         shell: bash
-#      - name: Test
-#        run: |
-#         cd build/tests
-#         export PATH=../bin:$PATH
-#         ctest -C Release --output-on-failure
-#        shell: bash
+      - name: Test
+        run: |
+         cd build/tests
+         ctest -C Release --output-on-failure
+        shell: bash
 
       - uses: actions/upload-artifact@v2
         with:

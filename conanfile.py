@@ -27,9 +27,6 @@ class ProxyFmuConan(ConanFile):
     def set_version(self):
         self.version = tools.load(path.join(self.recipe_folder, "version.txt")).strip()
 
-    def imports(self):
-        self.copy("boost_unit_test_framework.dll", dst="bin", src="lib", keep_path=False)
-
     def configure_cmake(self):
         cmake = CMake(self)
         cmake.configure()
