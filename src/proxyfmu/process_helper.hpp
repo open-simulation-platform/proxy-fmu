@@ -19,7 +19,7 @@ void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string&
                                           " --instanceName " +
         instanceName);
 
-#ifdef UNIX
+#ifdef __linux__
     cmd.insert(0, "./")
 #endif
 
