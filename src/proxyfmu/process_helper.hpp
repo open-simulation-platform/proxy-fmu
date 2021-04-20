@@ -18,6 +18,11 @@ void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string&
         " --fmu \"" + fmuPath.string() + +"\""
                                           " --instanceName " +
         instanceName);
+
+#ifdef UNIX
+    cmd.insert(0, "./")
+#endif
+
     auto status = system(cmd.c_str());
     std::cout << "[proxyfmu] External proxy process for instance '" << instanceName << "' returned with status " << std::to_string(status) << std::endl;
 }
