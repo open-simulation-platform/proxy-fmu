@@ -20,7 +20,7 @@ void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string&
         instanceName);
 
 #ifdef __linux__
-    cmd.insert(0, "./")
+    cmd.insert(0, "./");
 #endif
 
     auto status = system(cmd.c_str());
