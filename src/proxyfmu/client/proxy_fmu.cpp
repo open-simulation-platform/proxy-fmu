@@ -1,5 +1,5 @@
 
-#include "remote_slave.hpp"
+#include "proxy_slave.hpp"
 
 #include <proxyfmu/client/proxy_fmu.hpp>
 #include <proxyfmu/fmi/fmu.hpp>
@@ -25,7 +25,7 @@ const fmi::model_description& proxy_fmu::get_model_description() const
 
 std::unique_ptr<fmi::slave> proxy_fmu::new_instance(const std::string& instanceName)
 {
-    return std::make_unique<remote_slave>(fmuPath_, instanceName, modelDescription_, remote_);
+    return std::make_unique<proxy_slave>(fmuPath_, instanceName, modelDescription_, remote_);
 }
 
 } // namespace proxyfmu::client
