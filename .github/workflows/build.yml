@@ -35,7 +35,6 @@ jobs:
       - name: Test
         run: |
          cd build/tests
-         export PATH=../bin:$PATH
          ctest --output-on-failure
 
       - uses: actions/upload-artifact@v2
