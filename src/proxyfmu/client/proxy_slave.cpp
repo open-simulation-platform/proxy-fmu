@@ -1,6 +1,7 @@
 
 #include "proxy_slave.hpp"
 
+#include "../port_range.hpp"
 #include "../process_helper.hpp"
 
 #include <proxyfmu/thrift/BootService.h>
@@ -44,7 +45,7 @@ namespace proxyfmu::client
 {
 
 proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
-    : rng_(49152, 65535)
+    : rng_(port_range_min, port_range_max)
     , modelDescription_(std::move(modelDescription))
 {
     int port;

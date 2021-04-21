@@ -132,6 +132,7 @@ set(clientPublicHeaders
         "proxyfmu/client/proxy_fmu.hpp")
 
 set(clientPrivateHeaders
+        "proxyfmu/port_range.hpp"
         "proxyfmu/process_helper.hpp"
         "proxyfmu/client/proxy_slave.hpp")
 
@@ -170,9 +171,6 @@ add_dependencies(proxyfmu-client proxyfmu)
 set(serverPublicHeaders
         "proxyfmu/server/fmu_service_handler.hpp")
 
-set(serverPrivateHeaders
-        "proxyfmu/process_helper.hpp")
-
 set(serverSources
         "proxyfmu/server/fmu_service_handler.cpp")
 
@@ -181,7 +179,7 @@ foreach (header IN LISTS serverPublicHeaders)
   list(APPEND serverPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(proxyfmu-lib ${serverPublicHeadersFull} ${serverPrivateHeaders} ${serverSources} ${generatedFiles})
+add_library(proxyfmu-lib ${serverPublicHeadersFull} ${serverSources} ${generatedFiles})
 add_library(proxyfmu::proxy-lib ALIAS proxyfmu-lib)
 target_compile_features(proxyfmu-lib PUBLIC "cxx_std_17")
 target_include_directories(proxyfmu-lib
@@ -203,6 +201,10 @@ endif ()
 set(serverBooterPublicHeaders
         "proxyfmu/server/boot_service_handler.hpp")
 
+set(serverBooterPrivateHeaders
+        "proxyfmu/port_range.hpp"
+        "proxyfmu/process_helper.hpp")
+
 set(serverBooterSources
         "proxyfmu/server/boot_service_handler.cpp")
 
@@ -211,7 +213,7 @@ foreach (header IN LISTS serverBooterPublicHeaders)
   list(APPEND serverBooterPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(proxyfmu-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterSources} ${generatedFiles})
+add_library(proxyfmu-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterPrivateHeaders} ${serverBooterSources} ${generatedFiles})
 add_library(proxyfmu::proxyfmu-booter-lib ALIAS proxyfmu-booter-lib)
 target_compile_features(proxyfmu-booter-lib PUBLIC "cxx_std_17")
 target_include_directories(proxyfmu-booter-lib

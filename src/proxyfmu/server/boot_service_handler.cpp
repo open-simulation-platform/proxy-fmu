@@ -1,4 +1,5 @@
 
+#include "../port_range.hpp"
 #include "../process_helper.hpp"
 
 #include <proxyfmu/server/boot_service_handler.hpp>
@@ -21,7 +22,7 @@ void write_data(std::string const& fileName, std::string const& data)
 } // namespace
 
 boot_service_handler::boot_service_handler()
-    : rng_(49152, 65535)
+    : rng_(port_range_min, port_range_max)
 {
 }
 
