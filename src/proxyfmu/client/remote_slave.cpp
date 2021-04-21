@@ -1,6 +1,7 @@
 
 #include "remote_slave.hpp"
 
+#include "../port_range.hpp"
 #include "../process_helper.hpp"
 
 #include <proxyfmu/thrift/BootService.h>
@@ -9,10 +10,10 @@
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
+#include <chrono>
 #include <cstdio>
 #include <utility>
 #include <vector>
-#include <chrono>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -44,7 +45,7 @@ namespace proxyfmu::client
 {
 
 remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
-    : rng_(49152, 65535)
+    : rng_(port_range_min, port_range_max)
     , modelDescription_(std::move(modelDescription))
 {
     int port;
@@ -54,7 +55,7 @@ remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& i
         port = rng_.next();
         host = "localhost";
         thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, port);
-        std::this_thread::sleep_for (std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     } else {
         host = remote->host;
         std::shared_ptr<TTransport> socket(new TSocket(host, remote->port));
