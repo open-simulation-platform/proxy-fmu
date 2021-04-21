@@ -134,10 +134,10 @@ set(clientPublicHeaders
 set(clientPrivateHeaders
         "proxyfmu/port_range.hpp"
         "proxyfmu/process_helper.hpp"
-        "proxyfmu/client/remote_slave.hpp")
+        "proxyfmu/client/proxy_slave.hpp")
 
 set(clientSources
-        "proxyfmu/client/remote_slave.cpp"
+        "proxyfmu/client/proxy_slave.cpp"
         "proxyfmu/client/proxy_fmu.cpp")
 
 set(clientPublicHeadersFull)

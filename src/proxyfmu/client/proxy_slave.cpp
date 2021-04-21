@@ -1,7 +1,6 @@
 
-#include "remote_slave.hpp"
+#include "proxy_slave.hpp"
 
-#include "../port_range.hpp"
 #include "../process_helper.hpp"
 
 #include <proxyfmu/thrift/BootService.h>
@@ -44,8 +43,8 @@ void read_data(std::string const& fileName, std::string& data)
 namespace proxyfmu::client
 {
 
-remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
-    : rng_(port_range_min, port_range_max)
+proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
+    : rng_(49152, 65535)
     , modelDescription_(std::move(modelDescription))
 {
     int port;
@@ -79,42 +78,42 @@ remote_slave::remote_slave(const filesystem::path& fmuPath, const std::string& i
     transport_->open();
 }
 
-const fmi::model_description& remote_slave::get_model_description() const
+const fmi::model_description& proxy_slave::get_model_description() const
 {
     return modelDescription_;
 }
 
-bool remote_slave::setup_experiment(double start_time, double stop_time, double tolerance)
+bool proxy_slave::setup_experiment(double start_time, double stop_time, double tolerance)
 {
     auto status = client_->setup_experiment(start_time, stop_time, tolerance);
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::enter_initialization_mode()
+bool proxy_slave::enter_initialization_mode()
 {
     auto status = client_->enter_initialization_mode();
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::exit_initialization_mode()
+bool proxy_slave::exit_initialization_mode()
 {
     auto status = client_->exit_initialization_mode();
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::step(double current_time, double step_size)
+bool proxy_slave::step(double current_time, double step_size)
 {
     auto status = client_->step(current_time, step_size);
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::terminate()
+bool proxy_slave::terminate()
 {
     auto status = client_->terminate();
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values)
+bool proxy_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values)
 {
     IntegerRead read;
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -125,7 +124,7 @@ bool remote_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vecto
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::get_real(const std::vector<fmi::value_ref>& vr, std::vector<double>& values)
+bool proxy_slave::get_real(const std::vector<fmi::value_ref>& vr, std::vector<double>& values)
 {
     assert(values.size() == vr.size());
     RealRead read;
@@ -137,7 +136,7 @@ bool remote_slave::get_real(const std::vector<fmi::value_ref>& vr, std::vector<d
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::get_string(const std::vector<fmi::value_ref>& vr, std::vector<std::string>& values)
+bool proxy_slave::get_string(const std::vector<fmi::value_ref>& vr, std::vector<std::string>& values)
 {
     assert(values.size() == vr.size());
     StringRead read;
@@ -149,7 +148,7 @@ bool remote_slave::get_string(const std::vector<fmi::value_ref>& vr, std::vector
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::get_boolean(const std::vector<fmi::value_ref>& vr, std::vector<bool>& values)
+bool proxy_slave::get_boolean(const std::vector<fmi::value_ref>& vr, std::vector<bool>& values)
 {
     assert(values.size() == vr.size());
     BooleanRead read;
@@ -161,7 +160,7 @@ bool remote_slave::get_boolean(const std::vector<fmi::value_ref>& vr, std::vecto
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::set_integer(const std::vector<fmi::value_ref>& vr, const std::vector<int>& values)
+bool proxy_slave::set_integer(const std::vector<fmi::value_ref>& vr, const std::vector<int>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -169,7 +168,7 @@ bool remote_slave::set_integer(const std::vector<fmi::value_ref>& vr, const std:
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values)
+bool proxy_slave::set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -177,7 +176,7 @@ bool remote_slave::set_real(const std::vector<fmi::value_ref>& vr, const std::ve
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values)
+bool proxy_slave::set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -185,7 +184,7 @@ bool remote_slave::set_string(const std::vector<fmi::value_ref>& vr, const std::
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool remote_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values)
+bool proxy_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -193,7 +192,7 @@ bool remote_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std:
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-void remote_slave::freeInstance()
+void proxy_slave::freeInstance()
 {
     if (!freed) {
         freed = true;
@@ -202,9 +201,9 @@ void remote_slave::freeInstance()
     }
 }
 
-remote_slave::~remote_slave()
+proxy_slave::~proxy_slave()
 {
-    remote_slave::freeInstance();
+    proxy_slave::freeInstance();
 }
 
 } // namespace proxyfmu::client

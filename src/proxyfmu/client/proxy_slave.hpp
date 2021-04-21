@@ -1,6 +1,6 @@
 
-#ifndef PROXY_FMU_REMOTE_SLAVE_HPP
-#define PROXY_FMU_REMOTE_SLAVE_HPP
+#ifndef PROXY_FMU_PROXY_SLAVE_HPP
+#define PROXY_FMU_PROXY_SLAVE_HPP
 
 #include <proxyfmu/fixed_range_random_generator.hpp>
 #include <proxyfmu/fmi/slave.hpp>
@@ -17,7 +17,7 @@ using namespace apache::thrift::transport;
 namespace proxyfmu::client
 {
 
-class remote_slave : public fmi::slave
+class proxy_slave : public fmi::slave
 {
 
 private:
@@ -31,7 +31,7 @@ private:
     bool freed = false;
 
 public:
-    remote_slave(
+    proxy_slave(
         const filesystem::path& fmuPath,
         const std::string& instanceName,
         fmi::model_description modelDescription,
@@ -58,9 +58,9 @@ public:
     bool set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values) override;
     bool set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values) override;
 
-    ~remote_slave() override;
+    ~proxy_slave() override;
 };
 
 } // namespace proxyfmu::client
 
-#endif //PROXY_FMU_REMOTE_SLAVE_HPP
+#endif //PROXY_FMU_PROXY_SLAVE_HPP
