@@ -8,7 +8,7 @@ message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
 # Build settings
 # ==============================================================================
 
-option(BUILD_SHARED_LIBS OFF)
+set(BUILD_SHARED_LIBS OFF)
 option(PROXYFMU_BUILD_TESTS "Build tests" OFF)
 option(PROXYFMU_BUILD_EXAMPLES "Build examples" OFF)
 option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
@@ -21,13 +21,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+set(Boost_USE_STATIC_LIBS ON)
+
 if (MSVC)
-  set(CMAKE_DEBUG_POSTFIX "d")
   add_definitions("-D_WIN32_WINNT=0x600" "-D_CRT_SECURE_NO_WARNINGS")
   add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
 endif ()
-
-set(Boost_USE_STATIC_LIBS ON)
 
 # Prepare for export and installation.
 set(PROXYFMU_HEADER_INSTALL_DIR "include")
@@ -56,11 +55,7 @@ else ()
   message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
 endif ()
 
-set(Boost_COMPONENTS)
-if (PROXYFMU_BUILD_TOOL)
-  list(APPEND BOOST_COMPONENTS program_options)
-endif ()
-
+set(BOOST_COMPONENTS program_options)
 if (PROXYFMU_BUILD_TESTS)
   list(APPEND BOOST_COMPONENTS unit_test_framework)
 endif ()
@@ -74,10 +69,7 @@ find_package(FMILIB REQUIRED)
 # ==============================================================================
 
 add_subdirectory(src)
-
-if (PROXYFMU_BUILD_TOOL)
-  add_subdirectory(tool)
-endif ()
+add_subdirectory(tool)
 
 if (PROXYFMU_BUILD_EXAMPLES OR PROXYFMU_BUILD_TESTS)
   file(COPY data/fmus DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
