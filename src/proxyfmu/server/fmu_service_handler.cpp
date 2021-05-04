@@ -10,8 +10,13 @@ using namespace proxyfmu::thrift;
 using namespace proxyfmu::server;
 
 fmu_service_handler::fmu_service_handler(const std::string& fmu, const std::string& instanceName, std::function<void()> stop)
-: fmu_(fmi::loadFmu(fmu)), slave_(fmu_->new_instance(instanceName)), instanceName_(instanceName), stop_(std::move(stop))
+: fmu_(fmi::loadFmu(fmu)), instanceName_(instanceName), stop_(std::move(stop))
 {
+}
+
+void fmu_service_handler::instantiate()
+{
+    slave_ = fmu_->new_instance(instanceName_);
 }
 
 Status::type fmu_service_handler::setup_experiment(const double start, const double stop, const double tolerance)

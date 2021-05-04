@@ -23,6 +23,8 @@ private:
 public:
     fmu_service_handler(const std::string& fmu, const std::string& instanceName, std::function<void()> stop);
 
+    void instantiate() override;
+
     thrift::Status::type setup_experiment(double start, double stop, double tolerance) override;
     thrift::Status::type enter_initialization_mode() override;
     thrift::Status::type exit_initialization_mode() override;

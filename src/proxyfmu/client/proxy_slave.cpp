@@ -55,7 +55,7 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         port = rng_.next();
         host = "localhost";
         thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, port);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds (500));
     } else {
         host = remote->host;
         std::shared_ptr<TTransport> socket(new TSocket(host, remote->port));
@@ -77,6 +77,8 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
     std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport_));
     client_ = std::make_shared<FmuServiceClient>(protocol);
     transport_->open();
+
+    client_->instantiate();
 }
 
 const fmi::model_description& proxy_slave::get_model_description() const
