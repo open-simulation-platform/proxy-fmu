@@ -38,6 +38,7 @@ jobs:
          ctest --output-on-failure
 
       - uses: actions/upload-artifact@v2
+        if: matrix.build_type == 'Release'
         with:
           name: proxyfmu
           path: build/bin/proxyfmu*
@@ -70,10 +71,11 @@ jobs:
       - name: Test
         run: |
          cd build/tests
-         ctest -C Release --output-on-failure
+         ctest -C ${{ matrix.build_type }} --output-on-failure
         shell: bash
 
       - uses: actions/upload-artifact@v2
+        if: matrix.build_type == 'Release'
         with:
           name: proxyfmu
           path: build/bin/proxyfmu*

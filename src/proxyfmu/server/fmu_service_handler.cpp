@@ -9,9 +9,16 @@
 using namespace proxyfmu::thrift;
 using namespace proxyfmu::server;
 
-fmu_service_handler::fmu_service_handler(const std::string& fmu, const std::string& instanceName, std::function<void()> stop)
-: fmu_(fmi::loadFmu(fmu)), slave_(fmu_->new_instance(instanceName)), instanceName_(instanceName), stop_(std::move(stop))
+fmu_service_handler::fmu_service_handler(const std::string& fmuPath, const std::string& instanceName, std::function<void()> stop)
+: fmuPath_(fmuPath), instanceName_(instanceName), stop_(std::move(stop))
 {
+}
+
+void fmu_service_handler::instantiate()
+{
+    auto fmu = fmi::loadFmu(fmuPath_);
+    modelName_ = fmu->get_model_description().modelName;
+    slave_ = fmu->new_instance(instanceName_);
 }
 
 Status::type fmu_service_handler::setup_experiment(const double start, const double stop, const double tolerance)
@@ -109,8 +116,7 @@ Status::type fmu_service_handler::write_boolean(const ValueReferences& vr, const
 void fmu_service_handler::freeInstance()
 {
     slave_->freeInstance();
-    auto modelName = fmu_->get_model_description().modelName;
-    std::cout << "[proxyfmu] Shutting down proxy for " << modelName << "::" << instanceName_;
+    std::cout << "[proxyfmu] Shutting down proxy for " << modelName_ << "::" << instanceName_;
     stop_();
     std::cout << " done.." << std::endl;
 }

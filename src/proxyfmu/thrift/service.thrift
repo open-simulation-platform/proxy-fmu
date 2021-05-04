@@ -5,6 +5,8 @@ include "defs.thrift"
 
 service FmuService {
 
+    void instantiate()
+
     defs.Status setup_experiment(1: double start, 2: double stop, 3: double tolerance) throws (1: defs.NoSuchInstanceException ex)
     defs.Status enter_initialization_mode() throws (1: defs.NoSuchInstanceException ex)
     defs.Status exit_initialization_mode() throws (1: defs.NoSuchInstanceException ex)
