@@ -4,7 +4,6 @@
 
 #include <proxyfmu/server/boot_service_handler.hpp>
 
-#include <chrono>
 #include <cstdio>
 #include <string>
 
@@ -39,9 +38,6 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
     processes_.emplace_back(std::move(t));
 
     dirs_.emplace_back(std::move(tmp));
-
-    //TODO: Waiting for proxyfmu to start. Solve without using hardcoded sleep time.
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     return port;
 }

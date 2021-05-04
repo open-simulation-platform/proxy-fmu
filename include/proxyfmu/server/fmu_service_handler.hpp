@@ -14,14 +14,18 @@ class fmu_service_handler : virtual public thrift::FmuServiceIf
 {
 
 private:
+
+    std::string modelName_;
+
+    const std::string& fmuPath_;
     const std::string& instanceName_;
-    std::unique_ptr<fmi::fmu> fmu_;
+
     std::unique_ptr<fmi::slave> slave_;
 
     std::function<void()> stop_;
 
 public:
-    fmu_service_handler(const std::string& fmu, const std::string& instanceName, std::function<void()> stop);
+    fmu_service_handler(const std::string& fmuPath, const std::string& instanceName, std::function<void()> stop);
 
     void instantiate() override;
 
