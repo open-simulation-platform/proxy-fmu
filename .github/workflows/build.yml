@@ -74,6 +74,7 @@ jobs:
         shell: bash
 
       - uses: actions/upload-artifact@v2
+        if: ${{ matrix.build_type == "Release" }}
         with:
           name: proxyfmu
           path: build/bin/proxyfmu*
