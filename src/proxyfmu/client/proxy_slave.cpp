@@ -71,7 +71,7 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         transport->close();
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds (1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds (5000));
 
     std::shared_ptr<TTransport> socket(new TSocket(host, port));
     transport_ = std::make_shared<TFramedTransport>(socket);
