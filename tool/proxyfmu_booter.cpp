@@ -35,28 +35,20 @@ void wait_for_input()
 int run_application(const int port)
 {
     std::unique_ptr<TSimpleServer> server;
-    std::cout << "init" << std::endl;
     std::shared_ptr<boot_service_handler> handler(new boot_service_handler());
-    std::cout << "handler" << std::endl;
     std::shared_ptr<TProcessor> processor(new BootServiceProcessor(handler));
-    std::cout << "processor" << std::endl;
 
     std::shared_ptr<TTransportFactory> transportFactory(new TFramedTransportFactory());
-    std::cout << "transportFactory" << std::endl;
     std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
-    std::cout << "protocolFactory" << std::endl;
 
     std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
-    std::cout << "serverTransport" << std::endl;
     server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
-    std::cout << "server" << std::endl;
 
     std::thread t([&server] { server->serve(); });
-    std::cout << "server thread" << std::endl;
+
     wait_for_input();
 
     server->stop();
-    std::cout << "Stopping server" << std::endl;
     t.join();
 
     return 0;
