@@ -1,11 +1,11 @@
 
-#include "../port_range.hpp"
 #include "../process_helper.hpp"
 
 #include <proxyfmu/server/boot_service_handler.hpp>
 
 #include <cstdio>
 #include <string>
+#include <chrono>
 
 using namespace proxyfmu::server;
 
@@ -33,6 +33,8 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
     processes_.emplace_back(std::move(t));
 
     dirs_.emplace_back(std::move(tmp));
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     return port;
 }

@@ -132,7 +132,6 @@ set(clientPublicHeaders
         "proxyfmu/client/proxy_fmu.hpp")
 
 set(clientPrivateHeaders
-        "proxyfmu/port_range.hpp"
         "proxyfmu/process_helper.hpp"
         "proxyfmu/client/proxy_slave.hpp")
 
@@ -209,7 +208,6 @@ set(serverBooterPublicHeaders
         "proxyfmu/server/boot_service_handler.hpp")
 
 set(serverBooterPrivateHeaders
-        "proxyfmu/port_range.hpp"
         "proxyfmu/process_helper.hpp")
 
 set(serverBooterSources
