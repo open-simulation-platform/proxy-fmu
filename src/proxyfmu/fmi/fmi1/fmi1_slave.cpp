@@ -7,12 +7,12 @@
 
 namespace
 {
-void fmilogger(fmi1_component_t c, fmi1_string_t instanceName, fmi1_status_t status, fmi1_string_t category, fmi1_string_t message, ...)
+void fmilogger(fmi1_component_t /*c*/, fmi1_string_t /*instanceName*/, fmi1_status_t /*status*/, fmi1_string_t /*category*/, fmi1_string_t /*message*/, ...)
 {
-    va_list argp;
-    va_start(argp, message);
-    fmi1_log_forwarding_v(c, instanceName, status, category, message, argp);
-    va_end(argp);
+    //    va_list argp;
+    //    va_start(argp, message);
+    //    fmi1_log_forwarding_v(c, instanceName, status, category, message, argp);
+    //    va_end(argp);
 }
 } // namespace
 
