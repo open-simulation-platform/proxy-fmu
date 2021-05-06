@@ -1,4 +1,5 @@
 
+#include <proxyfmu/fixed_range_random_generator.hpp>
 #include <proxyfmu/server/fmu_service_handler.hpp>
 
 #include <boost/program_options.hpp>
@@ -19,11 +20,14 @@ using namespace ::apache::thrift::transport;
 namespace
 {
 
+const int port_range_min = 49152;
+const int port_range_max = 65535;
+
 const int SUCCESS = 0;
 const int COMMANDLINE_ERROR = 1;
 const int UNHANDLED_ERROR = 2;
 
-int run_application(const std::string& fmu, const std::string& instanceName, const int port)
+int run_application(const std::string& fmu, const std::string& instanceName)
 {
     std::unique_ptr<TSimpleServer> server;
     auto stop = [&]() {
@@ -35,9 +39,26 @@ int run_application(const std::string& fmu, const std::string& instanceName, con
     std::shared_ptr<TTransportFactory> transportFactory(new TFramedTransportFactory());
     std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
-    std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
-    server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
-    server->serve();
+    proxyfmu::fixed_range_random_generator rng(port_range_min, port_range_max);
+
+    int port;
+    const int max_retries = 5;
+    for (auto i = 0; i < max_retries; i++) {
+        port = rng.next();
+        try {
+            std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+            server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
+
+            std::cout << "[proxyfmu] port=" << std::to_string(port) << std::endl;
+            server->serve();
+
+            break;
+        } catch (TTransportException& ex) {
+            std::cout << ex.what() << std::endl;
+            std::cout << "Retrying with another port.. " << std::to_string(i) << " of " << std::to_string(max_retries) << std::endl;
+        }
+    }
+
 
     return 0;
 }
@@ -58,7 +79,6 @@ int main(int argc, char** argv)
 
     po::options_description desc("Options");
     desc.add_options()("help,h", "Print this help message and quits.");
-    desc.add_options()("port", po::value<int>(), "Specify the network port to be used.");
     desc.add_options()("fmu", po::value<std::string>(), "Location of the fmu to load.");
     desc.add_options()("instanceName", po::value<std::string>(), "Name of the slave instance.");
 
@@ -86,11 +106,10 @@ int main(int argc, char** argv)
             return COMMANDLINE_ERROR;
         }
 
-        auto port = vm["port"].as<int>();
         auto fmu = vm["fmu"].as<std::string>();
         auto instanceName = vm["instanceName"].as<std::string>();
 
-        return run_application(fmu, instanceName, port);
+        return run_application(fmu, instanceName);
 
     } catch (std::exception& e) {
         std::cerr << "Unhandled Exception reached the top of main: " << e.what() << ", application will now exit" << std::endl;

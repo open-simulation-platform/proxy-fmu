@@ -7,36 +7,30 @@
 using namespace proxyfmu;
 using namespace proxyfmu::client;
 
+void run_slave(fmi::slave* slave)
+{
+    auto md2 = slave->get_model_description();
+    std::cout << "GUID=" << md2.guid << std::endl;
+    slave->setup_experiment();
+    slave->enter_initialization_mode();
+    slave->exit_initialization_mode();
+    std::vector<fmi::value_ref> vr{47};
+    std::vector<double> ref(1);
+    slave->get_real(vr, ref);
+    std::cout << "value=" << ref[0] << std::endl;
+    slave->terminate();
+    slave->freeInstance();
+}
+
 void run(proxy_fmu& fmu) {
     {
         auto slave = fmu.new_instance("instance1");
-        auto md2 = slave->get_model_description();
-        std::cout << "GUID=" << md2.guid << std::endl;
-        slave->setup_experiment();
-        slave->enter_initialization_mode();
-        slave->exit_initialization_mode();
-        std::vector<fmi::value_ref> vr{47};
-        std::vector<double> ref(1);
-        slave->get_real(vr, ref);
-        std::cout << "value=" << ref[0] << std::endl;
-        slave->terminate();
-        slave->freeInstance();
-
+        run_slave(slave.get());
     }
 
     {
         auto slave = fmu.new_instance("instance2");
-        auto md2 = slave->get_model_description();
-        std::cout << "GUID=" << md2.guid << std::endl;
-        slave->setup_experiment();
-        slave->enter_initialization_mode();
-        slave->exit_initialization_mode();
-        std::vector<fmi::value_ref> vr{47};
-        std::vector<double> ref(1);
-        slave->get_real(vr, ref);
-        std::cout << "value=" << ref[0] << std::endl;
-        slave->terminate();
-        slave->freeInstance();
+        run_slave(slave.get());
     }
 }
 
@@ -66,8 +60,8 @@ int main() {
 
         run(fmu);
 
-        proxy_fmu remoteFmu(fmuLocation, remote_info("localhost", 9090));
-        run(remoteFmu);
+//        proxy_fmu remoteFmu(fmuLocation, remote_info("localhost", 9090));
+//        run(remoteFmu);
 
     } catch (std::exception& tx) {
         std::cout << "ERROR: " << tx.what() << std::endl;

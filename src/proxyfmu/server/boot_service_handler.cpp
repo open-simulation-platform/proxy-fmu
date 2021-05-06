@@ -21,11 +21,6 @@ void write_data(std::string const& fileName, std::string const& data)
 
 } // namespace
 
-boot_service_handler::boot_service_handler()
-    : rng_(port_range_min, port_range_max)
-{
-}
-
 int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, const std::string& instanceName, const std::string& data)
 {
     auto tmp = std::make_unique<temp_dir>(fmuName);
@@ -33,8 +28,8 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
 
     write_data(fmuPath, data);
 
-    const int port = rng_.next();
-    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, port);
+    int port;
+    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port));
     processes_.emplace_back(std::move(t));
 
     dirs_.emplace_back(std::move(tmp));

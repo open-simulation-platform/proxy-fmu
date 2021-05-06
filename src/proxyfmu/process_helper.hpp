@@ -4,26 +4,34 @@
 
 #include <proxyfmu/fs_portability.hpp>
 
+#include <boost/process.hpp>
+
 #include <iostream>
 
 namespace proxyfmu
 {
 
-void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string& instanceName, const int port)
+void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string& instanceName, int& port)
 {
-    std::string cmd(
-        "proxyfmu"
-        " --port " +
-        std::to_string(port) +
-        " --fmu \"" + fmuPath.string() + +"\""
-                                          " --instanceName " +
-        instanceName);
+    std::string cmd("proxyfmu --fmu " + fmuPath.string() + " --instanceName " + instanceName);
 
 #ifdef __linux__
     cmd.insert(0, "./");
 #endif
 
-    auto status = system(cmd.c_str());
+    boost::process::ipstream pipe_stream;
+    boost::process::child c(cmd, boost::process::std_out > pipe_stream);
+
+    std::string line;
+    while (pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
+        if (line.substr(0, 16) == "[proxyfmu] port=") {
+            port = std::stoi(line.substr(16));
+        }
+    }
+
+    c.wait();
+
+    auto status = c.exit_code();
     std::cout << "[proxyfmu] External proxy process for instance '" << instanceName << "' returned with status " << std::to_string(status) << std::endl;
 }
 

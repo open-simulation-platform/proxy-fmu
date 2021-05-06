@@ -2,7 +2,6 @@
 #ifndef PROXY_FMU_PROXY_SLAVE_HPP
 #define PROXY_FMU_PROXY_SLAVE_HPP
 
-#include <proxyfmu/fixed_range_random_generator.hpp>
 #include <proxyfmu/fmi/slave.hpp>
 #include <proxyfmu/fs_portability.hpp>
 #include <proxyfmu/remote_info.hpp>
@@ -25,8 +24,6 @@ private:
     std::shared_ptr<thrift::FmuServiceClient> client_;
     std::shared_ptr<TTransport> transport_;
     std::unique_ptr<std::thread> thread_;
-
-    fixed_range_random_generator rng_;
 
     bool freed = false;
 

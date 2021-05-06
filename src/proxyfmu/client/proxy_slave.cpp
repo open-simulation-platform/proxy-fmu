@@ -1,7 +1,6 @@
 
 #include "proxy_slave.hpp"
 
-#include "../port_range.hpp"
 #include "../process_helper.hpp"
 
 #include <proxyfmu/thrift/BootService.h>
@@ -45,16 +44,14 @@ namespace proxyfmu::client
 {
 
 proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
-    : rng_(port_range_min, port_range_max)
-    , modelDescription_(std::move(modelDescription))
+    : modelDescription_(std::move(modelDescription))
 {
-    int port;
+    int port = -1;
     std::string host;
 
     if (!remote) {
-        port = rng_.next();
         host = "localhost";
-        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, port);
+        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port));
     } else {
         host = remote->host;
         std::shared_ptr<TTransport> socket(new TSocket(host, remote->port));
@@ -71,7 +68,7 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         transport->close();
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds (1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     std::shared_ptr<TTransport> socket(new TSocket(host, port));
     transport_ = std::make_shared<TFramedTransport>(socket);
