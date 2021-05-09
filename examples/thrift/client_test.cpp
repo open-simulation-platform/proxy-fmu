@@ -26,6 +26,7 @@ void run(proxy_fmu& fmu) {
     {
         auto slave = fmu.new_instance("instance1");
         run_slave(slave.get());
+
     }
 
     {
