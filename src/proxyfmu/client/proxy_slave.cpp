@@ -51,8 +51,11 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
 
     if (!remote) {
         host = "localhost";
-        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port));
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        std::mutex mtx;
+        std::condition_variable cv;
+        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
+        std::unique_lock<std::mutex> lck(mtx);
+        while (port == -1) cv.wait(lck);
     } else {
         host = remote->host;
         std::shared_ptr<TTransport> socket(new TSocket(host, remote->port));

@@ -8,6 +8,8 @@
 #include <thrift/transport/TTransportUtils.h>
 
 #include <iostream>
+#include <functional>
+#include <utility>
 
 using namespace proxyfmu::thrift;
 using namespace proxyfmu::server;
@@ -19,6 +21,22 @@ using namespace ::apache::thrift::transport;
 
 namespace
 {
+
+class ServerReadyEventHandler: public TServerEventHandler
+{
+
+private:
+    std::function<void()> callback_;
+
+public:
+
+    explicit ServerReadyEventHandler(std::function<void()> callback): callback_(std::move(callback)){}
+
+    void preServe() override
+    {
+        callback_();
+    }
+};
 
 const int port_range_min = 49152;
 const int port_range_max = 65535;
@@ -48,17 +66,17 @@ int run_application(const std::string& fmu, const std::string& instanceName)
         try {
             std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
             server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
-
-            std::cout << "[proxyfmu] port=" << std::to_string(port) << std::endl;
+            server->setServerEventHandler(std::make_shared<ServerReadyEventHandler>([port] {
+                std::cout << "[proxyfmu] port=" << std::to_string(port) << std::endl;
+            }));
             server->serve();
 
             break;
         } catch (TTransportException& ex) {
             std::cout << ex.what() << std::endl;
-            std::cout << "Retrying with another port.. " << std::to_string(i) << " of " << std::to_string(max_retries) << std::endl;
+            std::cout << "[proxyfmu] Retrying with another port.. " << std::to_string(i) << " of " << std::to_string(max_retries) << std::endl;
         }
     }
-
 
     return 0;
 }
@@ -112,7 +130,7 @@ int main(int argc, char** argv)
         return run_application(fmu, instanceName);
 
     } catch (std::exception& e) {
-        std::cerr << "Unhandled Exception reached the top of main: " << e.what() << ", application will now exit" << std::endl;
+        std::cerr << "[proxyfmu] Unhandled Exception reached the top of main: " << e.what() << ", application will now exit" << std::endl;
         return UNHANDLED_ERROR;
     }
 }

@@ -6,13 +6,22 @@
 
 #include <boost/process.hpp>
 
+#include <condition_variable>
 #include <iostream>
+#include <mutex>
+#include <string>
 
 namespace proxyfmu
 {
 
-void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string& instanceName, int& port)
+void start_process(
+    const proxyfmu::filesystem::path& fmuPath,
+    const std::string& instanceName,
+    int& port,
+    std::mutex& mtx,
+    std::condition_variable& cv)
 {
+
     std::string cmd("proxyfmu --fmu " + fmuPath.string() + " --instanceName " + instanceName);
 
 #ifdef __linux__
@@ -26,6 +35,8 @@ void start_process(const proxyfmu::filesystem::path& fmuPath, const std::string&
     while (pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
         if (line.substr(0, 16) == "[proxyfmu] port=") {
             port = std::stoi(line.substr(16));
+            std::unique_lock<std::mutex> lck(mtx);
+            cv.notify_all();
         }
     }
 

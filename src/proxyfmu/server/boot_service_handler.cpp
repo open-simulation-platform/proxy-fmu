@@ -3,9 +3,8 @@
 
 #include <proxyfmu/server/boot_service_handler.hpp>
 
-#include <cstdio>
-#include <string>
 #include <chrono>
+#include <cstdio>
 
 using namespace proxyfmu::server;
 
@@ -28,13 +27,15 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
 
     write_data(fmuPath, data);
 
-    int port;
-    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port));
+    int port = -1;
+    std::mutex mtx;
+    std::condition_variable cv;
+    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
     processes_.emplace_back(std::move(t));
-
     dirs_.emplace_back(std::move(tmp));
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::unique_lock<std::mutex> lck(mtx);
+    while (port == -1) cv.wait(lck);
 
     return port;
 }
