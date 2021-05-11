@@ -1,11 +1,10 @@
 
-#include "../port_range.hpp"
 #include "../process_helper.hpp"
 
 #include <proxyfmu/server/boot_service_handler.hpp>
 
+#include <chrono>
 #include <cstdio>
-#include <string>
 
 using namespace proxyfmu::server;
 
@@ -21,11 +20,6 @@ void write_data(std::string const& fileName, std::string const& data)
 
 } // namespace
 
-boot_service_handler::boot_service_handler()
-    : rng_(port_range_min, port_range_max)
-{
-}
-
 int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, const std::string& instanceName, const std::string& data)
 {
     auto tmp = std::make_unique<temp_dir>(fmuName);
@@ -33,11 +27,15 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
 
     write_data(fmuPath, data);
 
-    const int port = rng_.next();
-    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, port);
+    int port = -1;
+    std::mutex mtx;
+    std::condition_variable cv;
+    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
     processes_.emplace_back(std::move(t));
-
     dirs_.emplace_back(std::move(tmp));
+
+    std::unique_lock<std::mutex> lck(mtx);
+    while (port == -1) cv.wait(lck);
 
     return port;
 }

@@ -55,7 +55,7 @@ else ()
   message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
 endif ()
 
-set(BOOST_COMPONENTS program_options)
+set(BOOST_COMPONENTS system filesystem program_options)
 if (PROXYFMU_BUILD_TESTS)
   list(APPEND BOOST_COMPONENTS unit_test_framework)
 endif ()

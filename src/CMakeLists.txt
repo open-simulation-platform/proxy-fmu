@@ -132,7 +132,6 @@ set(clientPublicHeaders
         "proxyfmu/client/proxy_fmu.hpp")
 
 set(clientPrivateHeaders
-        "proxyfmu/port_range.hpp"
         "proxyfmu/process_helper.hpp"
         "proxyfmu/client/proxy_slave.hpp")
 
@@ -156,7 +155,14 @@ target_include_directories(proxyfmu-client
         "${CMAKE_CURRENT_SOURCE_DIR}"
         "${generatedSourcesDir}"
         )
-target_link_libraries(proxyfmu-client PUBLIC fmi PRIVATE thrift::thrift)
+target_link_libraries(proxyfmu-client
+        PUBLIC
+        fmi
+        PRIVATE
+        thrift::thrift
+        Boost::system
+        Boost::filesystem
+        )
 if (UNIX)
   target_link_libraries(proxyfmu-client PRIVATE pthread)
 endif ()
@@ -202,7 +208,6 @@ set(serverBooterPublicHeaders
         "proxyfmu/server/boot_service_handler.hpp")
 
 set(serverBooterPrivateHeaders
-        "proxyfmu/port_range.hpp"
         "proxyfmu/process_helper.hpp")
 
 set(serverBooterSources
@@ -223,7 +228,12 @@ target_include_directories(proxyfmu-booter-lib
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(proxyfmu-booter-lib PUBLIC thrift::thrift)
+target_link_libraries(proxyfmu-booter-lib
+        PUBLIC
+        thrift::thrift
+        Boost::system
+        Boost::filesystem
+        )
 if (UNIX)
   target_link_libraries(proxyfmu-booter-lib PRIVATE pthread stdc++fs)
 endif ()
