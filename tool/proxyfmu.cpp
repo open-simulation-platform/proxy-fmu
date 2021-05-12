@@ -7,8 +7,8 @@
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
-#include <iostream>
 #include <functional>
+#include <iostream>
 #include <utility>
 
 using namespace proxyfmu::thrift;
@@ -22,15 +22,16 @@ using namespace ::apache::thrift::transport;
 namespace
 {
 
-class ServerReadyEventHandler: public TServerEventHandler
+class ServerReadyEventHandler : public TServerEventHandler
 {
 
 private:
     std::function<void()> callback_;
 
 public:
-
-    explicit ServerReadyEventHandler(std::function<void()> callback): callback_(std::move(callback)){}
+    explicit ServerReadyEventHandler(std::function<void()> callback)
+        : callback_(std::move(callback))
+    { }
 
     void preServe() override
     {
@@ -40,6 +41,8 @@ public:
 
 const int port_range_min = 49152;
 const int port_range_max = 65535;
+
+const int max_port_retries = 10;
 
 const int SUCCESS = 0;
 const int COMMANDLINE_ERROR = 1;
@@ -60,25 +63,28 @@ int run_application(const std::string& fmu, const std::string& instanceName)
     proxyfmu::fixed_range_random_generator rng(port_range_min, port_range_max);
 
     int port;
-    const int max_retries = 5;
-    for (auto i = 0; i < max_retries; i++) {
+    int final_port = -1;
+    for (auto i = 0; i < max_port_retries; i++) {
         port = rng.next();
         try {
             std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
             server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
-            server->setServerEventHandler(std::make_shared<ServerReadyEventHandler>([port] {
-                std::cout << "[proxyfmu] port=" << std::to_string(port) << std::endl;
+            server->setServerEventHandler(std::make_shared<ServerReadyEventHandler>([port, &final_port] {
+                final_port = port;
+                std::cout << "[proxyfmu] port=" << std::to_string(final_port) << std::endl;
             }));
             server->serve();
 
             break;
         } catch (TTransportException& ex) {
-            std::cout << ex.what() << std::endl;
-            std::cout << "[proxyfmu] Retrying with another port.. " << std::to_string(i) << " of " << std::to_string(max_retries) << std::endl;
+            std::cout << "[proxyfmu] " << ex.what()
+                      << ". Failed to bind to port " << std::to_string(port)
+                      << ". Retrying with another one. Attempt " << std::to_string(i + 1)
+                      << " of " << std::to_string(max_port_retries) << ".." << std::endl;
         }
     }
 
-    return 0;
+    return final_port != -1 ? 0 : -1;
 }
 
 int printHelp(boost::program_options::options_description& desc)
