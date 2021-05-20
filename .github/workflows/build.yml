@@ -25,7 +25,7 @@ jobs:
       - name: Configure Conan
         run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Run conan
-        run: conan install . -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 --install-folder=build
+        run: conan install . -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 --install-folder=build --build=missing
         shell: bash
       - name: Configure and build
         run: |
@@ -61,7 +61,7 @@ jobs:
       - name: Configure Conan
         run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Run conan
-        run: conan install . -s build_type=${{ matrix.build_type }} --install-folder=build
+        run: conan install . -s build_type=${{ matrix.build_type }} --install-folder=build --build=missing
         shell: bash
       - name: Configure and build
         run: |
