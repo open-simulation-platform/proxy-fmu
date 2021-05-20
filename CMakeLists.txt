@@ -19,8 +19,6 @@ option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
 set(Boost_USE_STATIC_LIBS ON)
 
 if (MSVC)
@@ -59,10 +57,6 @@ set(BOOST_COMPONENTS system filesystem program_options)
 if (PROXYFMU_BUILD_TESTS)
   list(APPEND BOOST_COMPONENTS unit_test_framework)
 endif ()
-
-#find_package(Boost 1.66 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
-#find_package(THRIFT REQUIRED)
-#find_package(FMILIB REQUIRED)
 
 # ==============================================================================
 # Targets
