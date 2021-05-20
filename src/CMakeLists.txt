@@ -68,7 +68,7 @@ target_include_directories(fmi
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(fmi PRIVATE FMILIB::FMILIB)
+target_link_libraries(fmi PRIVATE CONAN_PKG::fmilibrary)
 if (UNIX)
   target_link_libraries(fmi PRIVATE stdc++fs dl)
 endif ()
@@ -76,7 +76,6 @@ endif ()
 # ==============================================================================
 # thrift
 # ==============================================================================
-
 
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 set(thriftCppSourcesDir "${generatedSourcesDir}/proxyfmu/thrift")
@@ -86,6 +85,7 @@ file(MAKE_DIRECTORY "${generatedSourcesDir}")
 file(MAKE_DIRECTORY "${thriftCppSourcesDir}")
 file(MAKE_DIRECTORY "${thriftJavaSourcesDir}")
 
+find_program(THRIFT_EXECUTABLE NAMES thrift)
 if (NOT THRIFT_EXECUTABLE)
   message(FATAL_ERROR "The thrift compiler was not found. Cannot generate Thrift sources.")
 endif ()
@@ -121,6 +121,7 @@ set(thriftGenerated
         )
 
 add_library(proxyfmu-service OBJECT ${thriftGenerated})
+target_link_libraries(proxyfmu-service PUBLIC CONAN_PKG::thrift)
 set_target_properties(proxyfmu-service PROPERTIES POSITION_INDEPENDENT_CODE ON)
 list(APPEND generatedFiles "$<TARGET_OBJECTS:proxyfmu-service>")
 
@@ -159,9 +160,8 @@ target_link_libraries(proxyfmu-client
         PUBLIC
         fmi
         PRIVATE
-        thrift::thrift
-        Boost::system
-        Boost::filesystem
+        CONAN_PKG::thrift
+        CONAN_PKG::boost
         )
 if (UNIX)
   target_link_libraries(proxyfmu-client PRIVATE pthread)
@@ -186,7 +186,6 @@ foreach (header IN LISTS serverPublicHeaders)
 endforeach ()
 
 add_library(proxyfmu-lib ${serverPublicHeadersFull} ${serverSources} ${generatedFiles})
-add_library(proxyfmu::proxy-lib ALIAS proxyfmu-lib)
 target_compile_features(proxyfmu-lib PUBLIC "cxx_std_17")
 target_include_directories(proxyfmu-lib
         PUBLIC
@@ -195,7 +194,7 @@ target_include_directories(proxyfmu-lib
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(proxyfmu-lib PUBLIC fmi thrift::thrift)
+target_link_libraries(proxyfmu-lib PUBLIC fmi CONAN_PKG::thrift)
 if (UNIX)
   target_link_libraries(proxyfmu-lib PRIVATE pthread)
 endif ()
@@ -219,7 +218,6 @@ foreach (header IN LISTS serverBooterPublicHeaders)
 endforeach ()
 
 add_library(proxyfmu-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterPrivateHeaders} ${serverBooterSources} ${generatedFiles})
-add_library(proxyfmu::proxyfmu-booter-lib ALIAS proxyfmu-booter-lib)
 target_compile_features(proxyfmu-booter-lib PUBLIC "cxx_std_17")
 target_include_directories(proxyfmu-booter-lib
         PUBLIC
@@ -230,9 +228,8 @@ target_include_directories(proxyfmu-booter-lib
         )
 target_link_libraries(proxyfmu-booter-lib
         PUBLIC
-        thrift::thrift
-        Boost::system
-        Boost::filesystem
+        CONAN_PKG::thrift
+        CONAN_PKG::boost
         )
 if (UNIX)
   target_link_libraries(proxyfmu-booter-lib PRIVATE pthread stdc++fs)

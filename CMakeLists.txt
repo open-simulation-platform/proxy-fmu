@@ -50,7 +50,7 @@ set(PROXYFMU_EXPORT_TARGET "${PROJECT_NAME}-targets")
 
 if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  conan_basic_setup()
+  conan_basic_setup(TARGETS)
 else ()
   message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
 endif ()
@@ -60,9 +60,9 @@ if (PROXYFMU_BUILD_TESTS)
   list(APPEND BOOST_COMPONENTS unit_test_framework)
 endif ()
 
-find_package(Boost 1.66 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
-find_package(THRIFT REQUIRED)
-find_package(FMILIB REQUIRED)
+#find_package(Boost 1.66 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+#find_package(THRIFT REQUIRED)
+#find_package(FMILIB REQUIRED)
 
 # ==============================================================================
 # Targets
@@ -116,11 +116,3 @@ write_basic_package_version_file(
         VERSION "${PROJECT_VERSION}"
         COMPATIBILITY "SameMajorVersion")
 install(FILES "${versionFile}" DESTINATION "${PROXYFMU_CMAKE_INSTALL_DIR}")
-
-# Install custom find modules
-install(FILES
-        "${CMAKE_SOURCE_DIR}/cmake/FindFMILIB.cmake"
-        "${CMAKE_SOURCE_DIR}/cmake/FindTHRIFT.cmake"
-        DESTINATION
-        "${PROXYFMU_CMAKE_INSTALL_DIR}"
-        )

@@ -2,14 +2,14 @@
 include_directories(${PROXYFMU_SOURCE_DIR}/include)
 
 add_executable(proxyfmu proxyfmu.cpp)
-target_link_libraries(proxyfmu PRIVATE proxyfmu-lib Boost::program_options)
+target_link_libraries(proxyfmu PRIVATE proxyfmu-lib CONAN_PKG::boost)
 if (UNIX)
   target_link_libraries(proxyfmu PRIVATE pthread)
 endif ()
 
 
 add_executable(proxyfmu_booter proxyfmu_booter.cpp)
-target_link_libraries(proxyfmu_booter PRIVATE proxyfmu-booter-lib Boost::program_options)
+target_link_libraries(proxyfmu_booter PRIVATE proxyfmu-booter-lib CONAN_PKG::boost)
 if (UNIX)
   target_link_libraries(proxyfmu_booter PRIVATE pthread)
 endif ()

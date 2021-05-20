@@ -17,7 +17,7 @@ class ProxyFmuConan(ConanFile):
     requires = (
         "boost/1.71.0",
         "fmilibrary/2.0.3",
-        "thrift/0.13.0"
+        "thrift/0.14.1"
     )
 
     default_options = {
