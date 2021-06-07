@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <random>
+#include <string>
 
 #include "fixed_range_random_generator.hpp"
 
