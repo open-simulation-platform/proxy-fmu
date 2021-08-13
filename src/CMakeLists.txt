@@ -1,9 +1,9 @@
 set(publicHeaderDir ${CMAKE_SOURCE_DIR}/include)
 
+
 # ==============================================================================
 # common headers
 # ==============================================================================
-
 
 set(commonPublicHeaders
         "proxyfmu/fs_portability.hpp"
@@ -17,10 +17,10 @@ foreach (header IN LISTS commonPublicHeaders)
   list(APPEND commonPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
+
 # ==============================================================================
 # fmilib wrapper
 # ==============================================================================
-
 
 set(fmiPublicHeaders
         "proxyfmu/fmi/fmu.hpp"
@@ -58,25 +58,25 @@ foreach (header IN LISTS fmiPublicHeaders)
   list(APPEND fmiPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(fmi ${commonPublicHeadersFull} ${fmiPublicHeadersFull} ${fmiPrivateHeaders} ${fmiSources})
-add_library(proxyfmu::fmi ALIAS fmi)
-target_compile_features(fmi PUBLIC "cxx_std_17")
-set_target_properties(fmi PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_include_directories(fmi
+add_library(fmilibwrapper ${commonPublicHeadersFull} ${fmiPublicHeadersFull} ${fmiPrivateHeaders} ${fmiSources})
+add_library(proxyfmu::fmilibwrapper ALIAS fmilibwrapper)
+target_compile_features(fmilibwrapper PUBLIC "cxx_std_17")
+set_target_properties(fmilibwrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(fmilibwrapper
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(fmi PRIVATE FMILIB::FMILIB)
+target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB)
 if (UNIX)
-  target_link_libraries(fmi PRIVATE stdc++fs dl)
+  target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
 endif ()
+
 
 # ==============================================================================
 # thrift
 # ==============================================================================
-
 
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 set(thriftCppSourcesDir "${generatedSourcesDir}/proxyfmu/thrift")
@@ -124,6 +124,7 @@ add_library(proxyfmu-service OBJECT ${thriftGenerated})
 set_target_properties(proxyfmu-service PROPERTIES POSITION_INDEPENDENT_CODE ON)
 list(APPEND generatedFiles "$<TARGET_OBJECTS:proxyfmu-service>")
 
+
 # ==============================================================================
 # proxyfmu client lib
 # ==============================================================================
@@ -157,10 +158,9 @@ target_include_directories(proxyfmu-client
         )
 target_link_libraries(proxyfmu-client
         PUBLIC
-        fmi
+        fmilibwrapper
         PRIVATE
         thrift::thrift
-        Boost::system
         Boost::filesystem
         )
 if (UNIX)
@@ -169,6 +169,7 @@ endif ()
 
 # Make sure executable is up to date
 add_dependencies(proxyfmu-client proxyfmu)
+
 
 # ==============================================================================
 # proxyfmu server lib
@@ -195,10 +196,11 @@ target_include_directories(proxyfmu-lib
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(proxyfmu-lib PUBLIC fmi thrift::thrift)
+target_link_libraries(proxyfmu-lib PUBLIC fmilibwrapper thrift::thrift)
 if (UNIX)
   target_link_libraries(proxyfmu-lib PRIVATE pthread)
 endif ()
+
 
 # ==============================================================================
 # proxyfmu booter lib
@@ -231,19 +233,20 @@ target_include_directories(proxyfmu-booter-lib
 target_link_libraries(proxyfmu-booter-lib
         PUBLIC
         thrift::thrift
-        Boost::system
+        PRIVATE
         Boost::filesystem
         )
 if (UNIX)
   target_link_libraries(proxyfmu-booter-lib PRIVATE pthread stdc++fs)
 endif ()
 
+
 # ==============================================================================
 # Installation rules
 # ==============================================================================
 
 install(
-        TARGETS fmi proxyfmu-client
+        TARGETS fmilibwrapper proxyfmu-client
         EXPORT "${PROXYFMU_EXPORT_TARGET}"
         ${PROXYFMU_INSTALL_DESTINATIONS}
 )
