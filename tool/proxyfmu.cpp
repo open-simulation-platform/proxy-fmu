@@ -131,6 +131,12 @@ int main(int argc, char** argv)
         }
 
         auto fmu = vm["fmu"].as<std::string>();
+        auto fmuPath = proxyfmu::filesystem::path(fmu);
+        if (!proxyfmu::filesystem::exists(fmuPath)) {
+            std::cerr << "[proxyfmu] No such file " << proxyfmu::filesystem::absolute(fmuPath);
+            return COMMANDLINE_ERROR;
+        }
+
         auto instanceName = vm["instanceName"].as<std::string>();
 
         return run_application(fmu, instanceName);

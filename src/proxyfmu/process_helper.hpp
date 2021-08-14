@@ -25,9 +25,18 @@ void start_process(
 
     std::string cmd("proxyfmu --fmu " + fmuPath.string() + " --instanceName " + instanceName);
 
+    proxyfmu::filesystem::path executable;
 #ifdef __linux__
     cmd.insert(0, "./");
+    executable = "proxyfmu";
+#else
+    executable = "proxyfmu.exe";
 #endif
+
+    if (!proxyfmu::filesystem::exists(executable)) {
+        auto execPath = proxyfmu::filesystem::absolute(executable).string();
+        throw std::runtime_error("[proxyfmu] No proxyfmu executable found. " + execPath + " does not exist!");
+    }
 
     boost::process::ipstream pipe_stream;
     boost::process::child c(cmd, boost::process::std_out > pipe_stream);
@@ -58,4 +67,4 @@ void start_process(
 
 } // namespace proxyfmu
 
-#endif //PROXYFMU_PROCESS_HELPER_HPP
+#endif // PROXYFMU_PROCESS_HELPER_HPP

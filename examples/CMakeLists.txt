@@ -7,11 +7,11 @@ include_directories(${PROXYFMU_SOURCE_DIR}/src)
 
 add_executable(fmi-test
 		fmi/fmi_test.cpp)
-target_link_libraries(fmi-test PUBLIC fmi ${FMILibrary_LIBRARIES})
+target_link_libraries(fmi-test PUBLIC fmilibwrapper)
 
 ###########################################################
 #########################Thrift############################
 
 add_executable(client_test
         thrift/client_test.cpp)
-target_link_libraries(client_test PRIVATE ${FMILibrary_LIBRARIES} proxyfmu-client)
+target_link_libraries(client_test PRIVATE proxyfmu-client)
