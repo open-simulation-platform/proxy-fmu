@@ -1,6 +1,6 @@
 # proxy-fmu
 
-`proxy-fmu` is a tool-independent solution for running FMUs compatiable with FMI for Co-simulation version 1.x & 2.x in distributed fashion.
+`proxy-fmu` is a tool-independent solution for running FMUs compatible with FMI for Co-simulation version 1.x & 2.x in distributed fashion.
 `proxy-fmu` will automatically spawn a new process for each instance that is instantiated from an FMU.
 
 By default, `proxy-fmu` targets `localhost`. For this behaviour zero configuration is required apart from the fact that the `proxyfmu` executable must be available.
