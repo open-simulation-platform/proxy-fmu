@@ -34,10 +34,17 @@ Add the remote using the command:
 conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local
 ```
 
-Then add a dependency to: `proxyfmu/<version>@osp/testing`
+Then add a dependency to: `proxyfmu/<version>@osp/stable`
 
 The artifact contains both the library and required executables.
 
 ### proxy-fmu & libcosim
 
 Adding `proxy_fmu` support for [libcosim](https://github.com/open-simulation-platform/libcosim/blob/master/conanfile.py) is as simple as adding `-o proxyfmu=True` to its conan command.
+
+
+### How is this project related to `FMU-proxy`?
+
+This library serves similar purpose as [FMU-proxy v.0.6.2](https://github.com/NTNU-IHB/FMU-proxy/releases/tag/v0.6.2). 
+However, it requires no JVM and automatically spawns new processes.
+The current development of FMU-proxy is about wrapping existing FMUs into new FMUs with network capabilities, so they now serve different purposes. `proxy-fmu` is a library that apps can integrate with and FMU-proxy produces FMI compatible wrapper models.
