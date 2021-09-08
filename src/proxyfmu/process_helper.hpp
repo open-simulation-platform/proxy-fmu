@@ -4,6 +4,7 @@
 
 #include <proxyfmu/fs_portability.hpp>
 
+#include <boost/dll/runtime_symbol_info.hpp>
 #include <boost/process.hpp>
 
 #include <condition_variable>
@@ -34,6 +35,16 @@ void start_process(
 #endif
 
     if (!proxyfmu::filesystem::exists(executable)) {
+        boost::dll::fs::error_code ec;
+        boost::dll::fs::path loc = boost::dll::program_location(ec);
+        if (!ec.failed()) {
+            executable = loc.parent_path().string() / executable;
+        } else {
+            std::cerr << "[proxyfmu] Error, unable to locate parent executable" << std::endl;
+        }
+    }
+
+    if (!proxyfmu::filesystem::exists(executable)) {
         auto execPath = proxyfmu::filesystem::absolute(executable).string();
         throw std::runtime_error("[proxyfmu] No proxyfmu executable found. " + execPath + " does not exist!");
     }
@@ -47,6 +58,7 @@ void start_process(
             port = std::stoi(line.substr(16));
             std::unique_lock<std::mutex> lck(mtx);
             cv.notify_all();
+            std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
         } else if (line.substr(0, 10) == "[proxyfmu]") {
             std::cout << line << std::endl;
         }
