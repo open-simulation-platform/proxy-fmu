@@ -49,6 +49,8 @@ void start_process(
         throw std::runtime_error("[proxyfmu] No proxyfmu executable found. " + execPath + " does not exist!");
     }
 
+    std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
+
     boost::process::ipstream pipe_stream;
     boost::process::child c(cmd, boost::process::std_out > pipe_stream);
 
