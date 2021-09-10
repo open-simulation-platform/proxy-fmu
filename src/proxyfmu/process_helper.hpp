@@ -49,6 +49,7 @@ void start_process(
         throw std::runtime_error("[proxyfmu] No proxyfmu executable found. " + execPath + " does not exist!");
     }
 
+    std::cout << "[proxyfmu] executable: " << executable << std::endl;
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
     boost::process::ipstream pipe_stream;
@@ -69,12 +70,10 @@ void start_process(
     c.wait();
 
     auto status = c.exit_code();
-    if (status != 0) {
-        std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
-    }
     std::cout << "[proxyfmu] External proxy process for instance '" << instanceName << "' returned with status " << std::to_string(status) << std::endl;
 
     if (status != 0) {
+        std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
         throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
     }
 }
