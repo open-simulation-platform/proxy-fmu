@@ -44,9 +44,7 @@ void start_process(
     }
 
 #ifdef __linux__
-    if (executable.is_absolute()) {
-        cmd.insert(0, ".");
-    } else {
+    if (!executable.is_absolute()) {
         cmd.insert(0, "./");
     }
 #endif
