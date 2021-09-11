@@ -57,6 +57,8 @@ void start_process(
     std::cout << "[proxyfmu] executable: " << executable << std::endl;
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
+    std::cout << "cmd=" << cmd << std::endl;
+
     boost::process::ipstream pipe_stream;
     boost::process::child c(cmd, boost::process::std_out > pipe_stream);
 
