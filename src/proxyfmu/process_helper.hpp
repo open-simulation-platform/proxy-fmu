@@ -41,6 +41,8 @@ void start_process(
         } else {
             std::cerr << "[proxyfmu] Error, unable to locate parent executable" << std::endl;
         }
+    } else {
+        std::cout << "mhh" << std::endl;
     }
 
 #ifdef __linux__
