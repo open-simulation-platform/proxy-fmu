@@ -46,7 +46,7 @@ void start_process(
         throw std::runtime_error("[proxyfmu] No proxyfmu executable found. " + execPath + " does not exist!");
     }
 
-    std::cout << "[proxyfmu] executable: " << executable << std::endl;
+    std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << std::endl;
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
     std::string cmd(executable.string() + " --fmu " + fmuPath.string() + " --instanceName " + instanceName);
