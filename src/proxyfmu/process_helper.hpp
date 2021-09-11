@@ -24,8 +24,6 @@ void start_process(
     std::condition_variable& cv)
 {
 
-    std::string cmd("proxyfmu --fmu " + fmuPath.string() + " --instanceName " + instanceName);
-
     proxyfmu::filesystem::path executable;
 #ifdef __linux__
     executable = "proxyfmu";
@@ -41,8 +39,6 @@ void start_process(
         } else {
             std::cerr << "[proxyfmu] Error, unable to locate parent executable" << std::endl;
         }
-    } else {
-        std::cout << "mhh" << std::endl;
     }
 
 #ifdef __linux__
@@ -59,6 +55,7 @@ void start_process(
     std::cout << "[proxyfmu] executable: " << executable << std::endl;
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
+    std::string cmd(executable.string() + " --fmu " + fmuPath.string() + " --instanceName " + instanceName);
     std::cout << "cmd=" << cmd << std::endl;
 
     boost::process::ipstream pipe_stream;
