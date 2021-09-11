@@ -56,8 +56,6 @@ void start_process(
     }
 #endif
 
-    std::cout << "cmd=" << cmd << std::endl;
-
     boost::process::ipstream pipe_stream;
     boost::process::child c(cmd, boost::process::std_out > pipe_stream);
 
