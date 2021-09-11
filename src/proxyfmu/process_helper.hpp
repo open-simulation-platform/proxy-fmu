@@ -28,7 +28,6 @@ void start_process(
 
     proxyfmu::filesystem::path executable;
 #ifdef __linux__
-    cmd.insert(0, "./");
     executable = "proxyfmu";
 #else
     executable = "proxyfmu.exe";
@@ -43,6 +42,14 @@ void start_process(
             std::cerr << "[proxyfmu] Error, unable to locate parent executable" << std::endl;
         }
     }
+
+#ifdef __linux__
+    if (executable.is_absolute()) {
+        cmd.insert(0, ".");
+    } else {
+        cmd.insert(0, "./");
+    }
+#endif
 
     if (!proxyfmu::filesystem::exists(executable)) {
         auto execPath = proxyfmu::filesystem::absolute(executable).string();
