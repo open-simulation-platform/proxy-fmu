@@ -16,6 +16,7 @@ proxy_fmu::proxy_fmu(const filesystem::path& fmuPath, std::optional<remote_info>
     , remote_(std::move(remote))
     , modelDescription_(fmi::loadFmu(fmuPath)->get_model_description())
 {
+    if (!exists(fmuPath)) throw std::runtime_error("No such file: " + filesystem::absolute(fmuPath).string() + "!");
 }
 
 const fmi::model_description& proxy_fmu::get_model_description() const
