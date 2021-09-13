@@ -20,6 +20,10 @@ option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
 set(CMAKE_CXX_STANDARD 17)
 set(Boost_USE_STATIC_LIBS ON)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 if (MSVC)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
   add_definitions("-D_WIN32_WINNT=0x600" "-D_CRT_SECURE_NO_WARNINGS")
@@ -55,9 +59,12 @@ else()
 
   include(cmake/conan.cmake)
 
+  conan_cmake_autodetect(settings)
+
   conan_cmake_run(
           CONANFILE conanfile.py
           BUILD missing
+          SETTINGS ${settings}
           BASIC_SETUP CMAKE_TARGETS)
 
 endif()
