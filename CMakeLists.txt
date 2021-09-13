@@ -55,12 +55,9 @@ else()
 
   include(cmake/conan.cmake)
 
-  conan_cmake_autodetect(settings)
-
   conan_cmake_run(
           CONANFILE conanfile.py
           BUILD missing
-          SETTINGS ${settings}
           BASIC_SETUP CMAKE_TARGETS)
 
 endif()
