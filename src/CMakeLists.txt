@@ -68,7 +68,7 @@ target_include_directories(fmilibwrapper
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB)
+target_link_libraries(fmilibwrapper PRIVATE CONAN_PKG::fmilibrary)
 if (UNIX)
   target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
 endif ()
@@ -86,6 +86,7 @@ file(MAKE_DIRECTORY "${generatedSourcesDir}")
 file(MAKE_DIRECTORY "${thriftCppSourcesDir}")
 file(MAKE_DIRECTORY "${thriftJavaSourcesDir}")
 
+find_program(THRIFT_EXECUTABLE NAMES thrift)
 if (NOT THRIFT_EXECUTABLE)
   message(FATAL_ERROR "The thrift compiler was not found. Cannot generate Thrift sources.")
 endif ()
@@ -121,6 +122,7 @@ set(thriftGenerated
         )
 
 add_library(proxyfmu-service OBJECT ${thriftGenerated})
+target_link_libraries(proxyfmu-service PRIVATE CONAN_PKG::thrift)
 set_target_properties(proxyfmu-service PROPERTIES POSITION_INDEPENDENT_CODE ON)
 list(APPEND generatedFiles "$<TARGET_OBJECTS:proxyfmu-service>")
 
@@ -160,7 +162,7 @@ target_link_libraries(proxyfmu-client
         PUBLIC
         fmilibwrapper
         PRIVATE
-        thrift::thrift
+        CONAN_PKG::thrift
         Boost::filesystem
         )
 if (UNIX)
@@ -196,7 +198,7 @@ target_include_directories(proxyfmu-lib
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(proxyfmu-lib PUBLIC fmilibwrapper thrift::thrift)
+target_link_libraries(proxyfmu-lib PUBLIC fmilibwrapper CONAN_PKG::thrift)
 if (UNIX)
   target_link_libraries(proxyfmu-lib PRIVATE pthread)
 endif ()
@@ -232,7 +234,7 @@ target_include_directories(proxyfmu-booter-lib
         )
 target_link_libraries(proxyfmu-booter-lib
         PUBLIC
-        thrift::thrift
+        CONAN_PKG::thrift
         PRIVATE
         Boost::filesystem
         )

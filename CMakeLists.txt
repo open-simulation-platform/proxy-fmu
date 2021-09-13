@@ -19,7 +19,6 @@ option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 set(Boost_USE_STATIC_LIBS ON)
 
@@ -48,12 +47,22 @@ set(PROXYFMU_EXPORT_TARGET "${PROJECT_NAME}-targets")
 # Dependencies
 # ==============================================================================
 
-if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+if(CONAN_EXPORTED) # in conan local cache
+  # standard conan installation, deps will be defined in conanfile.py
+  # and not necessary to call conan again, conan is already running
   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  conan_basic_setup()
-else ()
-  message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
-endif ()
+  conan_basic_setup(TARGETS)
+else()
+
+  include(cmake/conan.cmake)
+
+  conan_cmake_run(
+          CONANFILE conanfile.py
+          BUILD missing
+          SETTINGS build_type=${CMAKE_BUILD_TYPE}
+          BASIC_SETUP CMAKE_TARGETS)
+
+endif()
 
 set(BOOST_COMPONENTS filesystem program_options)
 if (PROXYFMU_BUILD_TESTS)
@@ -61,8 +70,6 @@ if (PROXYFMU_BUILD_TESTS)
 endif ()
 
 find_package(Boost 1.71 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
-find_package(THRIFT REQUIRED)
-find_package(FMILIB REQUIRED)
 
 # ==============================================================================
 # Targets
@@ -116,11 +123,3 @@ write_basic_package_version_file(
         VERSION "${PROJECT_VERSION}"
         COMPATIBILITY "SameMajorVersion")
 install(FILES "${versionFile}" DESTINATION "${PROXYFMU_CMAKE_INSTALL_DIR}")
-
-# Install custom find modules
-install(FILES
-        "${CMAKE_SOURCE_DIR}/cmake/FindFMILIB.cmake"
-        "${CMAKE_SOURCE_DIR}/cmake/FindTHRIFT.cmake"
-        DESTINATION
-        "${PROXYFMU_CMAKE_INSTALL_DIR}"
-        )
