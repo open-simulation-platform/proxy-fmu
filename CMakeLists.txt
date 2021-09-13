@@ -18,11 +18,14 @@ option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
 # ==============================================================================
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-
 set(Boost_USE_STATIC_LIBS ON)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 if (MSVC)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
   add_definitions("-D_WIN32_WINNT=0x600" "-D_CRT_SECURE_NO_WARNINGS")
   add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
 endif ()
