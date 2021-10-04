@@ -49,7 +49,7 @@ void start_process(
     std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << std::endl;
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
-    std::string cmd(executable.string() + " --fmu " + fmuPath.string() + " --instanceName " + instanceName);
+    std::string cmd(executable.string() + " --fmu \"" + fmuPath.string() + "\" --instanceName " + instanceName);
 #ifdef __linux__
     if (!executable.is_absolute()) {
         cmd.insert(0, "./");
