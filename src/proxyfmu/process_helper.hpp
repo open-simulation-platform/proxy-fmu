@@ -79,7 +79,7 @@ void start_process(
     std::cout << "[proxyfmu] External proxy process for instance '" << instanceName << "' returned with status " << std::to_string(status) << std::endl;
 
     // exit code -999 has special meaning: not able to bind to a port
-    if (status == -999) {
+    if (!bound && status == -999) {
         std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
         throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
     }
