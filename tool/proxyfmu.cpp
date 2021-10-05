@@ -84,7 +84,7 @@ int run_application(const std::string& fmu, const std::string& instanceName)
         }
     }
 
-    return final_port != -1 ? 0 : -1;
+    return final_port != -1 ? 0 : -999;
 }
 
 int printHelp(boost::program_options::options_description& desc)
