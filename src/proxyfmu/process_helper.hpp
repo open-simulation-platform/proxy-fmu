@@ -65,7 +65,7 @@ void start_process(
         if (!bound && line.substr(0, 16) == "[proxyfmu] port=") {
             port = std::stoi(line.substr(16));
             std::unique_lock<std::mutex> lck(mtx);
-            cv.notify_all();
+            cv.notify_one();
             std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
             bound = true;
         } else if (line.substr(0, 10) == "[proxyfmu]") {
@@ -81,7 +81,8 @@ void start_process(
     // exit code -999 has special meaning: not able to bind to a port
     if (!bound && status == -999) {
         std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
-        throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
+        port = -999;
+        cv.notify_one();
     }
 }
 
