@@ -82,8 +82,11 @@ void start_process(
 
     // exit code -999 has special meaning: not able to bind to a port
     if (!bound && status == -999) {
-        std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
-        port = -999;
+        {
+            std::lock_guard<std::mutex> lck(mtx);
+            std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
+            port = -999;
+        }
         cv.notify_one();
     }
 }
