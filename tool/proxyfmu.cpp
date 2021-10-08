@@ -66,13 +66,19 @@ int run_application(const std::string& fmu, const std::string& instanceName)
     int final_port = -1;
     for (auto i = 0; i < max_port_retries; i++) {
         port = rng.next();
+
+        std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+        server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
+        server->setServerEventHandler(std::make_shared<ServerReadyEventHandler>([port, &final_port] {
+            final_port = port;
+            std::cout << "[proxyfmu] port=" << std::to_string(final_port) << std::endl;
+        }));
+
         try {
-            std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
-            server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
-            server->setServerEventHandler(std::make_shared<ServerReadyEventHandler>([port, &final_port] {
-                final_port = port;
-                std::cout << "[proxyfmu] port=" << std::to_string(final_port) << std::endl;
-            }));
+
+            server->serve();
+            break;
+
         } catch (TTransportException& ex) {
             std::cout << "[proxyfmu] " << ex.what()
                       << ". Failed to bind to port " << std::to_string(port)
@@ -80,8 +86,6 @@ int run_application(const std::string& fmu, const std::string& instanceName)
                       << " of " << std::to_string(max_port_retries) << ".." << std::endl;
         }
     }
-
-    server->serve();
 
     return final_port != -1 ? 0 : -999;
 }
