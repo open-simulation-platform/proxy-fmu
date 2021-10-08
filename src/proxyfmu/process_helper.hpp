@@ -63,10 +63,12 @@ void start_process(
     std::string line;
     while (pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
         if (!bound && line.substr(0, 16) == "[proxyfmu] port=") {
-            port = std::stoi(line.substr(16));
-            std::unique_lock<std::mutex> lck(mtx);
+            {
+                std::lock_guard<std::mutex> lck(mtx);
+                port = std::stoi(line.substr(16));
+                std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
+            }
             cv.notify_one();
-            std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
             bound = true;
         } else if (line.substr(0, 10) == "[proxyfmu]") {
             std::cout << line << std::endl;
