@@ -18,24 +18,28 @@ void test(fmu& fmu)
     BOOST_TEST(d.guid == "{06c2700b-b39c-4895-9151-304ddde28443}");
     BOOST_TEST(d.generationTool == "20-sim");
 
-    auto slave = fmu.new_instance("instance");
-    BOOST_REQUIRE(slave->setup_experiment());
-    BOOST_REQUIRE(slave->enter_initialization_mode());
-    BOOST_REQUIRE(slave->exit_initialization_mode());
+    try {
+        auto slave = fmu.new_instance("instance");
+        BOOST_REQUIRE(slave->setup_experiment());
+        BOOST_REQUIRE(slave->enter_initialization_mode());
+        BOOST_REQUIRE(slave->exit_initialization_mode());
 
-    std::vector<value_ref> vr{47};
-    std::vector<double> realRef(1);
+        std::vector<value_ref> vr{47};
+        std::vector<double> realRef(1);
 
-    slave->get_real(vr, realRef);
-    BOOST_REQUIRE_CLOSE(realRef[0], 298, 0.0001);
+        slave->get_real(vr, realRef);
+        BOOST_REQUIRE_CLOSE(realRef[0], 298, 0.0001);
 
-    BOOST_REQUIRE(slave->step(0.0, 0.1));
+        BOOST_REQUIRE(slave->step(0.0, 0.1));
 
-    slave->get_real(vr, realRef);
-    BOOST_TEST(realRef[0] < 298);
+        slave->get_real(vr, realRef);
+        BOOST_TEST(realRef[0] < 298);
 
-    BOOST_REQUIRE(slave->terminate());
-    slave->freeInstance();
+        BOOST_REQUIRE(slave->terminate());
+        slave->freeInstance();
+    } catch (std::runtime_error &ex) {
+        BOOST_FAIL(std::string("Runtime error encountered: ") + ex.what());
+    }
 }
 
 } // namespace

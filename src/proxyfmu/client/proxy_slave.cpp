@@ -72,6 +72,11 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         transport->close();
     }
 
+    if (port == -999) {
+        if (thread_) thread_->join();
+        throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
+    }
+
     std::shared_ptr<TTransport> socket(new TSocket(host, port));
     transport_ = std::make_shared<TFramedTransport>(socket);
     std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport_));
@@ -199,8 +204,8 @@ void proxy_slave::freeInstance()
 {
     if (!freed) {
         freed = true;
-        client_->freeInstance();
-        if (thread_) thread_->join();
+        if (client_) client_->freeInstance();
+        if (thread_ && thread_->joinable()) thread_->join();
     }
 }
 

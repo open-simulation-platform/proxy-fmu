@@ -59,13 +59,17 @@ void start_process(
     boost::process::ipstream pipe_stream;
     boost::process::child c(cmd, boost::process::std_out > pipe_stream);
 
+    bool bound = false;
     std::string line;
     while (pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
-        if (line.substr(0, 16) == "[proxyfmu] port=") {
-            port = std::stoi(line.substr(16));
-            std::unique_lock<std::mutex> lck(mtx);
-            cv.notify_all();
-            std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
+        if (!bound && line.substr(0, 16) == "[proxyfmu] port=") {
+            {
+                std::lock_guard<std::mutex> lck(mtx);
+                port = std::stoi(line.substr(16));
+                std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
+            }
+            cv.notify_one();
+            bound = true;
         } else if (line.substr(0, 10) == "[proxyfmu]") {
             std::cout << line << std::endl;
         }
@@ -76,9 +80,14 @@ void start_process(
     auto status = c.exit_code();
     std::cout << "[proxyfmu] External proxy process for instance '" << instanceName << "' returned with status " << std::to_string(status) << std::endl;
 
-    if (status != 0) {
-        std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
-        throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
+    // exit code -999 has special meaning: not able to bind to a port
+    if (!bound && status == -999) {
+        {
+            std::lock_guard<std::mutex> lck(mtx);
+            std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
+            port = -999;
+        }
+        cv.notify_one();
     }
 }
 

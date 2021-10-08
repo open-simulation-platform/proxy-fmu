@@ -73,9 +73,6 @@ int run_application(const std::string& fmu, const std::string& instanceName)
                 final_port = port;
                 std::cout << "[proxyfmu] port=" << std::to_string(final_port) << std::endl;
             }));
-            server->serve();
-
-            break;
         } catch (TTransportException& ex) {
             std::cout << "[proxyfmu] " << ex.what()
                       << ". Failed to bind to port " << std::to_string(port)
@@ -84,7 +81,9 @@ int run_application(const std::string& fmu, const std::string& instanceName)
         }
     }
 
-    return final_port != -1 ? 0 : -1;
+    server->serve();
+
+    return final_port != -1 ? 0 : -999;
 }
 
 int printHelp(boost::program_options::options_description& desc)
