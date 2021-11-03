@@ -70,7 +70,7 @@ void start_process(
             }
             cv.notify_one();
             bound = true;
-        } else if (line.substr(0, 10) == "[proxyfmu]") {
+        } else {
             std::cout << line << std::endl;
         }
     }
