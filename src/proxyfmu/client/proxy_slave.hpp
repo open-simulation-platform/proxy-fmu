@@ -23,7 +23,6 @@ private:
     const fmi::model_description modelDescription_;
     std::shared_ptr<thrift::FmuServiceClient> client_;
     std::shared_ptr<TTransport> transport_;
-    std::unique_ptr<std::thread> thread_;
 
     bool freed = false;
 

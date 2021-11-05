@@ -10,7 +10,7 @@
 #include <thrift/transport/TTransportUtils.h>
 
 #include <chrono>
-#include <cstdio>
+#include <fstream>
 #include <utility>
 #include <vector>
 
@@ -25,16 +25,9 @@ namespace
 
 void read_data(std::string const& fileName, std::string& data)
 {
-    FILE* file = fopen(fileName.c_str(), "rb");
-    if (file == nullptr) return;
-    fseek(file, 0, SEEK_END);
-    long int size = ftell(file);
-    fclose(file);
-    file = fopen(fileName.c_str(), "rb");
-
-    data.resize(size);
-    [[maybe_unused]] size_t bytes_read = fread(data.data(), sizeof(unsigned char), size, file);
-    fclose(file);
+    std::ofstream file(fileName);
+    file << data;
+    file.close();
 }
 
 } // namespace
@@ -53,7 +46,7 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         host = "localhost";
         std::mutex mtx;
         std::condition_variable cv;
-        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
+        std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv))->detach();
         std::unique_lock<std::mutex> lck(mtx);
         while (port == -1) cv.wait(lck);
     } else {
@@ -73,7 +66,6 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
     }
 
     if (port == -999) {
-        if (thread_) thread_->join();
         throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
     }
 
@@ -205,7 +197,6 @@ void proxy_slave::freeInstance()
     if (!freed) {
         freed = true;
         if (client_) client_->freeInstance();
-        if (thread_ && thread_->joinable()) thread_->join();
     }
 }
 
