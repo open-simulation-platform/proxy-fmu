@@ -28,6 +28,10 @@ if (MSVC)
   add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
 endif ()
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 # Prepare for export and installation.
 set(PROXYFMU_HEADER_INSTALL_DIR "include")
 if (WIN32)
@@ -48,12 +52,28 @@ set(PROXYFMU_EXPORT_TARGET "${PROJECT_NAME}-targets")
 # Dependencies
 # ==============================================================================
 
-if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+if(CONAN_EXPORTED) # in conan local cache
+  # standard conan installation, deps will be defined in conanfile.py
+  # and not necessary to call conan again, conan is already running
   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
   conan_basic_setup()
-else ()
-  message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
-endif ()
+else()
+
+  include(cmake/conan.cmake)
+  conan_cmake_autodetect(settings)
+
+  set(proxyfmu_option False)
+  if(LIBCOSIM_WITH_PROXYFMU)
+    set(proxyfmu_option True)
+  endif()
+
+  conan_cmake_run(
+          CONANFILE conanfile.py
+          BUILD missing
+          SETTINGS ${settings}
+          BASIC_SETUP)
+
+endif()
 
 set(BOOST_COMPONENTS filesystem program_options)
 if (PROXYFMU_BUILD_TESTS)
