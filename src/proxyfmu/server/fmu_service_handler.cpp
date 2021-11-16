@@ -119,4 +119,5 @@ void fmu_service_handler::freeInstance()
     std::cout << "[proxyfmu] Shutting down proxy for '" << modelName_ << "::" << instanceName_ << "'";
     stop_();
     std::cout << " done.." << std::endl;
+    std::cout << "[proxyfmu] freed";
 }

@@ -61,7 +61,7 @@ void start_process(
 
     bool bound = false;
     std::string line;
-    while (pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
+    while (pipe_stream && std::getline(pipe_stream, line)) {
         if (!bound && line.substr(0, 16) == "[proxyfmu] port=") {
             {
                 std::lock_guard<std::mutex> lck(mtx);
@@ -70,8 +70,10 @@ void start_process(
             }
             cv.notify_one();
             bound = true;
-        } else if (line.substr(0, 10) == "[proxyfmu]") {
-            std::cout << line << std::endl;
+        } else if (line.substr(0, 16) == "[proxyfmu] freed") {
+            break;
+        } else {
+            std::cerr << line << std::endl;
         }
     }
 
