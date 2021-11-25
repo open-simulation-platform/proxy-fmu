@@ -10,9 +10,9 @@
 #include <thrift/transport/TTransportUtils.h>
 
 #include <chrono>
+#include <cstdio>
 #include <utility>
 #include <vector>
-#include <fstream>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -25,8 +25,16 @@ namespace
 
 void read_data(std::string const& fileName, std::string& data)
 {
-    std::fstream file(fileName);
-    file << data;
+    FILE* file = fopen(fileName.c_str(), "rb");
+    if (file == nullptr) return;
+    fseek(file, 0, SEEK_END);
+    long int size = ftell(file);
+    fclose(file);
+    file = fopen(fileName.c_str(), "rb");
+
+    data.resize(size);
+    [[maybe_unused]] size_t bytes_read = fread(data.data(), sizeof(unsigned char), size, file);
+    fclose(file);
 }
 
 } // namespace
