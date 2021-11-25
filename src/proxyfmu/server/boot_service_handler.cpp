@@ -43,6 +43,6 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
 boot_service_handler::~boot_service_handler()
 {
     for (auto& t : processes_) {
-        t->join();
+        if (t->joinable()) t->join();
     }
 }
