@@ -57,7 +57,15 @@ endif ()
 
 set(BOOST_COMPONENTS filesystem program_options)
 if (PROXYFMU_BUILD_TESTS)
-  list(APPEND BOOST_COMPONENTS unit_test_framework)
+  Include(FetchContent)
+
+  FetchContent_Declare(
+          Catch2
+          GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+          GIT_TAG        v2.13.8
+  )
+
+  FetchContent_MakeAvailable(Catch2)
 endif ()
 
 find_package(Boost 1.71 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
