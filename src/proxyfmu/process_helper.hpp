@@ -51,7 +51,7 @@ void start_process(
 
     std::string executableStr =  executable.string();
     std::string fmuPathStr = fmuPath.string();
-    const char* cmd[] = {executableStr.c_str(), "--fmu", fmuPathStr.c_str(), "--instanceName", instanceName.c_str(), nullptr};
+   std::vector<const char*> cmd = {executableStr.c_str(), "--fmu", fmuPathStr.c_str(), "--instanceName", instanceName.c_str(), nullptr};
 #ifdef __linux__
     if (!executable.is_absolute()) {
         cmd.insert(0, "./");
@@ -59,7 +59,7 @@ void start_process(
 #endif
 
     struct subprocess_s process;
-    int result = subprocess_create(cmd, subprocess_option_inherit_environment | subprocess_option_no_window, &process);
+    int result = subprocess_create(cmd.data(), subprocess_option_inherit_environment | subprocess_option_no_window, &process);
 
     bool bound = false;
     if (result == 0) {
