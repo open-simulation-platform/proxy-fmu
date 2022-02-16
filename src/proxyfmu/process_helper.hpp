@@ -5,13 +5,13 @@
 #include <proxyfmu/fs_portability.hpp>
 
 #include <boost/dll/runtime_symbol_info.hpp>
-#include <subprocess/subprocess.h>
 
 #include <condition_variable>
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <string>
+#include <subprocess/subprocess.h>
 
 namespace proxyfmu
 {
@@ -49,12 +49,13 @@ void start_process(
     std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << std::endl;
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
-    std::string executableStr =  executable.string();
+    std::string executableStr = executable.string();
     std::string fmuPathStr = fmuPath.string();
-   std::vector<const char*> cmd = {executableStr.c_str(), "--fmu", fmuPathStr.c_str(), "--instanceName", instanceName.c_str(), nullptr};
+    std::vector<const char*> cmd = {executableStr.c_str(), "--fmu", fmuPathStr.c_str(), "--instanceName", instanceName.c_str(), nullptr};
+
 #ifdef __linux__
     if (!executable.is_absolute()) {
-        cmd.insert(0, "./");
+        cmd.insert(cmd.begin(), "./");
     }
 #endif
 
