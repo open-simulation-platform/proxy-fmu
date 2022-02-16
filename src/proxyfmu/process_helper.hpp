@@ -12,11 +12,13 @@
 #include <string>
 #include <subprocess/subprocess.h>
 
+
 #ifdef WIN32
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
 #endif
 #ifdef __linux__
+#    include <algorithm>
 #    include <unistd.h>
 #endif
 
@@ -28,7 +30,7 @@ std::optional<std::string> getLoc()
     char pBuf[256];
     size_t len = sizeof(pBuf);
 #ifdef __linux__
-    int bytes = MIN(readlink("/proc/self/exe", pBuf, len), len - 1);
+    int bytes = std::min(readlink("/proc/self/exe", pBuf, len), len - 1);
     if (bytes >= 0) {
         pBuf[bytes] = '\0';
         return {pBuf};
