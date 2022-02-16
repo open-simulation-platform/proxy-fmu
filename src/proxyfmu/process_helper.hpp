@@ -5,7 +5,7 @@
 #include <proxyfmu/fs_portability.hpp>
 
 #include <boost/dll/runtime_symbol_info.hpp>
-#include <boost/process.hpp>
+#include <subprocess/subprocess.h>
 
 #include <condition_variable>
 #include <exception>
@@ -49,38 +49,50 @@ void start_process(
     std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << std::endl;
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
-    std::string cmd(executable.string() + " --fmu \"" + fmuPath.string() + "\" --instanceName " + instanceName);
+    std::string executableStr =  executable.string();
+    std::string fmuPathStr = "" + fmuPath.string() + "";
+    const char* cmd[] = {executableStr.c_str(), "--fmu", fmuPathStr.c_str(), "--instanceName", instanceName.c_str(), nullptr};
 #ifdef __linux__
     if (!executable.is_absolute()) {
         cmd.insert(0, "./");
     }
 #endif
 
-    boost::process::ipstream pipe_stream;
-    boost::process::child c(cmd, boost::process::std_out > pipe_stream);
+    struct subprocess_s process;
+    int result = subprocess_create(cmd, subprocess_option_no_window, &process);
 
     bool bound = false;
-    std::string line;
-    while (pipe_stream && std::getline(pipe_stream, line)) {
-        if (!bound && line.substr(0, 16) == "[proxyfmu] port=") {
-            {
-                std::lock_guard<std::mutex> lck(mtx);
-                port = std::stoi(line.substr(16));
-                std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
+    if (result == 0) {
+        FILE* p_stdout = subprocess_stdout(&process);
+
+        char buffer[256];
+        while (fgets(buffer, 256, p_stdout)) {
+            std::string line(buffer);
+            if (!bound && line.substr(0, 16) == "[proxyfmu] port=") {
+                {
+                    std::lock_guard<std::mutex> lck(mtx);
+                    port = std::stoi(line.substr(16));
+                    std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
+                }
+                cv.notify_one();
+                bound = true;
+            } else if (line.substr(0, 16) == "[proxyfmu] freed") {
+                break;
+            } else {
+                std::cerr << line << std::endl;
             }
-            cv.notify_one();
-            bound = true;
-        } else if (line.substr(0, 16) == "[proxyfmu] freed") {
-            break;
-        } else {
-            std::cerr << line << std::endl;
         }
+    } else {
+        std::lock_guard<std::mutex> lck(mtx);
+        std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
+        port = -999;
     }
 
-    c.wait();
-
-    auto status = c.exit_code();
-    std::cout << "[proxyfmu] External proxy process for instance '" << instanceName << "' returned with status " << std::to_string(status) << std::endl;
+    int status = -999;
+    result = subprocess_join(&process, &status);
+    if (result == 0) {
+        std::cout << "[proxyfmu] External proxy process for instance '" << instanceName << "' returned with status " << std::to_string(status) << std::endl;
+    }
 
     // exit code -999 has special meaning: not able to bind to a port
     if (!bound && status == -999) {
