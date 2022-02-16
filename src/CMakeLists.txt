@@ -161,7 +161,6 @@ target_link_libraries(proxyfmu-client
         fmilibwrapper
         PRIVATE
         thrift::thrift
-        Boost::filesystem
         )
 if (UNIX)
   target_link_libraries(proxyfmu-client PRIVATE pthread)
@@ -234,7 +233,6 @@ target_link_libraries(proxyfmu-booter-lib
         PUBLIC
         thrift::thrift
         PRIVATE
-        Boost::filesystem
         )
 if (UNIX)
   target_link_libraries(proxyfmu-booter-lib PRIVATE pthread stdc++fs)

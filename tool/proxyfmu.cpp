@@ -2,7 +2,6 @@
 #include <proxyfmu/fixed_range_random_generator.hpp>
 #include <proxyfmu/server/fmu_service_handler.hpp>
 
-#include <boost/program_options.hpp>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TTransportUtils.h>
@@ -90,10 +89,10 @@ int run_application(const std::string& fmu, const std::string& instanceName)
     return final_port != -1 ? 0 : -999;
 }
 
-int printHelp(boost::program_options::options_description& desc)
+int printHelp()
 {
     std::cout << "proxyfmu" << '\n'
-              << desc << std::endl;
+              << "<fmuPath> <instanceName>" << std::endl;
     return SUCCESS;
 }
 
@@ -102,45 +101,20 @@ int printHelp(boost::program_options::options_description& desc)
 int main(int argc, char** argv)
 {
 
-    namespace po = boost::program_options;
-
-    po::options_description desc("Options");
-    desc.add_options()("help,h", "Print this help message and quits.");
-    desc.add_options()("fmu", po::value<std::string>(), "Location of the fmu to load.");
-    desc.add_options()("instanceName", po::value<std::string>(), "Name of the slave instance.");
-
     if (argc == 1) {
-        return printHelp(desc);
+        return printHelp();
     }
 
     try {
 
-        po::variables_map vm;
-        try {
-
-            po::store(po::parse_command_line(argc, argv, desc), vm);
-
-            if (vm.count("help")) {
-                return printHelp(desc);
-            }
-
-            po::notify(vm);
-
-        } catch (po::error& e) {
-            std::cerr << "ERROR: " << e.what() << std::endl
-                      << std::endl;
-            std::cerr << desc << std::endl;
-            return COMMANDLINE_ERROR;
-        }
-
-        auto fmu = vm["fmu"].as<std::string>();
+        std::string fmu = argv[1];
         auto fmuPath = proxyfmu::filesystem::path(fmu);
         if (!proxyfmu::filesystem::exists(fmuPath)) {
             std::cerr << "[proxyfmu] No such file " << proxyfmu::filesystem::absolute(fmuPath);
             return COMMANDLINE_ERROR;
         }
 
-        auto instanceName = vm["instanceName"].as<std::string>();
+        std::string instanceName = argv[2];
 
         return run_application(fmu, instanceName);
 

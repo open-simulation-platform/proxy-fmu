@@ -21,8 +21,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-set(Boost_USE_STATIC_LIBS ON)
-
 if (MSVC)
   add_definitions("-D_WIN32_WINNT=0x600" "-D_CRT_SECURE_NO_WARNINGS")
   add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
@@ -55,7 +53,6 @@ else ()
   message(FATAL_ERROR "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first!")
 endif ()
 
-set(BOOST_COMPONENTS filesystem program_options)
 if (PROXYFMU_BUILD_TESTS)
   Include(FetchContent)
 
@@ -68,7 +65,6 @@ if (PROXYFMU_BUILD_TESTS)
   FetchContent_MakeAvailable(Catch2)
 endif ()
 
-find_package(Boost 1.71 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 find_package(THRIFT REQUIRED)
 find_package(FMILIB REQUIRED)
 

@@ -1,7 +1,6 @@
 
 #include <proxyfmu/server/boot_service_handler.hpp>
 
-#include <boost/program_options.hpp>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TTransportUtils.h>
@@ -28,7 +27,8 @@ void wait_for_input()
 {
     std::cout << '\n'
               << "Press any key to quit...\n";
-    while (std::cin.get() != '\n');
+    while (std::cin.get() != '\n')
+        ;
     std::cout << "Done." << std::endl;
 }
 
@@ -54,10 +54,10 @@ int run_application(const int port)
     return 0;
 }
 
-int printHelp(boost::program_options::options_description& desc)
+int printHelp()
 {
     std::cout << "proxyfmu-booter" << '\n'
-              << desc << std::endl;
+              << "<port>" << std::endl;
     return SUCCESS;
 }
 
@@ -66,38 +66,14 @@ int printHelp(boost::program_options::options_description& desc)
 
 int main(int argc, char** argv)
 {
-    namespace po = boost::program_options;
-
-    po::options_description desc("Options");
-    desc.add_options()("help,h", "Print this help message and quits.");
-    desc.add_options()("port", po::value<int>(), "Specify the network port to be used.");
 
     if (argc == 1) {
-        return printHelp(desc);
+        return printHelp();
     }
 
     try {
 
-        po::variables_map vm;
-        try {
-
-            po::store(po::parse_command_line(argc, argv, desc), vm);
-
-            if (vm.count("help")) {
-                return printHelp(desc);
-            }
-
-            po::notify(vm);
-
-        } catch (po::error& e) {
-            std::cerr << "ERROR: " << e.what() << std::endl
-                      << std::endl;
-            std::cerr << desc << std::endl;
-            return COMMANDLINE_ERROR;
-        }
-
-        auto port = vm["port"].as<int>();
-
+        int port = std::stoi(argv[1]);
         return run_application(port);
 
     } catch (std::exception& e) {

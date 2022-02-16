@@ -4,17 +4,41 @@
 
 #include <proxyfmu/fs_portability.hpp>
 
-#include <boost/dll/runtime_symbol_info.hpp>
-
 #include <condition_variable>
 #include <exception>
 #include <iostream>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <subprocess/subprocess.h>
 
+#ifdef WIN32
+#    define WIN32_LEAN_AND_MEAN
+#    include <windows.h>
+#endif
+#ifdef __linux__
+#    include <unistd.h>
+#endif
+
 namespace proxyfmu
 {
+
+std::optional<std::string> getLoc()
+{
+    char pBuf[256];
+    size_t len = sizeof(pBuf);
+#ifdef __linux__
+    int bytes = MIN(readlink("/proc/self/exe", pBuf, len), len - 1);
+    if (bytes >= 0) {
+        pBuf[bytes] = '\0';
+        return {pBuf};
+    }
+#else
+    int bytes = GetModuleFileName(nullptr, pBuf, len);
+    if (bytes) return {pBuf};
+#endif
+    return std::nullopt;
+}
 
 void start_process(
     const proxyfmu::filesystem::path& fmuPath,
@@ -32,10 +56,9 @@ void start_process(
 #endif
 
     if (!proxyfmu::filesystem::exists(executable)) {
-        boost::dll::fs::error_code ec;
-        boost::dll::fs::path loc = boost::dll::program_location(ec);
-        if (!ec.failed()) {
-            executable = loc.parent_path().string() / executable;
+        auto loc = getLoc();
+        if (loc) {
+            executable = proxyfmu::filesystem::path(*loc).parent_path().string() / executable;
         } else {
             std::cerr << "[proxyfmu] Error, unable to locate parent executable" << std::endl;
         }
@@ -51,7 +74,7 @@ void start_process(
 
     std::string executableStr = executable.string();
     std::string fmuPathStr = fmuPath.string();
-    std::vector<const char*> cmd = {executableStr.c_str(), "--fmu", fmuPathStr.c_str(), "--instanceName", instanceName.c_str(), nullptr};
+    std::vector<const char*> cmd = {executableStr.c_str(), fmuPathStr.c_str(), instanceName.c_str(), nullptr};
 
 #ifdef __linux__
     if (!executable.is_absolute()) {
