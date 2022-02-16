@@ -30,7 +30,7 @@ std::optional<std::string> getLoc()
     char pBuf[256];
     size_t len = sizeof(pBuf);
 #ifdef __linux__
-    int bytes = std::min(readlink("/proc/self/exe", pBuf, len), len - 1);
+    int bytes = std::min(static_cast<int>(readlink("/proc/self/exe", pBuf, len)), static_cast<int>(len - 1));
     if (bytes >= 0) {
         pBuf[bytes] = '\0';
         return {pBuf};
