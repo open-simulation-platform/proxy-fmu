@@ -10,8 +10,8 @@
 #include <mutex>
 #include <optional>
 #include <string>
-#include <vector>
 #include <subprocess/subprocess.h>
+#include <vector>
 
 
 #ifdef WIN32
@@ -20,14 +20,14 @@
 #endif
 #ifdef __linux__
 #    include <climits>
-#    include <unistd.h>
 #    include <cstring>
+#    include <unistd.h>
 #endif
 
 namespace proxyfmu
 {
 
-std::optional<std::string> getLoc()
+std::string getLoc()
 {
 
 #ifdef __linux__
@@ -57,11 +57,7 @@ void start_process(
 
     if (!proxyfmu::filesystem::exists(executable)) {
         auto loc = getLoc();
-        if (loc) {
-            executable = proxyfmu::filesystem::path(*loc).parent_path().string() / executable;
-        } else {
-            std::cerr << "[proxyfmu] Error, unable to locate parent executable" << std::endl;
-        }
+        executable = proxyfmu::filesystem::path(loc).parent_path().string() / executable;
     }
 
     if (!proxyfmu::filesystem::exists(executable)) {
@@ -73,15 +69,11 @@ void start_process(
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
     std::string executableStr = executable.string();
+#ifdef __linux__
+    executableStr.insert(0, "./");
+#endif
     std::string fmuPathStr = fmuPath.string();
     std::vector<const char*> cmd = {executableStr.c_str(), fmuPathStr.c_str(), instanceName.c_str(), nullptr};
-
-#ifdef __linux__
-    std::string cmdFix = "./" + executableStr;
-    if (!executable.is_absolute()) {
-        cmd[0] = cmdFix.c_str();
-    }
-#endif
 
     struct subprocess_s process;
     int result = subprocess_create(cmd.data(), subprocess_option_inherit_environment | subprocess_option_no_window, &process);
