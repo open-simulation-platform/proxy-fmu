@@ -29,7 +29,7 @@ jobs:
         shell: bash
       - name: Configure and build
         run: |
-          cmake . -B build -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
+          cmake . -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
           cmake --build build
         shell: bash
       - name: Test
@@ -43,13 +43,14 @@ jobs:
           name: proxyfmu
           path: build/bin/proxyfmu*
 
+
   cmake-on-windows:
     name: cmake
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2016, windows-2019]
+        os: [windows-2019]
         build_type: [Debug, Release]
 
     steps:
@@ -65,7 +66,7 @@ jobs:
         shell: bash
       - name: Configure and build
         run: |
-          cmake . -A x64 -B build -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
+          cmake . -A x64 -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
           cmake --build build --config ${{ matrix.build_type }}
         shell: bash
       - name: Test
