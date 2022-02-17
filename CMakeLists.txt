@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.11)
 file(STRINGS "${CMAKE_SOURCE_DIR}/version.txt" projectVersion)
 project("proxyfmu" VERSION ${projectVersion})
 message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
