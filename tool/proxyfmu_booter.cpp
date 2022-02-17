@@ -27,8 +27,7 @@ void wait_for_input()
 {
     std::cout << '\n'
               << "Press any key to quit...\n";
-    while (std::cin.get() != '\n')
-        ;
+    while (std::cin.get() != '\n') { };
     std::cout << "Done." << std::endl;
 }
 
