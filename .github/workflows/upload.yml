@@ -46,15 +46,16 @@ jobs:
       - name: Conan upload
         run: conan upload --all --confirm --remote osp 'proxyfmu*'
 
+
   conan-on-windows:
     name: Conan
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2016, windows-2019]
+        os: [windows-2019]
         build_type: [Debug, Release]
-        #compiler_version: [15]
+
     steps:
       - uses: actions/checkout@v2
       - name: Install prerequisites
