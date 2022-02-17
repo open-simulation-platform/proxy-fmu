@@ -10,6 +10,7 @@
 #include <mutex>
 #include <optional>
 #include <string>
+#include <vector>
 #include <subprocess/subprocess.h>
 
 
@@ -18,8 +19,9 @@
 #    include <windows.h>
 #endif
 #ifdef __linux__
-#    include <limits.h>
+#    include <climits>
 #    include <unistd.h>
+#    include <cstring>
 #endif
 
 namespace proxyfmu
@@ -27,11 +29,13 @@ namespace proxyfmu
 
 std::optional<std::string> getLoc()
 {
-    char result[MAX_PATH];
+
 #ifdef __linux__
+    char result[PATH_MAX];
     ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
     return std::string(result, (count > 0) ? count : 0);
 #else
+    char result[MAX_PATH];
     return std::string(result, GetModuleFileName(nullptr, result, MAX_PATH));
 #endif
 }
@@ -73,8 +77,9 @@ void start_process(
     std::vector<const char*> cmd = {executableStr.c_str(), fmuPathStr.c_str(), instanceName.c_str(), nullptr};
 
 #ifdef __linux__
+    std::string cmdFix = "./" + executableStr;
     if (!executable.is_absolute()) {
-        cmd.insert(cmd.begin(), "./");
+        cmd[0] = cmdFix.c_str();
     }
 #endif
 
