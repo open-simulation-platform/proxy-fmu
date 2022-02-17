@@ -18,9 +18,10 @@ Currently, only Windows and Linux are supported, but there are no known obstacle
 
 ### Building
 
-Building `proxy-fmu` is straightforward, however, conan is a hard requirement.
-With conan installed, simply run conan followed by a regular CMake build.
-For your convenience you could call `run_conan_install.sh` to run conan.
+Building `proxy-fmu` is straightforward, however, conan is a hard requirement:
+```cmd
+pip install conan
+```
 
 For an example on how to build the project using the command line, refer to the [CI setup](https://github.com/open-simulation-platform/proxy-fmu/blob/master/.github/workflows/build.yml).
 
