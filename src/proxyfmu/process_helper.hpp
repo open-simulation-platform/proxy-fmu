@@ -18,7 +18,7 @@
 #    include <windows.h>
 #endif
 #ifdef __linux__
-#    include <algorithm>
+#    include <limits.h>
 #    include <unistd.h>
 #endif
 
@@ -27,19 +27,13 @@ namespace proxyfmu
 
 std::optional<std::string> getLoc()
 {
-    char pBuf[256];
-    size_t len = sizeof(pBuf);
+    char result[MAX_PATH];
 #ifdef __linux__
-    int bytes = std::min(static_cast<int>(readlink("/proc/self/exe", pBuf, len)), static_cast<int>(len - 1));
-    if (bytes >= 0) {
-        pBuf[bytes] = '\0';
-        return {pBuf};
-    }
+    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+    return std::string(result, (count > 0) ? count : 0);
 #else
-    int bytes = GetModuleFileName(nullptr, pBuf, len);
-    if (bytes) return {pBuf};
+    return std::string(result, GetModuleFileName(nullptr, result, MAX_PATH));
 #endif
-    return std::nullopt;
 }
 
 void start_process(
