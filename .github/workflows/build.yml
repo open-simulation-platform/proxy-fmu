@@ -22,8 +22,6 @@ jobs:
         run: |
           sudo pip3 install --upgrade setuptools pip
           sudo pip3 install conan
-      - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Run conan
         run: conan install . -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 --install-folder=build -b missing
         shell: bash
@@ -59,8 +57,6 @@ jobs:
         run: |
           pip3 install --upgrade setuptools pip
           pip3 install conan
-      - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Run conan
         run: conan install . -s build_type=${{ matrix.build_type }} --install-folder=build -b missing
         shell: bash
