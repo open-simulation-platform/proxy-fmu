@@ -22,16 +22,10 @@ jobs:
         run: |
           sudo pip3 install --upgrade setuptools pip
           sudo pip3 install conan
-      - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Run conan
-        run: conan install . -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 --install-folder=build -b missing
-        shell: bash
       - name: Configure and build
         run: |
           cmake . -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
           cmake --build build
-        shell: bash
       - name: Test
         run: |
          cd build/tests
@@ -59,21 +53,14 @@ jobs:
         run: |
           pip3 install --upgrade setuptools pip
           pip3 install conan
-      - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Run conan
-        run: conan install . -s build_type=${{ matrix.build_type }} --install-folder=build -b missing
-        shell: bash
       - name: Configure and build
         run: |
           cmake . -A x64 -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
           cmake --build build --config ${{ matrix.build_type }}
-        shell: bash
       - name: Test
         run: |
          cd build/tests
          ctest -C ${{ matrix.build_type }} --output-on-failure
-        shell: bash
 
       - uses: actions/upload-artifact@v2
         if: matrix.build_type == 'Release'
