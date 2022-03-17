@@ -1,4 +1,6 @@
 .idea
+.vscode
+
 thrift.*
 
-/cmake-build-*
+cmake-build-*
