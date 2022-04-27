@@ -1,5 +1,6 @@
 
 #include <proxyfmu/fixed_range_random_generator.hpp>
+#include <proxyfmu/lib_info.hpp>
 #include <proxyfmu/server/fmu_service_handler.hpp>
 
 #include <thrift/server/TSimpleServer.h>
@@ -91,8 +92,17 @@ int run_application(const std::string& fmu, const std::string& instanceName)
 
 int printHelp()
 {
-    std::cout << "proxyfmu" << '\n'
-              << "<fmuPath> <instanceName>" << std::endl;
+    // clang-format off
+    std::cout << "Usage: proxyfmu [-v]" << '\n'
+              << "  " << "-v, --version" << "    " << "Print version" << std::endl;
+    // clang-format on
+    return SUCCESS;
+}
+
+int printVersion()
+{
+    const auto v = proxyfmu::library_version();
+    std::cout << v.major << "." << v.minor << "." << v.patch;
     return SUCCESS;
 }
 
@@ -100,14 +110,17 @@ int printHelp()
 
 int main(int argc, char** argv)
 {
-
     if (argc == 1) {
         return printHelp();
     }
 
-    try {
+    std::string cmd = argv[1];
+    if (cmd == "-v" || cmd == "--version") {
+        return printVersion();
+    }
 
-        std::string fmu = argv[1];
+    try {
+        std::string& fmu = cmd;
         auto fmuPath = proxyfmu::filesystem::path(fmu);
         if (!proxyfmu::filesystem::exists(fmuPath)) {
             std::cerr << "[proxyfmu] No such file " << proxyfmu::filesystem::absolute(fmuPath);
@@ -115,7 +128,6 @@ int main(int argc, char** argv)
         }
 
         std::string instanceName = argv[2];
-
         return run_application(fmu, instanceName);
 
     } catch (std::exception& e) {

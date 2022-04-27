@@ -1,4 +1,5 @@
 
+#include <proxyfmu/lib_info.hpp>
 #include <proxyfmu/server/boot_service_handler.hpp>
 
 #include <thrift/server/TSimpleServer.h>
@@ -55,19 +56,31 @@ int run_application(const int port)
 
 int printHelp()
 {
-    std::cout << "proxyfmu-booter" << '\n'
-              << "<port>" << std::endl;
+    // clang-format off
+    std::cout << "Usage: proxyfmu [-v] port" << '\n'
+              << "  " << "-v, --version" << "    " << "Print version" << std::endl;
+    // clang-format on
+    return SUCCESS;
+}
+
+int printVersion()
+{
+    const auto v = proxyfmu::library_version();
+    std::cout << v.major << "." << v.minor << "." << v.patch;
     return SUCCESS;
 }
 
 } // namespace
 
-
 int main(int argc, char** argv)
 {
-
     if (argc == 1) {
         return printHelp();
+    }
+
+    std::string cmd = argv[1];
+    if (cmd == "-v" || cmd == "--version") {
+        return printVersion();
     }
 
     try {
