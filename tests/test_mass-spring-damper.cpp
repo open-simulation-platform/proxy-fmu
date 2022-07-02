@@ -94,7 +94,7 @@ void test(fmu* damper, fmu* mass, fmu* spring)
         REQUIRE(instance->enter_initialization_mode());
     }
 
-    for (auto& [name, instance] : slaves) {
+    for (unsigned j = 0; j < slaves.size(); ++j) {
         slaves["spring"]->get_real(spring_out_vr, spring_out);
         slaves["damper"]->get_real(damper_out_vr, damper_out);
         slaves["mass"]->get_real(mass_spring_out_vr, mass_spring_out);
@@ -111,12 +111,10 @@ void test(fmu* damper, fmu* mass, fmu* spring)
         REQUIRE(instance->exit_initialization_mode());
     }
 
-    for (auto& [name, instance] : slaves) {
-        slaves["spring"]->get_real(spring_out_vr, spring_out);
-        slaves["damper"]->get_real(damper_out_vr, damper_out);
-        slaves["mass"]->get_real(mass_spring_out_vr, mass_spring_out);
-        slaves["mass"]->get_real(mass_damper_out_vr, mass_damper_out);
-    }
+    slaves["spring"]->get_real(spring_out_vr, spring_out);
+    slaves["damper"]->get_real(damper_out_vr, damper_out);
+    slaves["mass"]->get_real(mass_spring_out_vr, mass_spring_out);
+    slaves["mass"]->get_real(mass_damper_out_vr, mass_damper_out);
 
     double t = 0.0;
     while (t <= tEnd) {
