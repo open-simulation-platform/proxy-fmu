@@ -5,12 +5,11 @@
 #include <catch2/catch.hpp>
 
 using namespace proxyfmu;
-using namespace proxyfmu::fmi;
 
 namespace
 {
 
-void test(fmu& fmu)
+void test(fmilibcpp::fmu& fmu)
 {
     const auto d = fmu.get_model_description();
     CHECK(d.modelName == "ControlledTemperature");
@@ -23,7 +22,7 @@ void test(fmu& fmu)
     REQUIRE(slave->enter_initialization_mode());
     REQUIRE(slave->exit_initialization_mode());
 
-    std::vector<value_ref> vr{47};
+    std::vector<fmilibcpp::value_ref> vr{47};
     std::vector<double> realRef(1);
 
     slave->get_real(vr, realRef);
@@ -43,7 +42,7 @@ void test(fmu& fmu)
 TEST_CASE("fmi_test_controlled_temp")
 {
     std::string fmuPath("../fmus/2.0/20sim/ControlledTemperature.fmu");
-    auto fmu = loadFmu(fmuPath);
+    auto fmu = fmilibcpp::loadFmu(fmuPath);
     test(*fmu);
 }
 

@@ -43,8 +43,8 @@ void read_data(std::string const& fileName, std::string& data)
 namespace proxyfmu::client
 {
 
-proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
-    : modelDescription_(std::move(modelDescription))
+proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmilibcpp::model_description modelDescription, const std::optional<remote_info>& remote)
+    : fmilibcpp::slave(instanceName), modelDescription_(std::move(modelDescription))
 {
     int port = -1;
     std::string host;
@@ -86,7 +86,7 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
     client_->instantiate();
 }
 
-const fmi::model_description& proxy_slave::get_model_description() const
+const fmilibcpp::model_description& proxy_slave::get_model_description() const
 {
     return modelDescription_;
 }
@@ -121,7 +121,7 @@ bool proxy_slave::terminate()
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool proxy_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vector<int>& values)
+bool proxy_slave::get_integer(const std::vector<fmilibcpp::value_ref>& vr, std::vector<int>& values)
 {
     IntegerRead read;
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -132,7 +132,7 @@ bool proxy_slave::get_integer(const std::vector<fmi::value_ref>& vr, std::vector
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool proxy_slave::get_real(const std::vector<fmi::value_ref>& vr, std::vector<double>& values)
+bool proxy_slave::get_real(const std::vector<fmilibcpp::value_ref>& vr, std::vector<double>& values)
 {
     assert(values.size() == vr.size());
     RealRead read;
@@ -144,7 +144,7 @@ bool proxy_slave::get_real(const std::vector<fmi::value_ref>& vr, std::vector<do
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool proxy_slave::get_string(const std::vector<fmi::value_ref>& vr, std::vector<std::string>& values)
+bool proxy_slave::get_string(const std::vector<fmilibcpp::value_ref>& vr, std::vector<std::string>& values)
 {
     assert(values.size() == vr.size());
     StringRead read;
@@ -156,7 +156,7 @@ bool proxy_slave::get_string(const std::vector<fmi::value_ref>& vr, std::vector<
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool proxy_slave::get_boolean(const std::vector<fmi::value_ref>& vr, std::vector<bool>& values)
+bool proxy_slave::get_boolean(const std::vector<fmilibcpp::value_ref>& vr, std::vector<bool>& values)
 {
     assert(values.size() == vr.size());
     BooleanRead read;
@@ -168,7 +168,7 @@ bool proxy_slave::get_boolean(const std::vector<fmi::value_ref>& vr, std::vector
     return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool proxy_slave::set_integer(const std::vector<fmi::value_ref>& vr, const std::vector<int>& values)
+bool proxy_slave::set_integer(const std::vector<fmilibcpp::value_ref>& vr, const std::vector<int>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -176,7 +176,7 @@ bool proxy_slave::set_integer(const std::vector<fmi::value_ref>& vr, const std::
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool proxy_slave::set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values)
+bool proxy_slave::set_real(const std::vector<fmilibcpp::value_ref>& vr, const std::vector<double>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -184,7 +184,7 @@ bool proxy_slave::set_real(const std::vector<fmi::value_ref>& vr, const std::vec
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool proxy_slave::set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values)
+bool proxy_slave::set_string(const std::vector<fmilibcpp::value_ref>& vr, const std::vector<std::string>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
@@ -192,7 +192,7 @@ bool proxy_slave::set_string(const std::vector<fmi::value_ref>& vr, const std::v
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
-bool proxy_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values)
+bool proxy_slave::set_boolean(const std::vector<fmilibcpp::value_ref>& vr, const std::vector<bool>& values)
 {
     assert(values.size() == vr.size());
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());

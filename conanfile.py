@@ -15,7 +15,7 @@ class ProxyFmuConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
     requires = (
-        "fmilibrary/2.3",
+        "fmilibcpp/0.1.4@ais/testing",
         "thrift/0.13.0"
     )
 

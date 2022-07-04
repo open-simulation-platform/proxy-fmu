@@ -1,5 +1,6 @@
 
 #include <proxyfmu/fixed_range_random_generator.hpp>
+#include <proxyfmu/fs_portability.hpp>
 #include <proxyfmu/lib_info.hpp>
 #include <proxyfmu/server/fmu_service_handler.hpp>
 

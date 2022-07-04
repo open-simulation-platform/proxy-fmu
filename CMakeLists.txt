@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.15)
 file(STRINGS "${CMAKE_SOURCE_DIR}/version.txt" projectVersion)
 project("proxyfmu" VERSION ${projectVersion})
 message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
@@ -62,7 +62,10 @@ else ()
 
     conan_cmake_autodetect(settings)
 
+    # Force add remotes
+    conan_add_remote(NAME ais URL https://ais.jfrog.io/artifactory/api/conan/ais-conan-local)
     conan_add_remote(NAME osp URL https://osp.jfrog.io/artifactory/api/conan/conan-local)
+
     conan_cmake_run(
             CONANFILE conanfile.py
             BUILD missing
@@ -84,7 +87,7 @@ if (PROXYFMU_BUILD_TESTS)
 endif ()
 
 find_package(THRIFT REQUIRED)
-find_package(FMILIB REQUIRED)
+find_package(Fmilibcpp CONFIG REQUIRED)
 
 # ==============================================================================
 # Targets
@@ -141,7 +144,7 @@ install(FILES "${versionFile}" DESTINATION "${PROXYFMU_CMAKE_INSTALL_DIR}")
 
 # Install custom find modules
 install(FILES
-        "${CMAKE_SOURCE_DIR}/cmake/FindFMILIB.cmake"
+        "${CMAKE_SOURCE_DIR}/cmake/FindFmilibcpp.cmake"
         "${CMAKE_SOURCE_DIR}/cmake/FindTHRIFT.cmake"
         DESTINATION
         "${PROXYFMU_CMAKE_INSTALL_DIR}"

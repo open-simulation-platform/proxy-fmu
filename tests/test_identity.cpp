@@ -4,12 +4,11 @@
 #include <catch2/catch.hpp>
 
 using namespace proxyfmu;
-using namespace proxyfmu::fmi;
 
 namespace
 {
 
-void test(fmu& fmu)
+void test(fmilibcpp::fmu& fmu)
 {
     const auto d = fmu.get_model_description();
     CHECK(d.modelName == "no.viproma.demo.identity");
@@ -22,7 +21,7 @@ void test(fmu& fmu)
     REQUIRE(slave->enter_initialization_mode());
     REQUIRE(slave->exit_initialization_mode());
 
-    std::vector<value_ref> vr{0};
+    std::vector<fmilibcpp::value_ref> vr{0};
 
     std::vector<double> realVal{0.0};
     std::vector<int> integerVal{0};
@@ -74,7 +73,7 @@ void test(fmu& fmu)
 TEST_CASE("fmi_test_identity")
 {
     std::string fmuPath("../fmus/1.0/identity.fmu");
-    auto fmu = loadFmu(fmuPath);
+    auto fmu = fmilibcpp::loadFmu(fmuPath);
     test(*fmu);
 }
 
