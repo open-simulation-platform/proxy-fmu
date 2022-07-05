@@ -11,7 +11,6 @@ message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
 set(BUILD_SHARED_LIBS OFF)
 option(PROXYFMU_BUILD_TESTS "Build tests" OFF)
 option(PROXYFMU_BUILD_EXAMPLES "Build examples" OFF)
-option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
 
 # ==============================================================================
 # Global internal configuration
