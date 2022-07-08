@@ -5,7 +5,7 @@
 #include <catch2/catch.hpp>
 
 using namespace proxyfmu;
-using namespace proxyfmu::fmi;
+using namespace fmilibcpp;
 
 namespace
 {

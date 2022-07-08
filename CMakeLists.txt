@@ -64,7 +64,10 @@ else()
 
     conan_cmake_autodetect(settings)
 
+    # Force add remotes
+    conan_add_remote(NAME ais URL https://ais.jfrog.io/artifactory/api/conan/ais-conan-local)
     conan_add_remote(NAME osp URL https://osp.jfrog.io/artifactory/api/conan/conan-local)
+
     conan_cmake_run(
             CONANFILE conanfile.py
             BUILD missing
@@ -88,7 +91,7 @@ endif ()
 
 find_package(Boost 1.71 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 find_package(THRIFT REQUIRED)
-find_package(FMILIB REQUIRED)
+find_package(Fmilibcpp CONFIG REQUIRED)
 
 # ==============================================================================
 # Targets
@@ -145,7 +148,7 @@ install(FILES "${versionFile}" DESTINATION "${PROXYFMU_CMAKE_INSTALL_DIR}")
 
 # Install custom find modules
 install(FILES
-        "${CMAKE_SOURCE_DIR}/cmake/FindFMILIB.cmake"
+        "${CMAKE_SOURCE_DIR}/cmake/FindFmilibcpp.cmake"
         "${CMAKE_SOURCE_DIR}/cmake/FindTHRIFT.cmake"
         DESTINATION
         "${PROXYFMU_CMAKE_INSTALL_DIR}"

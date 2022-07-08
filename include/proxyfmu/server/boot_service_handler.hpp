@@ -2,7 +2,6 @@
 #ifndef PROXYFMU_BOOT_SERVICE_HANDLER_HPP
 #define PROXYFMU_BOOT_SERVICE_HANDLER_HPP
 
-#include <proxyfmu/fixed_range_random_generator.hpp>
 #include <proxyfmu/temp_dir.hpp>
 #include <proxyfmu/thrift/BootService.h>
 

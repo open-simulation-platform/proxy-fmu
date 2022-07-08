@@ -2,7 +2,7 @@
 #ifndef PROXY_FMU_FMUSERVICEHANDLER_HPP
 #define PROXY_FMU_FMUSERVICEHANDLER_HPP
 
-#include <proxyfmu/fmi/fmu.hpp>
+#include <fmilibcpp/fmu.hpp>
 #include <proxyfmu/thrift/FmuService.h>
 
 #include <functional>
@@ -20,7 +20,7 @@ private:
     const std::string& fmuPath_;
     const std::string& instanceName_;
 
-    std::unique_ptr<fmi::slave> slave_;
+    std::unique_ptr<fmilibcpp::slave> slave_;
 
     std::function<void()> stop_;
 
@@ -34,6 +34,7 @@ public:
     thrift::Status::type exit_initialization_mode() override;
     thrift::Status::type step(double currentTime, double stepSize) override;
     thrift::Status::type terminate() override;
+    thrift::Status::type reset() override;
     void freeInstance() override;
 
     void read_integer(thrift::IntegerRead& _return, const thrift::ValueReferences& vr) override;

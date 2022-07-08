@@ -21,61 +21,6 @@ foreach (header IN LISTS commonPublicHeaders)
 endforeach ()
 
 
-# ==============================================================================
-# fmilib wrapper
-# ==============================================================================
-
-set(fmiPublicHeaders
-        "proxyfmu/fmi/fmu.hpp"
-        "proxyfmu/fmi/slave.hpp"
-        "proxyfmu/fmi/scalar_variable.hpp"
-        "proxyfmu/fmi/model_description.hpp"
-        )
-
-set(fmiPrivateHeaders
-        "proxyfmu/fmi/fmicontext.hpp"
-
-        "proxyfmu/fmi/fmi1/fmi1_fmu.hpp"
-        "proxyfmu/fmi/fmi1/fmi1_model_description.hpp"
-        "proxyfmu/fmi/fmi1/fmi1_slave.hpp"
-
-        "proxyfmu/fmi/fmi2/fmi2_fmu.hpp"
-        "proxyfmu/fmi/fmi2/fmi2_model_description.hpp"
-        "proxyfmu/fmi/fmi2/fmi2_slave.hpp"
-        )
-
-set(fmiSources
-        "proxyfmu/fmi/fmu.cpp"
-
-        "proxyfmu/fmi/fmi1/fmi1_fmu.cpp"
-        "proxyfmu/fmi/fmi1/fmi1_slave.cpp"
-        "proxyfmu/fmi/fmi1/fmi1_model_description.cpp"
-
-        "proxyfmu/fmi/fmi2/fmi2_fmu.cpp"
-        "proxyfmu/fmi/fmi2/fmi2_slave.cpp"
-        "proxyfmu/fmi/fmi2/fmi2_model_description.cpp"
-        )
-
-set(fmiPublicHeadersFull)
-foreach (header IN LISTS fmiPublicHeaders)
-    list(APPEND fmiPublicHeadersFull "${publicHeaderDir}/${header}")
-endforeach ()
-
-add_library(fmilibwrapper ${commonPublicHeadersFull} ${fmiPublicHeadersFull} ${fmiPrivateHeaders} ${fmiSources})
-add_library(proxyfmu::fmilibwrapper ALIAS fmilibwrapper)
-target_compile_features(fmilibwrapper PUBLIC "cxx_std_17")
-set_target_properties(fmilibwrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_include_directories(fmilibwrapper
-        PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-        PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}"
-        )
-target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB)
-if (UNIX)
-    target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
-endif ()
-
 # Generate sources from .in files
 set(generatedFiles "${generatedSourcesDir}/proxyfmu/lib_info.cpp")
 configure_file(
@@ -83,7 +28,6 @@ configure_file(
         "${generatedFiles}"
         @ONLY
 )
-
 
 # ==============================================================================
 # thrift
@@ -168,7 +112,7 @@ target_include_directories(proxyfmu-client
         )
 target_link_libraries(proxyfmu-client
         PUBLIC
-        fmilibwrapper
+        fmilibcpp::fmilibcpp
         PRIVATE
         thrift::thrift
         Boost::filesystem
@@ -206,7 +150,11 @@ target_include_directories(proxyfmu-lib
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(proxyfmu-lib PUBLIC fmilibwrapper thrift::thrift)
+target_link_libraries(proxyfmu-lib
+        PUBLIC
+        fmilibcpp::fmilibcpp
+        thrift::thrift
+        )
 if (UNIX)
     target_link_libraries(proxyfmu-lib PRIVATE pthread)
 endif ()
@@ -260,7 +208,7 @@ endif ()
 # ==============================================================================
 
 install(
-        TARGETS fmilibwrapper proxyfmu-client
+        TARGETS proxyfmu-client
         EXPORT "${PROXYFMU_EXPORT_TARGET}"
         ${PROXYFMU_INSTALL_DESTINATIONS}
 )
