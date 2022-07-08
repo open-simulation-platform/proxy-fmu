@@ -19,7 +19,7 @@ fmu_service_handler::fmu_service_handler(
 
 void fmu_service_handler::instantiate()
 {
-    auto fmu = fmilibcpp::loadFmu(fmuPath_);
+    auto fmu = fmilibcpp::loadFmu(fmuPath_, false);
     modelName_ = fmu->get_model_description().modelName;
     slave_ = fmu->new_instance(instanceName_);
 }
