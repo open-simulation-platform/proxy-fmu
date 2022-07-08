@@ -6,7 +6,7 @@ include_directories(${PROXYFMU_SOURCE_DIR}/src)
 #########################FMI############################
 
 add_executable(fmi-test fmi_test.cpp)
-target_link_libraries(fmi-test PUBLIC fmilibwrapper)
+target_link_libraries(fmi-test PUBLIC fmilibcpp::fmilibcpp)
 
 ###########################################################
 #########################PROXY############################
