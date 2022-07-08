@@ -31,7 +31,9 @@ jobs:
           sudo pip3 install --upgrade setuptools pip
           sudo pip3 install conan
       - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+        run: |
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+          conan remote add ais https://ais.jfrog.io/artifactory/api/conan/ais-conan-local --force
       - name: Conan create
         run: |
           REFNAME="${GITHUB_REF#refs/*/}"
@@ -63,7 +65,9 @@ jobs:
           pip3 install --upgrade setuptools pip
           pip3 install conan
       - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+        run: |
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+          conan remote add ais https://ais.jfrog.io/artifactory/api/conan/ais-conan-local --force
       - name: Conan create
         shell: bash
         run: |
