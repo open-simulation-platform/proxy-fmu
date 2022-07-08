@@ -46,15 +46,20 @@ void start_process(
         throw std::runtime_error("[proxyfmu] No proxyfmu executable found. " + execPath + " does not exist!");
     }
 
-    std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << std::endl;
-    std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
-
-    std::string cmd(executable.string() + " --fmu \"" + fmuPath.string() + "\" --instanceName " + instanceName);
+    std::string execStr = executable.string();
 #ifdef __linux__
     if (!executable.is_absolute()) {
-        cmd.insert(0, "./");
+        execStr.insert(0, "./");
     }
 #endif
+
+    std::cout << "[proxyfmu] Found proxyfmu executable: " << executable <<" version: ";
+    std::cout.flush();
+    system((execStr + " -v").c_str());
+    std::cout << "\n";
+    std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
+
+    std::string cmd(execStr + " --fmu \"" + fmuPath.string() + "\" --instanceName " + instanceName);
 
     boost::process::ipstream pipe_stream;
     boost::process::child c(cmd, boost::process::std_out > pipe_stream);
