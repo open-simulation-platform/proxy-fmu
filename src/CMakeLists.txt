@@ -1,20 +1,23 @@
 set(publicHeaderDir ${CMAKE_SOURCE_DIR}/include)
-
+set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 
 # ==============================================================================
 # common headers
 # ==============================================================================
 
 set(commonPublicHeaders
-        "proxyfmu/fs_portability.hpp"
-        "proxyfmu/temp_dir.hpp"
+
         "proxyfmu/fixed_range_random_generator.hpp"
+        "proxyfmu/fs_portability.hpp"
+        "proxyfmu/lib_info.hpp"
         "proxyfmu/remote_info.hpp"
+        "proxyfmu/temp_dir.hpp"
+
         )
 
 set(commonPublicHeadersFull)
 foreach (header IN LISTS commonPublicHeaders)
-  list(APPEND commonPublicHeadersFull "${publicHeaderDir}/${header}")
+    list(APPEND commonPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
 
@@ -55,7 +58,7 @@ set(fmiSources
 
 set(fmiPublicHeadersFull)
 foreach (header IN LISTS fmiPublicHeaders)
-  list(APPEND fmiPublicHeadersFull "${publicHeaderDir}/${header}")
+    list(APPEND fmiPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
 add_library(fmilibwrapper ${commonPublicHeadersFull} ${fmiPublicHeadersFull} ${fmiPrivateHeaders} ${fmiSources})
@@ -70,15 +73,22 @@ target_include_directories(fmilibwrapper
         )
 target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB)
 if (UNIX)
-  target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
+    target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
 endif ()
+
+# Generate sources from .in files
+set(generatedFiles "${generatedSourcesDir}/proxyfmu/lib_info.cpp")
+configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/lib_info.cpp.in"
+        "${generatedFiles}"
+        @ONLY
+)
 
 
 # ==============================================================================
 # thrift
 # ==============================================================================
 
-set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 set(thriftCppSourcesDir "${generatedSourcesDir}/proxyfmu/thrift")
 set(thriftJavaSourcesDir "${generatedSourcesDir}/java")
 
@@ -87,7 +97,7 @@ file(MAKE_DIRECTORY "${thriftCppSourcesDir}")
 file(MAKE_DIRECTORY "${thriftJavaSourcesDir}")
 
 if (NOT THRIFT_EXECUTABLE)
-  message(FATAL_ERROR "The thrift compiler was not found. Cannot generate Thrift sources.")
+    message(FATAL_ERROR "The thrift compiler was not found. Cannot generate Thrift sources.")
 endif ()
 
 set(thriftServiceDefinitions
@@ -97,18 +107,18 @@ set(thriftServiceDefinitions
 
 # Generate PROXY-FMU classes from Thrift service definitions
 foreach (def ${thriftServiceDefinitions})
-  execute_process(
-          COMMAND "${THRIFT_EXECUTABLE}"
-          "--gen" "cpp:no_skeleton"
-          "-out" "${thriftCppSourcesDir}"
-          "${def}"
-  )
-  execute_process(
-          COMMAND "${THRIFT_EXECUTABLE}"
-          "--gen" "java:private-members,fullcamel"
-          "-out" "${thriftJavaSourcesDir}"
-          "${def}"
-  )
+    execute_process(
+            COMMAND "${THRIFT_EXECUTABLE}"
+            "--gen" "cpp:no_skeleton"
+            "-out" "${thriftCppSourcesDir}"
+            "${def}"
+    )
+    execute_process(
+            COMMAND "${THRIFT_EXECUTABLE}"
+            "--gen" "java:private-members,fullcamel"
+            "-out" "${thriftJavaSourcesDir}"
+            "${def}"
+    )
 endforeach ()
 
 set(thriftGenerated
@@ -142,7 +152,7 @@ set(clientSources
 
 set(clientPublicHeadersFull)
 foreach (header IN LISTS clientPublicHeaders)
-  list(APPEND clientPublicHeadersFull "${publicHeaderDir}/${header}")
+    list(APPEND clientPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
 add_library(proxyfmu-client ${commonPublicHeadersFull} ${clientPublicHeadersFull} ${clientPrivateHeaders} ${clientSources} ${generatedFiles})
@@ -164,7 +174,7 @@ target_link_libraries(proxyfmu-client
         Boost::filesystem
         )
 if (UNIX)
-  target_link_libraries(proxyfmu-client PRIVATE pthread)
+    target_link_libraries(proxyfmu-client PRIVATE pthread)
 endif ()
 
 # Make sure executable is up to date
@@ -183,7 +193,7 @@ set(serverSources
 
 set(serverPublicHeadersFull)
 foreach (header IN LISTS serverPublicHeaders)
-  list(APPEND serverPublicHeadersFull "${publicHeaderDir}/${header}")
+    list(APPEND serverPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
 add_library(proxyfmu-lib ${serverPublicHeadersFull} ${serverSources} ${generatedFiles})
@@ -198,7 +208,7 @@ target_include_directories(proxyfmu-lib
         )
 target_link_libraries(proxyfmu-lib PUBLIC fmilibwrapper thrift::thrift)
 if (UNIX)
-  target_link_libraries(proxyfmu-lib PRIVATE pthread)
+    target_link_libraries(proxyfmu-lib PRIVATE pthread)
 endif ()
 
 
@@ -217,7 +227,7 @@ set(serverBooterSources
 
 set(serverBooterPublicHeadersFull)
 foreach (header IN LISTS serverBooterPublicHeaders)
-  list(APPEND serverBooterPublicHeadersFull "${publicHeaderDir}/${header}")
+    list(APPEND serverBooterPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
 add_library(proxyfmu-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterPrivateHeaders} ${serverBooterSources} ${generatedFiles})
@@ -237,7 +247,11 @@ target_link_libraries(proxyfmu-booter-lib
         Boost::filesystem
         )
 if (UNIX)
-  target_link_libraries(proxyfmu-booter-lib PRIVATE pthread stdc++fs)
+    target_link_libraries(proxyfmu-booter-lib
+            PRIVATE
+            pthread
+            stdc++fs
+            )
 endif ()
 
 
