@@ -1,5 +1,6 @@
 
 #include <proxyfmu/fixed_range_random_generator.hpp>
+#include <proxyfmu/lib_info.hpp>
 #include <proxyfmu/server/fmu_service_handler.hpp>
 
 #include <boost/program_options.hpp>
@@ -97,6 +98,13 @@ int printHelp(boost::program_options::options_description& desc)
     return SUCCESS;
 }
 
+int printVersion()
+{
+    const auto v = proxyfmu::library_version();
+    std::cout << v.major << "." << v.minor << "." << v.patch;
+    return SUCCESS;
+}
+
 } // namespace
 
 int main(int argc, char** argv)
@@ -106,6 +114,7 @@ int main(int argc, char** argv)
 
     po::options_description desc("Options");
     desc.add_options()("help,h", "Print this help message and quits.");
+    desc.add_options()("version,v", "Print program version.");
     desc.add_options()("fmu", po::value<std::string>(), "Location of the fmu to load.");
     desc.add_options()("instanceName", po::value<std::string>(), "Name of the slave instance.");
 
@@ -122,6 +131,8 @@ int main(int argc, char** argv)
 
             if (vm.count("help")) {
                 return printHelp(desc);
+            } else if (vm.count("version")) {
+               return printVersion();
             }
 
             po::notify(vm);
@@ -133,14 +144,14 @@ int main(int argc, char** argv)
             return COMMANDLINE_ERROR;
         }
 
-        auto fmu = vm["fmu"].as<std::string>();
-        auto fmuPath = proxyfmu::filesystem::path(fmu);
+        const auto fmu = vm["fmu"].as<std::string>();
+        const auto fmuPath = proxyfmu::filesystem::path(fmu);
         if (!proxyfmu::filesystem::exists(fmuPath)) {
             std::cerr << "[proxyfmu] No such file " << proxyfmu::filesystem::absolute(fmuPath);
             return COMMANDLINE_ERROR;
         }
 
-        auto instanceName = vm["instanceName"].as<std::string>();
+        const auto instanceName = vm["instanceName"].as<std::string>();
 
         return run_application(fmu, instanceName);
 
