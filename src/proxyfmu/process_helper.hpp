@@ -65,13 +65,19 @@ void start_process(
         throw std::runtime_error("[proxyfmu] No proxyfmu executable found. " + execPath + " does not exist!");
     }
 
-    std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << std::endl;
-    std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
+    std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << " version ";
+    std::cout.flush();
 
     std::string executableStr = executable.string();
 #ifdef __linux__
     executableStr.insert(0, "./");
 #endif
+
+    system((executableStr + " -v").c_str());
+    std::cout << "\n";
+    std::cout << "[proxyfmu] Booting FMU instance '" << instanceName
+              << "'. Source: '" << proxyfmu::filesystem::absolute(fmuPath) << "'" << std::endl;
+
     std::string fmuPathStr = fmuPath.string();
     std::vector<const char*> cmd = {executableStr.c_str(), fmuPathStr.c_str(), instanceName.c_str(), nullptr};
 
