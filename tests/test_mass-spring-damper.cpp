@@ -5,12 +5,12 @@
 #include <unordered_map>
 
 using namespace proxyfmu;
-using namespace proxyfmu::fmi;
+using namespace fmilibcpp;
 
 namespace
 {
 
-const double tEnd = 20;
+const double tEnd = 10;
 const double dt = 0.01;
 
 
