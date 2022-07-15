@@ -17,7 +17,7 @@ class ProxyFmuConan(ConanFile):
     requires = (
         "boost/1.71.0",
         "thrift/0.16.0",
-        "fmilibcpp/0.2.1@ais/testing"
+        "fmilibcpp/0.2.1@ais/testing",
         # conflict resolution
         "zlib/1.2.12"
     )
