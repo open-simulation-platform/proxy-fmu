@@ -4,7 +4,7 @@
 #include <exception>
 #include <iostream>
 
-using namespace proxyfmu::fmi;
+using namespace fmilibcpp;
 
 void run(const std::string& fmuPath)
 {
@@ -22,13 +22,13 @@ void run(const std::string& fmuPath)
     std::vector<std::string> real_names;
     std::vector<value_ref> real_refs;
     for (auto& v : mv) {
-        auto attr = v.typeAttribute;
+        auto attr = v.typeAttributes;
         if (v.is_real() && v.causality == "output") {
             real_names.push_back(v.name);
             real_refs.push_back(v.vr);
-            auto start = std::get<real>(attr).start;
+            auto start = std::get<real_attributes>(attr).start;
             if (start) {
-                std::cout << v.name << " start=" << std::get<real>(attr).start.value() << std::endl;
+                std::cout << v.name << " start=" << std::get<real_attributes>(attr).start.value() << std::endl;
             }
         }
     }
