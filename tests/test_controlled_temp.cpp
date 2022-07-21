@@ -42,14 +42,14 @@ void test(fmu& fmu)
 
 TEST_CASE("fmi_test_controlled_temp")
 {
-    std::string fmuPath("../fmus/2.0/20sim/ControlledTemperature.fmu");
+    std::string fmuPath(std::string(PROXYFMU_DATA_DIR) + "/fmus/2.0/20sim/ControlledTemperature.fmu");
     auto fmu = loadFmu(fmuPath);
     test(*fmu);
 }
 
 TEST_CASE("client_test_controlled_temp")
 {
-    std::string fmuPath("../fmus/2.0/20sim/ControlledTemperature.fmu");
+    std::string fmuPath(std::string(PROXYFMU_DATA_DIR) + "/fmus/2.0/20sim/ControlledTemperature.fmu");
     auto fmu = client::proxy_fmu(fmuPath);
     test(fmu);
 }

@@ -1,8 +1,9 @@
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.15)
 file(STRINGS "${CMAKE_SOURCE_DIR}/version.txt" projectVersion)
 project("proxyfmu" VERSION ${projectVersion})
 message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
+
 
 # ==============================================================================
 # Build settings
@@ -12,6 +13,7 @@ set(BUILD_SHARED_LIBS OFF)
 option(PROXYFMU_BUILD_TESTS "Build tests" OFF)
 option(PROXYFMU_BUILD_EXAMPLES "Build examples" OFF)
 option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
+
 
 # ==============================================================================
 # Global internal configuration
@@ -24,20 +26,20 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(Boost_USE_STATIC_LIBS ON)
 
 if (MSVC)
-  add_definitions("-D_WIN32_WINNT=0x600" "-D_CRT_SECURE_NO_WARNINGS")
-  add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
+    add_definitions("-D_WIN32_WINNT=0x600" "-D_CRT_SECURE_NO_WARNINGS")
+    add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
 endif ()
 
-if(NOT CMAKE_BUILD_TYPE)
+if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
-endif()
+endif ()
 
 # Prepare for export and installation.
 set(PROXYFMU_HEADER_INSTALL_DIR "include")
 if (WIN32)
-  set(PROXYFMU_CMAKE_INSTALL_DIR "cmake")
+    set(PROXYFMU_CMAKE_INSTALL_DIR "cmake")
 else ()
-  set(PROXYFMU_CMAKE_INSTALL_DIR "share/${PROJECT_NAME}/cmake")
+    set(PROXYFMU_CMAKE_INSTALL_DIR "share/${PROJECT_NAME}/cmake")
 endif ()
 
 set(PROXYFMU_INSTALL_DESTINATIONS
@@ -52,12 +54,12 @@ set(PROXYFMU_EXPORT_TARGET "${PROJECT_NAME}-targets")
 # Dependencies
 # ==============================================================================
 
-if(CONAN_EXPORTED) # in conan local cache
+if (CONAN_EXPORTED) # in conan local cache
     # standard conan installation, deps will be defined in conanfile.py
     # and not necessary to call conan again, conan is already running
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup()
-else()
+else ()
 
     include(cmake/conan.cmake)
     conan_check(REQUIRED)
@@ -71,24 +73,25 @@ else()
             SETTINGS ${settings}
             BASIC_SETUP)
 
-endif()
+endif ()
 
 set(BOOST_COMPONENTS filesystem program_options)
 if (PROXYFMU_BUILD_TESTS)
-  Include(FetchContent)
+    Include(FetchContent)
 
-  FetchContent_Declare(
-          Catch2
-          GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-          GIT_TAG        v2.13.8
-  )
+    FetchContent_Declare(
+            Catch2
+            GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+            GIT_TAG v2.13.8
+    )
 
-  FetchContent_MakeAvailable(Catch2)
+    FetchContent_MakeAvailable(Catch2)
 endif ()
 
 find_package(Boost 1.71 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 find_package(THRIFT REQUIRED)
 find_package(FMILIB REQUIRED)
+
 
 # ==============================================================================
 # Targets
@@ -97,18 +100,13 @@ find_package(FMILIB REQUIRED)
 add_subdirectory(src)
 add_subdirectory(tool)
 
-if (PROXYFMU_BUILD_EXAMPLES OR PROXYFMU_BUILD_TESTS)
-  file(COPY data/fmus DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-  if (PROXYFMU_BUILD_EXAMPLES)
+if (PROXYFMU_BUILD_EXAMPLES)
     add_subdirectory(examples)
-  endif ()
+endif ()
 
-  if (PROXYFMU_BUILD_TESTS)
+if (PROXYFMU_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
-  endif ()
-
 endif ()
 
 
