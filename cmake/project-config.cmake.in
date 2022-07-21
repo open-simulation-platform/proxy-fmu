@@ -7,7 +7,7 @@ list(APPEND CMAKE_MODULE_PATH "${PACKAGE_PREFIX_DIR}/@PROXYFMU_CMAKE_INSTALL_DIR
 
 find_dependency(Boost COMPONENTS filesystem program_options REQUIRED)
 
-find_dependency(Fmilibcpp REQUIRED)
+find_dependency(FMILIB REQUIRED)
 find_dependency(THRIFT REQUIRED)
 
 list(REMOVE_AT CMAKE_MODULE_PATH -1)

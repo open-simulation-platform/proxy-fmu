@@ -1,25 +1,22 @@
 
 #include <proxyfmu/server/fmu_service_handler.hpp>
 
+#include <thread>
+
 #include <iostream>
 #include <utility>
 
 using namespace proxyfmu::thrift;
 using namespace proxyfmu::server;
 
-fmu_service_handler::fmu_service_handler(
-    const std::string& fmuPath,
-    const std::string& instanceName,
-    std::function<void()> stop)
-    : fmuPath_(fmuPath)
-    , instanceName_(instanceName)
-    , stop_(std::move(stop))
+fmu_service_handler::fmu_service_handler(const std::string& fmuPath, const std::string& instanceName, std::function<void()> stop)
+: fmuPath_(fmuPath), instanceName_(instanceName), stop_(std::move(stop))
 {
 }
 
 void fmu_service_handler::instantiate()
 {
-    auto fmu = fmilibcpp::loadFmu(fmuPath_, false);
+    auto fmu = fmi::loadFmu(fmuPath_);
     modelName_ = fmu->get_model_description().modelName;
     slave_ = fmu->new_instance(instanceName_);
 }
@@ -53,15 +50,9 @@ Status::type fmu_service_handler::terminate()
     return status ? Status::OK_STATUS : Status::ERROR_STATUS;
 }
 
-Status::type fmu_service_handler::reset()
-{
-    auto status = slave_->reset();
-    return status ? Status::OK_STATUS : Status::ERROR_STATUS;
-}
-
 void fmu_service_handler::read_integer(IntegerRead& _return, const ValueReferences& vr)
 {
-    const std::vector<fmilibcpp::value_ref> _vr(vr.begin(), vr.end());
+    const std::vector<fmi::value_ref> _vr(vr.begin(), vr.end());
     _return.value.resize(vr.size());
     auto status = slave_->get_integer(_vr, _return.value);
     _return.status = status ? Status::OK_STATUS : Status::ERROR_STATUS;
@@ -69,7 +60,7 @@ void fmu_service_handler::read_integer(IntegerRead& _return, const ValueReferenc
 
 void fmu_service_handler::read_real(RealRead& _return, const ValueReferences& vr)
 {
-    const std::vector<fmilibcpp::value_ref> _vr(vr.begin(), vr.end());
+    const std::vector<fmi::value_ref> _vr(vr.begin(), vr.end());
     _return.value.resize(vr.size());
     auto status = slave_->get_real(_vr, _return.value);
     _return.status = status ? Status::OK_STATUS : Status::ERROR_STATUS;
@@ -78,7 +69,7 @@ void fmu_service_handler::read_real(RealRead& _return, const ValueReferences& vr
 
 void fmu_service_handler::read_string(StringRead& _return, const ValueReferences& vr)
 {
-    const std::vector<fmilibcpp::value_ref> _vr(vr.begin(), vr.end());
+    const std::vector<fmi::value_ref> _vr(vr.begin(), vr.end());
     _return.value.resize(vr.size());
     auto status = slave_->get_string(_vr, _return.value);
     _return.status = status ? Status::OK_STATUS : Status::ERROR_STATUS;
@@ -86,7 +77,7 @@ void fmu_service_handler::read_string(StringRead& _return, const ValueReferences
 
 void fmu_service_handler::read_boolean(BooleanRead& _return, const ValueReferences& vr)
 {
-    const std::vector<fmilibcpp::value_ref> _vr(vr.begin(), vr.end());
+    const std::vector<fmi::value_ref> _vr(vr.begin(), vr.end());
     _return.value.resize(vr.size());
     auto status = slave_->get_boolean(_vr, _return.value);
     _return.status = status ? Status::OK_STATUS : Status::ERROR_STATUS;
@@ -94,21 +85,21 @@ void fmu_service_handler::read_boolean(BooleanRead& _return, const ValueReferenc
 
 Status::type fmu_service_handler::write_integer(const ValueReferences& vr, const IntArray& value)
 {
-    const std::vector<fmilibcpp::value_ref> _vr(vr.begin(), vr.end());
+    const std::vector<fmi::value_ref> _vr(vr.begin(), vr.end());
     auto status = slave_->set_integer(_vr, value);
     return status ? Status::OK_STATUS : Status::ERROR_STATUS;
 }
 
 Status::type fmu_service_handler::write_real(const ValueReferences& vr, const RealArray& value)
 {
-    const std::vector<fmilibcpp::value_ref> _vr(vr.begin(), vr.end());
+    const std::vector<fmi::value_ref> _vr(vr.begin(), vr.end());
     auto status = slave_->set_real(_vr, value);
     return status ? Status::OK_STATUS : Status::ERROR_STATUS;
 }
 
 Status::type fmu_service_handler::write_string(const ValueReferences& vr, const StringArray& value)
 {
-    const std::vector<fmilibcpp::value_ref> _vr(vr.begin(), vr.end());
+    const std::vector<fmi::value_ref> _vr(vr.begin(), vr.end());
     auto status = slave_->set_string(_vr, value);
     return status ? Status::OK_STATUS : Status::ERROR_STATUS;
 }
@@ -116,7 +107,7 @@ Status::type fmu_service_handler::write_string(const ValueReferences& vr, const 
 
 Status::type fmu_service_handler::write_boolean(const ValueReferences& vr, const BooleanArray& value)
 {
-    const std::vector<fmilibcpp::value_ref> _vr(vr.begin(), vr.end());
+    const std::vector<fmi::value_ref> _vr(vr.begin(), vr.end());
     auto status = slave_->set_boolean(_vr, value);
     return status ? Status::OK_STATUS : Status::ERROR_STATUS;
 }
