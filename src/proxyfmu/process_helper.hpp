@@ -53,7 +53,7 @@ void start_process(
     }
 #endif
 
-    std::cout << "[proxyfmu] Found proxyfmu executable: " << executable <<" version: ";
+    std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << " version: ";
     std::cout.flush();
     system((execStr + " -v").c_str());
     std::cout << "\n";

@@ -1,9 +1,8 @@
 
-#include <proxyfmu/temp_dir.hpp>
-
 #include "fmi1/fmi1_fmu.hpp"
 #include "fmi2/fmi2_fmu.hpp"
 #include <fmilib.h>
+#include <proxyfmu/temp_dir.hpp>
 
 namespace proxyfmu::fmi
 {
@@ -21,7 +20,7 @@ std::unique_ptr<fmu> loadFmu(const filesystem::path& fmuPath)
     } else if (version == fmi_version_2_0_enu) {
         return std::make_unique<fmi2_fmu>(std::move(ctx), tmp);
     } else {
-        //TODO
+        // TODO
     }
 
     return nullptr;

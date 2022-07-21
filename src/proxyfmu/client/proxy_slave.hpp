@@ -60,4 +60,4 @@ public:
 
 } // namespace proxyfmu::client
 
-#endif //PROXY_FMU_PROXY_SLAVE_HPP
+#endif // PROXY_FMU_PROXY_SLAVE_HPP

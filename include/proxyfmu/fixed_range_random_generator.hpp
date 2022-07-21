@@ -7,7 +7,8 @@
 namespace proxyfmu
 {
 
-class fixed_range_random_generator {
+class fixed_range_random_generator
+{
 
 private:
     std::mt19937 mt_;
@@ -16,15 +17,16 @@ private:
 public:
     fixed_range_random_generator(int min, int max)
         : mt_(std::random_device()())
-        , dist_(min, max) {
+        , dist_(min, max)
+    {
     }
 
-    int next() {
+    int next()
+    {
         return dist_(mt_);
     }
-
 };
 
-}
+} // namespace proxyfmu
 
-#endif //PROXYFMU_FIXED_RANGE_RANDOM_GENERATOR_HPP
+#endif // PROXYFMU_FIXED_RANGE_RANDOM_GENERATOR_HPP

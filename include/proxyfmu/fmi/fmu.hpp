@@ -27,4 +27,4 @@ std::unique_ptr<fmu> loadFmu(const proxyfmu::filesystem::path& fmuPath);
 
 } // namespace proxyfmu::fmi
 
-#endif //PROXY_FMU_FMU_HPP
+#endif // PROXY_FMU_FMU_HPP

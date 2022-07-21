@@ -17,9 +17,8 @@ struct remote_info
         : host(std::move(host))
         , port(port)
     { }
-
 };
 
 } // namespace proxyfmu
 
-#endif //PROXYFMU_REMOTE_INFO_HPP
+#endif // PROXYFMU_REMOTE_INFO_HPP

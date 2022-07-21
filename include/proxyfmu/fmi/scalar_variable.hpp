@@ -65,4 +65,4 @@ using model_variables = std::vector<scalar_variable>;
 
 } // namespace proxyfmu::fmi
 
-#endif //PROXY_FMU_SCALAR_VARIABLE_HPP
+#endif // PROXY_FMU_SCALAR_VARIABLE_HPP

@@ -4,8 +4,8 @@
 
 #include "fmilib.h"
 
-#include <memory>
 #include <cstring>
+#include <memory>
 
 namespace
 {
@@ -61,4 +61,4 @@ public:
 
 } // namespace proxyfmu::fmi
 
-#endif //PROXY_FMU_FMICONTEXT_HPP
+#endif // PROXY_FMU_FMICONTEXT_HPP

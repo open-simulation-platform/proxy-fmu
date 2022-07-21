@@ -17,4 +17,4 @@ namespace filesystem = std::experimental::filesystem;
 }
 #endif
 
-#endif //PROXY_FMU_FS_PORTABILITY_HPP
+#endif // PROXY_FMU_FS_PORTABILITY_HPP

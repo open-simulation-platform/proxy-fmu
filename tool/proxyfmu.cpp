@@ -100,13 +100,13 @@ int printHelp(boost::program_options::options_description& desc)
 
 int printVersion()
 {
+    // namespace
     const auto v = proxyfmu::library_version();
     std::cout << v.major << "." << v.minor << "." << v.patch;
     return SUCCESS;
 }
 
 } // namespace
-
 int main(int argc, char** argv)
 {
 
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
             if (vm.count("help")) {
                 return printHelp(desc);
             } else if (vm.count("version")) {
-               return printVersion();
+                return printVersion();
             }
 
             po::notify(vm);

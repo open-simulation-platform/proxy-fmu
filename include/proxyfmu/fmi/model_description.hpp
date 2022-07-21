@@ -35,4 +35,4 @@ struct model_description
 
 } // namespace proxyfmu::fmi
 
-#endif //PROXY_FMU_MODEL_DESCRIPTION_HPP
+#endif // PROXY_FMU_MODEL_DESCRIPTION_HPP
