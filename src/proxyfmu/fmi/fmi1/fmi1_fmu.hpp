@@ -2,11 +2,11 @@
 #ifndef PROXY_FMU_FMI1_FMU_HPP
 #define PROXY_FMU_FMI1_FMU_HPP
 
-#include <proxyfmu/temp_dir.hpp>
 #include "../fmicontext.hpp"
 
 #include <fmilib.h>
 #include <proxyfmu/fmi/fmu.hpp>
+#include <proxyfmu/temp_dir.hpp>
 
 namespace proxyfmu::fmi
 {
@@ -33,4 +33,4 @@ public:
 
 } // namespace proxyfmu::fmi
 
-#endif //PROXY_FMU_FMI2_FMU_HPP
+#endif // PROXY_FMU_FMI2_FMU_HPP

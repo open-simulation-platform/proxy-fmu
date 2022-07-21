@@ -56,4 +56,4 @@ public:
 
 } // namespace proxyfmu::fmi
 
-#endif //PROXY_FMU_FMI2_SLAVE_HPP
+#endif // PROXY_FMU_FMI2_SLAVE_HPP

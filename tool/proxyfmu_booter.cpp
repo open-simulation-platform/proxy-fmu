@@ -1,4 +1,5 @@
 
+#include <proxyfmu/lib_info.hpp>
 #include <proxyfmu/server/boot_service_handler.hpp>
 
 #include <boost/program_options.hpp>
@@ -28,7 +29,9 @@ void wait_for_input()
 {
     std::cout << '\n'
               << "Press any key to quit...\n";
+    // clang-format off
     while (std::cin.get() != '\n');
+    //clang-format on
     std::cout << "Done." << std::endl;
 }
 
@@ -61,6 +64,14 @@ int printHelp(boost::program_options::options_description& desc)
     return SUCCESS;
 }
 
+int printVersion()
+{
+    // namespace
+    const auto v = proxyfmu::library_version();
+    std::cout << v.major << "." << v.minor << "." << v.patch;
+    return SUCCESS;
+}
+
 } // namespace
 
 
@@ -70,6 +81,7 @@ int main(int argc, char** argv)
 
     po::options_description desc("Options");
     desc.add_options()("help,h", "Print this help message and quits.");
+    desc.add_options()("version,v", "Print program version.");
     desc.add_options()("port", po::value<int>(), "Specify the network port to be used.");
 
     if (argc == 1) {
@@ -85,6 +97,8 @@ int main(int argc, char** argv)
 
             if (vm.count("help")) {
                 return printHelp(desc);
+            } else if (vm.count("version")) {
+                return printVersion();
             }
 
             po::notify(vm);

@@ -2,9 +2,9 @@
 #ifndef PROXY_PROXY_FMU_FMU_HPP
 #define PROXY_PROXY_FMU_FMU_HPP
 
+#include <proxyfmu/fmi/fmu.hpp>
 #include <proxyfmu/fmi/model_description.hpp>
 #include <proxyfmu/fmi/slave.hpp>
-#include <proxyfmu/fmi/fmu.hpp>
 #include <proxyfmu/fs_portability.hpp>
 #include <proxyfmu/remote_info.hpp>
 
@@ -13,7 +13,7 @@
 namespace proxyfmu::client
 {
 
-class proxy_fmu: public fmi::fmu
+class proxy_fmu : public fmi::fmu
 {
 
 private:
@@ -35,4 +35,4 @@ public:
 } // namespace proxyfmu::client
 
 
-#endif //PROXY_PROXY_FMU_FMU_HPP
+#endif // PROXY_PROXY_FMU_FMU_HPP

@@ -16,6 +16,6 @@ struct version
 /// Returns the version of the libcosim library.
 version library_version();
 
-}
+} // namespace proxyfmu
 
 #endif // PROXYFMU_LIB_INFO_HPP

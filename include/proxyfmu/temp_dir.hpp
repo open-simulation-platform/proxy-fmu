@@ -2,14 +2,14 @@
 #ifndef PROXY_FMU_TEMP_DIR_HPP
 #define PROXY_FMU_TEMP_DIR_HPP
 
+#include "fixed_range_random_generator.hpp"
+
 #include <proxyfmu/fs_portability.hpp>
 
 #include <iostream>
 #include <memory>
 #include <random>
 #include <string>
-
-#include "fixed_range_random_generator.hpp"
 
 namespace
 {
@@ -59,4 +59,4 @@ public:
 } // namespace proxyfmu
 
 
-#endif //PROXY_FMU_TEMP_DIR_HPP
+#endif // PROXY_FMU_TEMP_DIR_HPP

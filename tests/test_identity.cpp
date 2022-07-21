@@ -73,14 +73,14 @@ void test(fmu& fmu)
 
 TEST_CASE("fmi_test_identity")
 {
-    std::string fmuPath("../fmus/1.0/identity.fmu");
+    std::string fmuPath(std::string(PROXYFMU_DATA_DIR) + "/fmus/1.0/identity.fmu");
     auto fmu = loadFmu(fmuPath);
     test(*fmu);
 }
 
 TEST_CASE("client_test_identity")
 {
-    std::string fmuPath("../fmus/1.0/identity.fmu");
+    std::string fmuPath(std::string(PROXYFMU_DATA_DIR) + "/fmus/1.0/identity.fmu");
     auto fmu = client::proxy_fmu(fmuPath);
     test(fmu);
 }

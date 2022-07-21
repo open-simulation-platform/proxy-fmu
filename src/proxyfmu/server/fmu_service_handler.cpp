@@ -1,16 +1,17 @@
 
 #include <proxyfmu/server/fmu_service_handler.hpp>
 
-#include <thread>
-
 #include <iostream>
+#include <thread>
 #include <utility>
 
 using namespace proxyfmu::thrift;
 using namespace proxyfmu::server;
 
 fmu_service_handler::fmu_service_handler(const std::string& fmuPath, const std::string& instanceName, std::function<void()> stop)
-: fmuPath_(fmuPath), instanceName_(instanceName), stop_(std::move(stop))
+    : fmuPath_(fmuPath)
+    , instanceName_(instanceName)
+    , stop_(std::move(stop))
 {
 }
 

@@ -12,4 +12,4 @@ model_description create_model_description(fmi2_import_t* handle);
 
 } // namespace proxyfmu::fmi
 
-#endif //PROXY_FMU_FMI2_MODEL_DESCRIPTION_HPP
+#endif // PROXY_FMU_FMI2_MODEL_DESCRIPTION_HPP

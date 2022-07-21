@@ -14,7 +14,6 @@ class fmu_service_handler : virtual public thrift::FmuServiceIf
 {
 
 private:
-
     std::string modelName_;
 
     const std::string& fmuPath_;
@@ -49,4 +48,4 @@ public:
 
 } // namespace proxyfmu::server
 
-#endif //PROXY_FMU_FMUSERVICEHANDLER_HPP
+#endif // PROXY_FMU_FMUSERVICEHANDLER_HPP
