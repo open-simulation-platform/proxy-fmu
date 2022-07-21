@@ -4,10 +4,8 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-#include "data_dir.hpp"
-
 using namespace proxyfmu;
-using namespace fmilibcpp;
+using namespace proxyfmu::fmi;
 
 namespace
 {
@@ -44,14 +42,14 @@ void test(fmu& fmu)
 
 TEST_CASE("fmi_test_controlled_temp")
 {
-    std::string fmuPath = get_data("fmus/2.0/20sim/ControlledTemperature.fmu");
+    std::string fmuPath("../fmus/2.0/20sim/ControlledTemperature.fmu");
     auto fmu = loadFmu(fmuPath);
     test(*fmu);
 }
 
 TEST_CASE("client_test_controlled_temp")
 {
-    std::string fmuPath = get_data("fmus/2.0/20sim/ControlledTemperature.fmu");
+    std::string fmuPath("../fmus/2.0/20sim/ControlledTemperature.fmu");
     auto fmu = client::proxy_fmu(fmuPath);
     test(fmu);
 }

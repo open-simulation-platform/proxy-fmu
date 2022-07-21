@@ -1,6 +1,5 @@
 
 #include <proxyfmu/fixed_range_random_generator.hpp>
-#include <proxyfmu/fs_portability.hpp>
 #include <proxyfmu/lib_info.hpp>
 #include <proxyfmu/server/fmu_service_handler.hpp>
 
@@ -133,7 +132,7 @@ int main(int argc, char** argv)
             if (vm.count("help")) {
                 return printHelp(desc);
             } else if (vm.count("version")) {
-                return printVersion();
+               return printVersion();
             }
 
             po::notify(vm);

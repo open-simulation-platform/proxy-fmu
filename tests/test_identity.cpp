@@ -1,12 +1,10 @@
 #include <proxyfmu/client/proxy_fmu.hpp>
 
 #define CATCH_CONFIG_MAIN
-#include "data_dir.hpp"
-
 #include <catch2/catch.hpp>
 
 using namespace proxyfmu;
-using namespace fmilibcpp;
+using namespace proxyfmu::fmi;
 
 namespace
 {
@@ -75,14 +73,14 @@ void test(fmu& fmu)
 
 TEST_CASE("fmi_test_identity")
 {
-    std::string fmuPath = get_data("fmus/1.0/identity.fmu");
+    std::string fmuPath("../fmus/1.0/identity.fmu");
     auto fmu = loadFmu(fmuPath);
     test(*fmu);
 }
 
 TEST_CASE("client_test_identity")
 {
-    std::string fmuPath = get_data("fmus/1.0/identity.fmu");
+    std::string fmuPath("../fmus/1.0/identity.fmu");
     auto fmu = client::proxy_fmu(fmuPath);
     test(fmu);
 }
