@@ -1,7 +1,8 @@
 
+#include "fmu_service_handler.hpp"
+
 #include <proxyfmu/fixed_range_random_generator.hpp>
 #include <proxyfmu/lib_info.hpp>
-#include <proxyfmu/server/fmu_service_handler.hpp>
 
 #include <boost/program_options.hpp>
 #include <thrift/server/TSimpleServer.h>

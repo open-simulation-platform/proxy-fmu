@@ -1,3 +1,5 @@
+add_subdirectory(thrift)
+
 set(publicHeaderDir ${CMAKE_SOURCE_DIR}/include)
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 
@@ -77,62 +79,12 @@ if (UNIX)
 endif ()
 
 # Generate sources from .in files
-set(generatedFiles "${generatedSourcesDir}/proxyfmu/lib_info.cpp")
+set(libInfo "${generatedSourcesDir}/proxyfmu/lib_info.cpp")
 configure_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/lib_info.cpp.in"
-        "${generatedFiles}"
+        "${libInfo}"
         @ONLY
 )
-
-
-# ==============================================================================
-# thrift
-# ==============================================================================
-
-set(thriftCppSourcesDir "${generatedSourcesDir}/proxyfmu/thrift")
-set(thriftJavaSourcesDir "${generatedSourcesDir}/java")
-
-file(MAKE_DIRECTORY "${generatedSourcesDir}")
-file(MAKE_DIRECTORY "${thriftCppSourcesDir}")
-file(MAKE_DIRECTORY "${thriftJavaSourcesDir}")
-
-if (NOT THRIFT_EXECUTABLE)
-    message(FATAL_ERROR "The thrift compiler was not found. Cannot generate Thrift sources.")
-endif ()
-
-set(thriftServiceDefinitions
-        "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift/defs.thrift"
-        "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift/boot.thrift"
-        "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift/service.thrift")
-
-# Generate PROXY-FMU classes from Thrift service definitions
-foreach (def ${thriftServiceDefinitions})
-    execute_process(
-            COMMAND "${THRIFT_EXECUTABLE}"
-            "--gen" "cpp:no_skeleton"
-            "-out" "${thriftCppSourcesDir}"
-            "${def}"
-    )
-    execute_process(
-            COMMAND "${THRIFT_EXECUTABLE}"
-            "--gen" "java:private-members,fullcamel"
-            "-out" "${thriftJavaSourcesDir}"
-            "${def}"
-    )
-endforeach ()
-
-set(thriftGenerated
-        "${thriftCppSourcesDir}/defs_types.h"
-        "${thriftCppSourcesDir}/defs_types.cpp"
-        "${thriftCppSourcesDir}/FmuService.h"
-        "${thriftCppSourcesDir}/FmuService.cpp"
-        "${thriftCppSourcesDir}/BootService.h"
-        "${thriftCppSourcesDir}/BootService.cpp"
-        )
-
-add_library(proxyfmu-service OBJECT ${thriftGenerated})
-set_target_properties(proxyfmu-service PROPERTIES POSITION_INDEPENDENT_CODE ON)
-list(APPEND generatedFiles "$<TARGET_OBJECTS:proxyfmu-service>")
 
 
 # ==============================================================================
@@ -155,7 +107,7 @@ foreach (header IN LISTS clientPublicHeaders)
     list(APPEND clientPublicHeadersFull "${publicHeaderDir}/${header}")
 endforeach ()
 
-add_library(proxyfmu-client ${commonPublicHeadersFull} ${clientPublicHeadersFull} ${clientPrivateHeaders} ${clientSources} ${generatedFiles})
+add_library(proxyfmu-client ${commonPublicHeadersFull} ${clientPublicHeadersFull} ${clientPrivateHeaders} ${clientSources} ${libInfo} "$<TARGET_OBJECTS:proxyfmu-service>")
 add_library(proxyfmu::proxy-client ALIAS proxyfmu-client)
 target_compile_features(proxyfmu-client PUBLIC "cxx_std_17")
 set_target_properties(proxyfmu-client PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -182,80 +134,6 @@ add_dependencies(proxyfmu-client proxyfmu)
 
 
 # ==============================================================================
-# proxyfmu server lib
-# ==============================================================================
-
-set(serverPublicHeaders
-        "proxyfmu/server/fmu_service_handler.hpp")
-
-set(serverSources
-        "proxyfmu/server/fmu_service_handler.cpp")
-
-set(serverPublicHeadersFull)
-foreach (header IN LISTS serverPublicHeaders)
-    list(APPEND serverPublicHeadersFull "${publicHeaderDir}/${header}")
-endforeach ()
-
-add_library(proxyfmu-lib ${serverPublicHeadersFull} ${serverSources} ${generatedFiles})
-add_library(proxyfmu::proxy-lib ALIAS proxyfmu-lib)
-target_compile_features(proxyfmu-lib PUBLIC "cxx_std_17")
-target_include_directories(proxyfmu-lib
-        PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-        "${generatedSourcesDir}"
-        PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}"
-        )
-target_link_libraries(proxyfmu-lib PUBLIC fmilibwrapper thrift::thrift)
-if (UNIX)
-    target_link_libraries(proxyfmu-lib PRIVATE pthread)
-endif ()
-
-
-# ==============================================================================
-# proxyfmu booter lib
-# ==============================================================================
-
-set(serverBooterPublicHeaders
-        "proxyfmu/server/boot_service_handler.hpp")
-
-set(serverBooterPrivateHeaders
-        "proxyfmu/process_helper.hpp")
-
-set(serverBooterSources
-        "proxyfmu/server/boot_service_handler.cpp")
-
-set(serverBooterPublicHeadersFull)
-foreach (header IN LISTS serverBooterPublicHeaders)
-    list(APPEND serverBooterPublicHeadersFull "${publicHeaderDir}/${header}")
-endforeach ()
-
-add_library(proxyfmu-booter-lib ${commonPublicHeadersFull} ${serverBooterPublicHeadersFull} ${serverBooterPrivateHeaders} ${serverBooterSources} ${generatedFiles})
-add_library(proxyfmu::proxyfmu-booter-lib ALIAS proxyfmu-booter-lib)
-target_compile_features(proxyfmu-booter-lib PUBLIC "cxx_std_17")
-target_include_directories(proxyfmu-booter-lib
-        PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-        "${generatedSourcesDir}"
-        PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}"
-        )
-target_link_libraries(proxyfmu-booter-lib
-        PUBLIC
-        thrift::thrift
-        PRIVATE
-        Boost::filesystem
-        )
-if (UNIX)
-    target_link_libraries(proxyfmu-booter-lib
-            PRIVATE
-            pthread
-            stdc++fs
-            )
-endif ()
-
-
-# ==============================================================================
 # Installation rules
 # ==============================================================================
 
@@ -267,14 +145,4 @@ install(
 install(
         DIRECTORY "${publicHeaderDir}/proxyfmu"
         DESTINATION "${PROXYFMU_HEADER_INSTALL_DIR}"
-)
-
-install(
-        DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/proxyfmu/thrift"
-        DESTINATION "."
-)
-
-install(
-        DIRECTORY "${CMAKE_BINARY_DIR}/generated/java"
-        DESTINATION "thrift"
 )

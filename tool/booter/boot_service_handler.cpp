@@ -1,7 +1,7 @@
 
-#include "../process_helper.hpp"
+#include "boot_service_handler.hpp"
 
-#include <proxyfmu/server/boot_service_handler.hpp>
+#include "proxyfmu/process_helper.hpp"
 
 #include <chrono>
 #include <cstdio>
