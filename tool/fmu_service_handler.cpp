@@ -1,5 +1,5 @@
 
-#include <proxyfmu/server/fmu_service_handler.hpp>
+#include "fmu_service_handler.hpp"
 
 #include <iostream>
 #include <thread>

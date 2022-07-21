@@ -1,25 +1,26 @@
 
-include_directories(${PROXYFMU_SOURCE_DIR}/include)
+add_subdirectory(booter)
 
-add_executable(proxyfmu proxyfmu.cpp)
-target_link_libraries(proxyfmu PRIVATE proxyfmu-lib Boost::program_options)
+
+add_executable(proxyfmu
+        proxyfmu.cpp
+        fmu_service_handler.cpp
+        "$<TARGET_OBJECTS:proxyfmu-service>"
+        "${generatedSourcesDir}/proxyfmu/lib_info.cpp")
+target_include_directories(proxyfmu
+        PUBLIC
+        "${CMAKE_SOURCE_DIR}/include"
+        PRIVATE
+        "${generatedSourcesDir}")
+target_link_libraries(proxyfmu
+        PUBLIC
+        fmilibwrapper
+        thrift::thrift
+        Boost::program_options
+        )
 if (UNIX)
   target_link_libraries(proxyfmu PRIVATE pthread)
 endif ()
-
-
-add_executable(proxyfmu_booter proxyfmu_booter.cpp)
-target_link_libraries(proxyfmu_booter PRIVATE proxyfmu-booter-lib Boost::program_options)
-if (UNIX)
-  target_link_libraries(proxyfmu_booter PRIVATE pthread)
-endif ()
-
-install(
-        TARGETS
-        "proxyfmu"
-        "proxyfmu_booter"
-        DESTINATION ${PROXYFMU_INSTALL_DESTINATIONS}
-)
 
 if (PROXYFMU_BUILD_TESTS)
   # Copy executable to test directory in order for CTest to function
@@ -31,3 +32,14 @@ if (PROXYFMU_BUILD_TESTS)
           Copying $<TARGET_FILE:proxyfmu> into ${CMAKE_BINARY_DIR}/tests/$<TARGET_FILE_NAME:proxyfmu>
           )
 endif()
+
+
+# ==============================================================================
+# Installation rules
+# ==============================================================================
+
+install(
+        TARGETS
+        proxyfmu
+        DESTINATION ${PROXYFMU_INSTALL_DESTINATIONS}
+)

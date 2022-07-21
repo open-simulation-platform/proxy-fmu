@@ -23,6 +23,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
+
 set(Boost_USE_STATIC_LIBS ON)
 
 if (MSVC)
@@ -97,6 +99,7 @@ find_package(FMILIB REQUIRED)
 # Targets
 # ==============================================================================
 
+add_subdirectory(thrift)
 add_subdirectory(src)
 add_subdirectory(tool)
 
