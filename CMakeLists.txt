@@ -99,7 +99,6 @@ find_package(FMILIB REQUIRED)
 # Targets
 # ==============================================================================
 
-add_subdirectory(thrift)
 add_subdirectory(src)
 add_subdirectory(tool)
 

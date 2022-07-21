@@ -1,3 +1,5 @@
+add_subdirectory(thrift)
+
 set(publicHeaderDir ${CMAKE_SOURCE_DIR}/include)
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 

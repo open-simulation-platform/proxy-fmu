@@ -55,10 +55,15 @@ install(
         "${CMAKE_CURRENT_SOURCE_DIR}/boot.thrift"
         "${CMAKE_CURRENT_SOURCE_DIR}/defs.thrift"
         "${CMAKE_CURRENT_SOURCE_DIR}/service.thrift"
-        DESTINATION "thrift_definitions"
+        DESTINATION "thrift/definitions"
 )
 
 install(
         DIRECTORY "${CMAKE_BINARY_DIR}/generated/java"
         DESTINATION "thrift"
+)
+
+install(
+        DIRECTORY "${CMAKE_BINARY_DIR}/generated/proxyfmu/thrift/"
+        DESTINATION "thrift/cpp"
 )
