@@ -89,7 +89,13 @@ int run_application(const std::string& fmu, const std::string& instanceName)
         }
     }
 
-    return final_port != -1 ? 0 : -999;
+    if (final_port != -1) {
+        return 0;
+    } else {
+        std::cerr << "[proxyfmu] Unable to bind after max number of retries.." << std::endl;
+        return 1;
+    }
+
 }
 
 int printHelp(boost::program_options::options_description& desc)
