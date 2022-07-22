@@ -83,17 +83,17 @@ void start_process(
     }
 
     c.wait();
+    int status = c.exit_code();
 
-    auto status = c.exit_code();
-    std::cout << "[proxyfmu] External proxy process for instance '" << instanceName << "' returned with status " << std::to_string(status) << std::endl;
+    if (status == 0 && bound) {
+        return;
+    } else {
+        std::cerr << "[proxyfmu] External proxy process for instance '"
+                  << instanceName << "' returned with status "
+                  << std::to_string(status) << ". Unable to bind.." << std::endl;
+        std::lock_guard<std::mutex> lck(mtx);
+        port = -999;
 
-    // exit code -999 has special meaning: not able to bind to a port
-    if (!bound && status == -999) {
-        {
-            std::lock_guard<std::mutex> lck(mtx);
-            std::cerr << "[proxyfmu] Unable to bind to external proxy process!" << std::endl;
-            port = -999;
-        }
         cv.notify_one();
     }
 }
