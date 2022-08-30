@@ -15,9 +15,9 @@ class ProxyFmuConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
     requires = (
-        "boost/1.79.0",
+        "boost/1.71.0",
         "fmilibrary/2.3",
-        "thrift/0.16.0"
+        "thrift/0.13.0"
     )
 
     def set_version(self):
