@@ -13,7 +13,7 @@ mark_as_advanced(THRIFT_INCLUDE_DIR)
 find_library(THRIFT_LIBRARY NAMES thrift thriftd thriftmd thriftmdd)
 mark_as_advanced(THRIFT_LIBRARY)
 
-find_program(THRIFT_EXECUTABLE NAMES thrift)
+find_program(THRIFT_EXECUTABLE NAMES thrift HINTS ${CONAN_THRIFT_ROOT} PATH_SUFFIXES bin bin64)
 mark_as_advanced(THRIFT_EXECUTABLE)
 
 include(FindPackageHandleStandardArgs)
