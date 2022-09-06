@@ -74,7 +74,7 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
                 break;
             } catch (const TTransportException& ex) {
                 if (retries++ > max_retries) {
-                    throw ex;
+                    throw;
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(retry_interval));
             }
