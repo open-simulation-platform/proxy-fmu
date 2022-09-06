@@ -13,8 +13,9 @@ class ProxyFmuConan(ConanFile):
         "revision": "auto"
     }
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake"
+    generators = "cmake", "cmake_find_package"
     requires = (
+        "cli11/2.2.0",
         "boost/1.71.0",
         "fmilibrary/2.3",
         "thrift/0.13.0"
