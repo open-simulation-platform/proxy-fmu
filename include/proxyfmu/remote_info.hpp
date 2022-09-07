@@ -8,15 +8,28 @@
 namespace proxyfmu
 {
 
-struct remote_info
+class remote_info
 {
-    const std::string host;
-    const int port;
 
+public:
     remote_info(std::string host, int port)
-        : host(std::move(host))
-        , port(port)
+        : host_(std::move(host))
+        , port_(port)
     { }
+
+    [[nodiscard]] std::string host() const
+    {
+        return host_;
+    }
+
+    [[nodiscard]] int port() const
+    {
+        return port_;
+    }
+
+private:
+    std::string host_;
+    int port_;
 };
 
 } // namespace proxyfmu

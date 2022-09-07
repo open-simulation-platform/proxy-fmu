@@ -1,15 +1,18 @@
 
 #include <proxyfmu/client/proxy_fmu.hpp>
 
+#include <CLI/CLI.hpp>
+
 #include <exception>
 #include <iostream>
+#include <utility>
 
 using namespace proxyfmu::fmi;
 
-void run(const std::string& fmuPath)
+void run(const std::string& fmuPath, std::optional<proxyfmu::remote_info> remote)
 {
 
-    auto fmu = proxyfmu::client::proxy_fmu(fmuPath);
+    auto fmu = proxyfmu::client::proxy_fmu(fmuPath, std::move(remote));
 
     auto md = fmu.get_model_description();
     std::cout << "GUID=" << md.guid << std::endl;
@@ -58,11 +61,27 @@ void run(const std::string& fmuPath)
 int main(int argc, char** argv)
 {
 
-    if (argc != 2) return -1;
+    CLI::App app{"proxy_test"};
+
+    std::string fmuPath = std::string(PROXYFMU_DATA_DIR) + "/fmus/1.0/identity.fmu";
+    app.add_option("--fmu", fmuPath);
+
+    CLI::App* sub = app.add_subcommand("remote");
+    sub->add_option("--host")->required();
+    sub->add_option("--port")->required();
+
+    CLI11_PARSE(app, argc, argv);
+
+    std::optional<proxyfmu::remote_info> remote;
+    if (*sub) {
+        const auto host = sub->get_option("--host")->as<std::string>();
+        const auto port = sub->get_option("--port")->as<int>();
+        remote = {host, port};
+    }
 
     try {
 
-        run(argv[1]);
+        run(fmuPath, remote);
 
     } catch (std::exception& ex) {
         std::cerr << "error: " << ex.what() << std::endl;

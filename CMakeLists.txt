@@ -21,7 +21,10 @@ option(PROXYFMU_BUILD_TOOL "Build the server executable(s)" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}")
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 
@@ -77,7 +80,7 @@ else ()
 
 endif ()
 
-set(BOOST_COMPONENTS filesystem program_options)
+set(BOOST_COMPONENTS filesystem)
 if (PROXYFMU_BUILD_TESTS)
     Include(FetchContent)
 
@@ -91,7 +94,8 @@ if (PROXYFMU_BUILD_TESTS)
 endif ()
 
 find_package(Boost 1.71 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
-find_package(THRIFT REQUIRED)
+find_package(CLI11 REQUIRED)
+find_package(Thrift REQUIRED)
 find_package(FMILIB REQUIRED)
 
 
@@ -146,7 +150,6 @@ install(FILES "${versionFile}" DESTINATION "${PROXYFMU_CMAKE_INSTALL_DIR}")
 # Install custom find modules
 install(FILES
         "${CMAKE_SOURCE_DIR}/cmake/FindFMILIB.cmake"
-        "${CMAKE_SOURCE_DIR}/cmake/FindTHRIFT.cmake"
         DESTINATION
         "${PROXYFMU_CMAKE_INSTALL_DIR}"
         )

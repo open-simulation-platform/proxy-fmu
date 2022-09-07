@@ -1,10 +1,11 @@
 
-#include "fmu_service_handler.hpp"
+#include "handlers/boot_service_handler.hpp"
+#include "handlers/fmu_service_handler.hpp"
 
-#include <proxyfmu/fixed_range_random_generator.hpp>
-#include <proxyfmu/lib_info.hpp>
+#include "proxyfmu/fixed_range_random_generator.hpp"
+#include "proxyfmu/lib_info.hpp"
 
-#include <boost/program_options.hpp>
+#include <CLI/CLI.hpp>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TTransportUtils.h>
@@ -49,6 +50,39 @@ const int max_port_retries = 10;
 const int SUCCESS = 0;
 const int COMMANDLINE_ERROR = 1;
 const int UNHANDLED_ERROR = 2;
+
+
+void wait_for_input()
+{
+    std::cout << '\n'
+              << "Press any key to quit...\n";
+    // clang-format off
+    while (std::cin.get() != '\n');
+    //clang-format on
+    std::cout << "Done." << std::endl;
+}
+
+int run_booter_application(const int port)
+{
+    std::unique_ptr<TSimpleServer> server;
+    std::shared_ptr<boot_service_handler> handler(new boot_service_handler());
+    std::shared_ptr<TProcessor> processor(new BootServiceProcessor(handler));
+
+    std::shared_ptr<TTransportFactory> transportFactory(new TFramedTransportFactory());
+    std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+
+    std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+    server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
+
+    std::thread t([&server] { server->serve(); });
+
+    wait_for_input();
+
+    server->stop();
+    t.join();
+
+    return 0;
+}
 
 int run_application(const std::string& fmu, const std::string& instanceName)
 {
@@ -98,69 +132,61 @@ int run_application(const std::string& fmu, const std::string& instanceName)
 
 }
 
-int printHelp(boost::program_options::options_description& desc)
+int printHelp(const CLI::App& desc)
 {
-    std::cout << "proxyfmu" << '\n'
-              << desc << std::endl;
+    std::cout << desc.help() << std::endl;
     return SUCCESS;
 }
 
-int printVersion()
+std::string version()
 {
-    // namespace
     const auto v = proxyfmu::library_version();
-    std::cout << v.major << "." << v.minor << "." << v.patch;
-    return SUCCESS;
+    std::stringstream ss;
+    ss << "v" << v.major << "." << v.minor << "." << v.patch;
+    return ss.str();
 }
 
 } // namespace
+
+
 int main(int argc, char** argv)
 {
 
-    namespace po = boost::program_options;
+    CLI::App app{"proxyfmu"};
 
-    po::options_description desc("Options");
-    desc.add_options()("help,h", "Print this help message and quits.");
-    desc.add_options()("version,v", "Print program version.");
-    desc.add_options()("fmu", po::value<std::string>(), "Location of the fmu to load.");
-    desc.add_options()("instanceName", po::value<std::string>(), "Name of the slave instance.");
+    app.set_version_flag("-v,--version", version());
+    app.add_option("--fmu", "Location of the fmu to load.");
+    app.add_option("--instanceName", "Name of the slave instance.");
+
+    CLI::App* sub = app.add_subcommand("boot");
+    sub->add_option("--port", "Specify port to use.");
 
     if (argc == 1) {
-        return printHelp(desc);
+        return printHelp(app);
     }
 
     try {
 
-        po::variables_map vm;
-        try {
+        CLI11_PARSE(app, argc, argv);
 
-            po::store(po::parse_command_line(argc, argv, desc), vm);
+        if (*sub) {
 
-            if (vm.count("help")) {
-                return printHelp(desc);
-            } else if (vm.count("version")) {
-                return printVersion();
-            }
+            const auto port = sub->get_option("--port")->as<int>();
+            return run_booter_application(port);
 
-            po::notify(vm);
+        } else {
 
-        } catch (po::error& e) {
-            std::cerr << "ERROR: " << e.what() << std::endl
-                      << std::endl;
-            std::cerr << desc << std::endl;
-            return COMMANDLINE_ERROR;
+            const auto fmu = app["--fmu"]->as<std::string>();
+            const auto fmuPath = proxyfmu::filesystem::path(fmu);
+            if (!proxyfmu::filesystem::exists(fmuPath)) {
+                std::cerr << "[proxyfmu] No such file " << proxyfmu::filesystem::absolute(fmuPath);
+               return COMMANDLINE_ERROR;
+           }
+
+           const auto instanceName = app["--instanceName"]->as<std::string>();
+           return run_application(fmu, instanceName);
+
         }
-
-        const auto fmu = vm["fmu"].as<std::string>();
-        const auto fmuPath = proxyfmu::filesystem::path(fmu);
-        if (!proxyfmu::filesystem::exists(fmuPath)) {
-            std::cerr << "[proxyfmu] No such file " << proxyfmu::filesystem::absolute(fmuPath);
-            return COMMANDLINE_ERROR;
-        }
-
-        const auto instanceName = vm["instanceName"].as<std::string>();
-
-        return run_application(fmu, instanceName);
 
     } catch (std::exception& e) {
         std::cerr << "[proxyfmu] Unhandled Exception reached the top of main: " << e.what() << ", application will now exit" << std::endl;
