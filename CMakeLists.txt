@@ -150,11 +150,6 @@ install(FILES "${versionFile}" DESTINATION "${PROXYFMU_CMAKE_INSTALL_DIR}")
 # Install custom find modules
 install(FILES
         "${CMAKE_SOURCE_DIR}/cmake/FindFMILIB.cmake"
-        "${CMAKE_BINARY_DIR}/FindThrift.cmake"
-        "${CMAKE_BINARY_DIR}/FindOpenSSL.cmake"
-        "${CMAKE_BINARY_DIR}/FindBZip2.cmake"
-        "${CMAKE_BINARY_DIR}/FindLibevent.cmake"
-        "${CMAKE_BINARY_DIR}/FindCLI11.cmake"
         DESTINATION
         "${PROXYFMU_CMAKE_INSTALL_DIR}"
         )
