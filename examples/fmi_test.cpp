@@ -1,6 +1,8 @@
 
 #include <proxyfmu/fmi/fmu.hpp>
 
+#include <CLI/CLI.hpp>
+
 #include <exception>
 #include <iostream>
 
@@ -58,11 +60,16 @@ void run(const std::string& fmuPath)
 int main(int argc, char** argv)
 {
 
-    if (argc != 2) return -1;
+    CLI::App app{"fmi_test"};
+
+    std::string fmuPath = std::string(PROXYFMU_DATA_DIR) + "/fmus/1.0/identity.fmu";
+    app.add_option("--fmu", fmuPath);
+
+    CLI11_PARSE(app, argc, argv);
 
     try {
 
-        run(argv[1]);
+        run(fmuPath);
 
     } catch (std::exception& ex) {
         std::cerr << "error: " << ex.what() << std::endl;

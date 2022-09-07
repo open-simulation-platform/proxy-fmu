@@ -60,8 +60,8 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         std::unique_lock<std::mutex> lck(mtx);
         while (port == -1) cv.wait(lck);
     } else {
-        host = remote->host;
-        std::shared_ptr<TTransport> socket(new TSocket(host, remote->port));
+        host = remote->host();
+        std::shared_ptr<TTransport> socket(new TSocket(host, remote->port()));
         auto transport = std::make_shared<TFramedTransport>(socket);
         std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
         auto client = std::make_shared<BootServiceClient>(protocol);
