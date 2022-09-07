@@ -121,9 +121,9 @@ target_include_directories(proxyfmu-client
 target_link_libraries(proxyfmu-client
         PUBLIC
         fmilibwrapper
+        Boost::filesystem
         PRIVATE
         thrift::thrift
-        Boost::filesystem
         )
 if (UNIX)
     target_link_libraries(proxyfmu-client PRIVATE pthread)
