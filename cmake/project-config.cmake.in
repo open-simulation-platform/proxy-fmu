@@ -9,6 +9,6 @@ find_dependency(Boost COMPONENTS filesystem REQUIRED)
 
 find_dependency(FMILIB REQUIRED)
 find_dependency(Thrift REQUIRED)
-find_dependecy(CLI11 REQUIRED)
+find_dependency(CLI11 REQUIRED)
 
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
