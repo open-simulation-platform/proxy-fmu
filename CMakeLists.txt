@@ -91,7 +91,7 @@ if (PROXYFMU_BUILD_TESTS)
     FetchContent_MakeAvailable(Catch2)
 endif ()
 
-find_package(Boost 1.71 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+find_package(Boost 1.81 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 find_package(CLI11 REQUIRED)
 find_package(THRIFT REQUIRED)
 find_package(FMILIB REQUIRED)
