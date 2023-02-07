@@ -17,7 +17,7 @@ class ProxyFmuConan(ConanFile):
     requires = (
         "cli11/2.3.1",
         "fmilibrary/2.3",
-        "thrift/0.17.0"
+        "thrift/0.13.0"
     )
 
     def set_version(self):
