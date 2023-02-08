@@ -9,7 +9,7 @@ message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
 # Build settings
 # ==============================================================================
 
-set(BUILD_SHARED_LIBS OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries instead of static libraries" ON)
 option(PROXYFMU_BUILD_TESTS "Build tests" OFF)
 option(PROXYFMU_BUILD_EXAMPLES "Build examples" OFF)
 
