@@ -16,9 +16,14 @@ class ProxyFmuConan(ConanFile):
     generators = "cmake"
     requires = (
         "cli11/2.3.1",
-        "boost/1.81.0",
         "fmilibrary/2.3",
         "thrift/0.13.0"
+    )
+    options = {
+        "shared": [True, False]
+    }
+    default_options = (
+        "shared=True"
     )
 
     def set_version(self):
@@ -26,6 +31,7 @@ class ProxyFmuConan(ConanFile):
 
     def configure_cmake(self):
         cmake = CMake(self)
+        cmake.definitions["BUILD_SHARED_LIBS"] = self.options.shared
         cmake.configure()
         return cmake
 
