@@ -60,8 +60,8 @@ set(PROXYFMU_EXPORT_TARGET "${PROJECT_NAME}-targets")
 if (CONAN_EXPORTED) # in conan local cache
     # standard conan installation, deps will be defined in conanfile.py
     # and not necessary to call conan again, conan is already running
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup()
+    # include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    # conan_basic_setup()
 else ()
 
     include(cmake/conan.cmake)

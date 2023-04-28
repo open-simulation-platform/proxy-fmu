@@ -841,12 +841,9 @@ function(conan_add_remote)
     else()
         conan_check(REQUIRED)
     endif()
-    set(CONAN_VERIFY_SSL_ARG "True")
-    if(DEFINED CONAN_VERIFY_SSL)
-        set(CONAN_VERIFY_SSL_ARG ${CONAN_VERIFY_SSL})
-    endif()
-    message(STATUS "Conan: Adding ${CONAN_NAME} remote repository (${CONAN_URL}) verify ssl (${CONAN_VERIFY_SSL_ARG})")
-    execute_process(COMMAND ${CONAN_CMD} remote add ${CONAN_NAME} ${CONAN_INDEX_ARG} -f ${CONAN_URL} ${CONAN_VERIFY_SSL_ARG}
+
+    message(STATUS "Conan: Adding ${CONAN_NAME} remote repository (${CONAN_URL})")
+    execute_process(COMMAND ${CONAN_CMD} remote add ${CONAN_INDEX_ARG} -f ${CONAN_NAME} ${CONAN_URL}
                     RESULT_VARIABLE return_code)
     if(NOT "${return_code}" STREQUAL "0")
       message(FATAL_ERROR "Conan remote failed='${return_code}'")

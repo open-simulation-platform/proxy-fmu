@@ -1,5 +1,8 @@
-from conans import ConanFile, CMake, tools
-from os import path
+import os
+
+from conan import ConanFile
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.files import load
 
 
 class ProxyFmuConan(ConanFile):
@@ -7,13 +10,9 @@ class ProxyFmuConan(ConanFile):
     author = "osp"
     license = "MIT"
     exports = "version.txt"
-    scm = {
-        "type": "git",
-        "url": "auto",
-        "revision": "auto"
-    }
+    exports_sources = "CMakeLists.txt", "version.txt", "src/*", "include/*", "cmake/*", "data*", "tests/*", "tool/*"
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake"
+    generators = "CMakeDeps"
     requires = (
         "cli11/2.3.1",
         "fmilibrary/2.3",
@@ -22,25 +21,29 @@ class ProxyFmuConan(ConanFile):
     options = {
         "shared": [True, False]
     }
-    default_options = (
-        "shared=True"
-    )
+    default_options = {
+        "shared": True
+    }
 
     def set_version(self):
-        self.version = tools.load(path.join(self.recipe_folder, "version.txt")).strip()
+        self.version = load(self, os.path.join(self.recipe_folder, "version.txt")).strip()
 
-    def configure_cmake(self):
-        cmake = CMake(self)
-        cmake.definitions["BUILD_SHARED_LIBS"] = self.options.shared
-        cmake.configure()
-        return cmake
+    def layout(self):
+        cmake_layout(self)
+
+    def generate(self):
+        tc = CMakeToolchain(self)
+        tc.cache_variables["BUILD_SHARED_LIBS"] = self.options.shared
+        tc.cache_variables["CONAN_EXPORTED"] = True
+        tc.generate()
 
     def build(self):
-        cmake = self.configure_cmake()
+        cmake = CMake(self)
+        cmake.configure()
         cmake.build()
 
     def package(self):
-        cmake = self.configure_cmake()
+        cmake = CMake(self)
         cmake.install()
 
     def package_info(self):
