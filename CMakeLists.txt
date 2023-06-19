@@ -9,7 +9,7 @@ message("Current ${PROJECT_NAME} version: ${CMAKE_PROJECT_VERSION}\n")
 # Build settings
 # ==============================================================================
 
-option(BUILD_SHARED_LIBS "Build shared libraries instead of static libraries" ON)
+set(BUILD_SHARED_LIBS OFF)
 option(PROXYFMU_BUILD_TESTS "Build tests" OFF)
 option(PROXYFMU_BUILD_EXAMPLES "Build examples" OFF)
 
@@ -20,7 +20,6 @@ option(PROXYFMU_BUILD_EXAMPLES "Build examples" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-set(Boost_NO_WARN_NEW_VERSIONS ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 

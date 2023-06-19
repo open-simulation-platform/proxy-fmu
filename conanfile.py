@@ -19,19 +19,12 @@ class ProxyFmuConan(ConanFile):
         "fmilibrary/2.3",
         "thrift/0.13.0"
     )
-    options = {
-        "shared": [True, False]
-    }
-    default_options = (
-        "shared=True"
-    )
 
     def set_version(self):
         self.version = tools.load(path.join(self.recipe_folder, "version.txt")).strip()
 
     def configure_cmake(self):
         cmake = CMake(self)
-        cmake.definitions["BUILD_SHARED_LIBS"] = self.options.shared
         cmake.configure()
         return cmake
 
