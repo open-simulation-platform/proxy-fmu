@@ -29,7 +29,7 @@ jobs:
         run: |
           sudo apt-get install -y --no-install-recommends g++-8
           sudo pip3 install --upgrade setuptools pip
-          sudo pip3 install conan
+          sudo pip3 install conan==1.59
       - name: Configure Conan
         run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Conan create
@@ -61,7 +61,7 @@ jobs:
       - name: Install prerequisites
         run: |
           pip3 install --upgrade setuptools pip
-          pip3 install conan
+          pip3 install conan==1.59
       - name: Configure Conan
         run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Conan create
