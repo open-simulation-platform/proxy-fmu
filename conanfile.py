@@ -25,16 +25,15 @@ class ProxyFmuConan(ConanFile):
         "fPIC": True
     }
 
-    tool_requires = "thrift/0.13" # Thrift compiler
-    requires = (
-        "boost/1.81.0",
-        "cli11/2.3.2",
-        "fmilibrary/2.3",
-        "thrift/0.13.0"
-    )
-
     exports = "version.txt"
     exports_sources = "*"
+
+    def requirements(self):
+        self.tool_requires("cmake/[>=3.15]")
+        self.requires("boost/[>=1.71]", force=True)
+        self.requires("cli11/[~2.3]")
+        self.requires("fmilibrary/[~2.3]")
+        self.requires("thrift/[~0.13]", build=True)
 
     def config_options(self):
         if self.settings.os == "Windows":
