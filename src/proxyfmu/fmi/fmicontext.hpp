@@ -4,6 +4,8 @@
 
 #include "fmilib.h"
 
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <memory>
 

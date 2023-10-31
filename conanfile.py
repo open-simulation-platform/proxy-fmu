@@ -1,41 +1,50 @@
-import os
+from os import path
 
 from conan import ConanFile
-from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.cmake import CMake
 from conan.tools.files import load
 
 
 class ProxyFmuConan(ConanFile):
     name = "proxyfmu"
+    def set_version(self):
+        self.version = load(self, path.join(self.recipe_folder, "version.txt")).strip()
+
     author = "osp"
     license = "MIT"
-    exports = "version.txt"
-    exports_sources = "CMakeLists.txt", "version.txt", "src/*", "include/*", "cmake/*", "data*", "tests/*", "tool/*"
+    url = "https://github.com/open-simulation-platform/proxy-fmu"
+
+    package_type = "library"
     settings = "os", "compiler", "build_type", "arch"
-    generators = "CMakeDeps"
-    requires = (
-        "cli11/2.3.1",
-        "fmilibrary/2.3",
-        "thrift/0.13.0"
-    )
     options = {
-        "shared": [True, False]
+        "shared": [True, False],
+        "fPIC": [True, False]
     }
     default_options = {
-        "shared": True
+        "shared": True,
+        "fPIC": True
     }
 
-    def set_version(self):
-        self.version = load(self, os.path.join(self.recipe_folder, "version.txt")).strip()
+    tool_requires = "thrift/[~0.13]" # Thrift compiler
+    requires = (
+        "boost/[>=1.71]",
+        "cli11/[~2.3]",
+        "fmilibrary/[~2.3]",
+        "thrift/[~0.13]"
+    )
 
-    def layout(self):
-        cmake_layout(self)
+    exports = "version.txt"
+    exports_sources = "*"
 
-    def generate(self):
-        tc = CMakeToolchain(self)
-        tc.cache_variables["BUILD_SHARED_LIBS"] = self.options.shared
-        tc.cache_variables["CONAN_EXPORTED"] = True
-        tc.generate()
+    generators = "CMakeDeps", "CMakeToolchain"
+
+    def config_options(self):
+        if self.settings.os == "Windows":
+            del self.options.fPIC
+
+    def configure(self):
+        if self.options.shared:
+            self.options.rm_safe("fPIC")
 
     def build(self):
         cmake = CMake(self)
@@ -48,4 +57,6 @@ class ProxyFmuConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["proxyfmu-client"]
-        self.cpp_info.defines = ["Boost_USE_STATIC_LIBS=ON"]
+        # Tell consumers to use "our" CMake package config file.
+        self.cpp_info.builddirs.append(".")
+        self.cpp_info.set_property("cmake_find_mode", "none")

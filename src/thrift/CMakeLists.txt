@@ -45,6 +45,7 @@ set(thriftGenerated
         )
 
 add_library(proxyfmu-service OBJECT ${thriftGenerated})
+target_link_libraries(proxyfmu-service PUBLIC thrift::thrift)
 set_target_properties(proxyfmu-service PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 
