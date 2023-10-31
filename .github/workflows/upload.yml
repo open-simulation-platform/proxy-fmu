@@ -25,11 +25,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Install prerequisites
-        run: |
-          sudo apt-get install -y --no-install-recommends g++-8
-          sudo pip3 install --upgrade setuptools pip
-          sudo pip3 install conan
+      - name: Install compiler
+        run: sudo apt-get install -y --no-install-recommends g++-8
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
       - name: Configure Conan
         run: |
           conan profile detect
@@ -60,10 +59,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Install prerequisites
-        run: |
-          pip3 install --upgrade setuptools pip
-          pip3 install conan
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
       - name: Configure Conan
         run:  |
           conan profile detect 
