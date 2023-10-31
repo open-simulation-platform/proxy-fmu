@@ -1,7 +1,7 @@
 from os import path
 
 from conan import ConanFile
-from conan.tools.cmake import CMake
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain
 from conan.tools.files import load
 
 
@@ -36,8 +36,6 @@ class ProxyFmuConan(ConanFile):
     exports = "version.txt"
     exports_sources = "*"
 
-    generators = "CMakeDeps", "CMakeToolchain"
-
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
@@ -45,6 +43,12 @@ class ProxyFmuConan(ConanFile):
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
+
+    def generate(self):
+        CMakeDeps(self).generate()
+        tc = CMakeToolchain(self)
+        tc.cache_variables["CONAN_EXPORTED"] = True
+        tc.generate()
 
     def build(self):
         cmake = CMake(self)
