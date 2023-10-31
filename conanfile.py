@@ -25,12 +25,12 @@ class ProxyFmuConan(ConanFile):
         "fPIC": True
     }
 
-    tool_requires = "thrift/[~0.13]" # Thrift compiler
+    tool_requires = "thrift/0.13" # Thrift compiler
     requires = (
-        "boost/[>=1.71]",
-        "cli11/[~2.3]",
-        "fmilibrary/[~2.3]",
-        "thrift/[~0.13]"
+        "boost/1.81.0",
+        "cli11/2.3.2",
+        "fmilibrary/2.3",
+        "thrift/0.13.0"
     )
 
     exports = "version.txt"
