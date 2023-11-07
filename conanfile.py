@@ -25,14 +25,13 @@ class ProxyFmuConan(ConanFile):
         "fPIC": True
     }
 
+    generators = "CMakeDeps", "CMakeToolchain"
     exports = "version.txt"
     exports_sources = "*"
 
-    def build_requirements(self):
+    def requirements(self):
         self.tool_requires("cmake/[>=3.15]")
         self.tool_requires("thrift/[~0.13]")
-
-    def requirements(self):
         self.requires("boost/[~1.81]") # This version is required by Thrift
         self.requires("cli11/[~2.3]")
         self.requires("fmilibrary/[~2.3]")
@@ -46,12 +45,6 @@ class ProxyFmuConan(ConanFile):
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
-
-    def generate(self):
-        CMakeDeps(self).generate()
-        tc = CMakeToolchain(self)
-        tc.cache_variables["CONAN_EXPORTED"] = True
-        tc.generate()
 
     def build(self):
         cmake = CMake(self)

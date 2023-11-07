@@ -55,21 +55,6 @@ set(PROXYFMU_EXPORT_TARGET "${PROJECT_NAME}-targets")
 # Dependencies
 # ==============================================================================
 
-if (NOT CONAN_EXPORTED)
-    # Conan is not already running, so run it to get dependencies.
-    include(cmake/conan.cmake)
-    conan_check(REQUIRED)
-
-    conan_cmake_autodetect(settings)
-
-    conan_add_remote(NAME osp URL https://osp.jfrog.io/artifactory/api/conan/conan-local)
-    conan_cmake_run(
-            CONANFILE conanfile.py
-            BUILD missing
-            SETTINGS ${settings}
-            BASIC_SETUP)
-endif ()
-
 set(BOOST_COMPONENTS filesystem)
 if (PROXYFMU_BUILD_TESTS)
     Include(FetchContent)
