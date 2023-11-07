@@ -28,9 +28,11 @@ class ProxyFmuConan(ConanFile):
     exports = "version.txt"
     exports_sources = "*"
 
-    def requirements(self):
+    def build_requirements(self):
         self.tool_requires("cmake/[>=3.15]")
         self.tool_requires("thrift/[~0.13]")
+
+    def requirements(self):
         self.requires("boost/[~1.81]") # This version is required by Thrift
         self.requires("cli11/[~2.3]")
         self.requires("fmilibrary/[~2.3]")
