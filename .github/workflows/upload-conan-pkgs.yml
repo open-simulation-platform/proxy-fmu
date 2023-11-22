@@ -1,4 +1,4 @@
-name: Upload conan recipe
+name: Upload Conan packages
 
 env:
   CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
@@ -9,8 +9,8 @@ env:
 on: [push, workflow_dispatch]
 
 jobs:
-  conan-on-linux:
-    name: Conan
+  linux:
+    name: Linux
     runs-on: ${{matrix.os}}
     env:
       CC: gcc-${{ matrix.compiler_version }}
@@ -24,7 +24,7 @@ jobs:
         compiler_libcxx: [libstdc++11]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install compiler
         run: sudo apt-get install -y --no-install-recommends g++-${{ matrix.compiler_version }}
       - name: Install Conan
@@ -48,8 +48,8 @@ jobs:
         run: conan upload --confirm --remote osp 'proxyfmu*'
 
 
-  conan-on-windows:
-    name: Conan
+  windows:
+    name: Windows
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
@@ -58,7 +58,7 @@ jobs:
         build_type: [Debug, Release]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
       - name: Configure Conan
