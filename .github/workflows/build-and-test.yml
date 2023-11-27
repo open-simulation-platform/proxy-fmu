@@ -6,11 +6,16 @@ jobs:
   linux:
     name: Linux
     runs-on: ${{ matrix.os }}
+    env:
+      CC: gcc-${{ matrix.compiler_version }}
+      CXX: g++-${{ matrix.compiler_version }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-latest]
         build_type: [Debug, Release]
+        compiler_version: [ 9 ]
+        compiler_libcxx: [ libstdc++11 ]
     steps:
       - uses: actions/checkout@v4
       - name: Install Conan
@@ -19,22 +24,21 @@ jobs:
         run: |
           conan profile detect
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Cache conan
-        id: cache-conan
-        uses: actions/cache@v3
-        with:
-          path: $HOME/.conan2
-          key: ${{ matrix.os }}
       - name: Install dependencies
         run: conan install --build=missing --output-folder=build -s build_type=${{ matrix.build_type }} .
       - name: Generate build system
-        run: cmake --preset conan-$(echo ${{ matrix.build_type }} | tr '[:upper:]' '[:lower:]') -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
+        working-directory: build
+        run: >
+          cmake .. 
+          -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DPROXYFMU_BUILD_EXAMPLES=ON
+          -DPROXYFMU_BUILD_TESTS=ON
       - name: Build
-        run: cmake --build --preset conan-$(echo ${{ matrix.build_type }} | tr '[:upper:]' '[:lower:]')
+        working-directory: build
+        run: cmake --build .
       - name: Test
-        run: |
-         cd build/tests
-         ctest --output-on-failure --extra-verbose
+        run: cd build/tests && ctest --output-on-failure --extra-verbose
       - uses: actions/upload-artifact@v3
         if: matrix.build_type == 'Release'
         with:
@@ -57,22 +61,22 @@ jobs:
         run: |
           conan profile detect
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Cache conan
-        id: cache-conan
-        uses: actions/cache@v3
-        with:
-          path: $HOME/.conan2
-          key: ${{ matrix.os }}
       - name: Install dependencies
         run: conan install --build=missing --output-folder=build -s build_type=${{ matrix.build_type }} .
       - name: Generate build system
-        run: cmake --preset conan-default -DPROXYFMU_BUILD_EXAMPLES=ON -DPROXYFMU_BUILD_TESTS=ON
+        working-directory: build
+        shell: bash
+        run: >
+          cmake .. 
+          -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake 
+          -DCMAKE_POLICY_DEFAULT_CMP0091=NEW 
+          -DPROXYFMU_BUILD_EXAMPLES=ON 
+          -DPROXYFMU_BUILD_TESTS=ON
       - name: Build
-        run: cmake --build --preset "conan-${{ matrix.build_type }}".ToLower()
+        working-directory: build
+        run: cmake --build . --config ${{ matrix.build_type }}
       - name: Test
-        run: |
-         cd build/tests
-         ctest -C ${{ matrix.build_type }} --output-on-failure --extra-verbose
+        run: cd build/tests && ctest -C ${{ matrix.build_type }} --output-on-failure --extra-verbose
       - uses: actions/upload-artifact@v3
         if: matrix.build_type == 'Release'
         with:
