@@ -19,12 +19,6 @@ jobs:
         run: |
           conan profile detect
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Cache conan
-        id: cache-conan
-        uses: actions/cache@v3
-        with:
-          path: $HOME/.conan2
-          key: ${{ matrix.os }}
       - name: Install dependencies
         run: conan install --build=missing --output-folder=build -s build_type=${{ matrix.build_type }} .
       - name: Generate build system
@@ -57,12 +51,6 @@ jobs:
         run: |
           conan profile detect
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Cache conan
-        id: cache-conan
-        uses: actions/cache@v3
-        with:
-          path: $HOME/.conan2
-          key: ${{ matrix.os }}
       - name: Install dependencies
         run: conan install --build=missing --output-folder=build -s build_type=${{ matrix.build_type }} .
       - name: Generate build system
