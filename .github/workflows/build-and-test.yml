@@ -34,16 +34,19 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DPROXYFMU_BUILD_EXAMPLES=ON
           -DPROXYFMU_BUILD_TESTS=ON
+          -DCMAKE_INSTALL_PREFIX=install
       - name: Build
         working-directory: build
-        run: cmake --build .
+        run: cmake --build . --target install
       - name: Test
         run: cd build/tests && ctest --output-on-failure --extra-verbose
       - uses: actions/upload-artifact@v3
         if: matrix.build_type == 'Release'
         with:
-          name: proxyfmu
-          path: build/bin/proxyfmu*
+          name: proxyfmu-linux64-${{ matrix.build_type }}
+          path: |
+            build/install/bin
+            build/install/lib
 
   windows:
     name: Windows
@@ -72,13 +75,14 @@ jobs:
           -DCMAKE_POLICY_DEFAULT_CMP0091=NEW 
           -DPROXYFMU_BUILD_EXAMPLES=ON 
           -DPROXYFMU_BUILD_TESTS=ON
+          -DCMAKE_INSTALL_PREFIX=install
       - name: Build
         working-directory: build
-        run: cmake --build . --config ${{ matrix.build_type }}
+        run: cmake --build . --config ${{ matrix.build_type }} --target install
       - name: Test
         run: cd build/tests && ctest -C ${{ matrix.build_type }} --output-on-failure --extra-verbose
       - uses: actions/upload-artifact@v3
         if: matrix.build_type == 'Release'
         with:
-          name: proxyfmu
-          path: build/bin/proxyfmu*
+          name: proxyfmu-win64-${{ matrix.build_type }}
+          path: build/install/bin
