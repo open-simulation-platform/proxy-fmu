@@ -1,0 +1,84 @@
+name: Build and test
+
+on: [push, workflow_dispatch]
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ${{ matrix.os }}
+    env:
+      CC: gcc-${{ matrix.compiler_version }}
+      CXX: g++-${{ matrix.compiler_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [Debug, Release]
+        compiler_version: [ 9 ]
+        compiler_libcxx: [ libstdc++11 ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
+      - name: Configure Conan
+        run: |
+          conan profile detect
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+      - name: Install dependencies
+        run: conan install --build=missing --output-folder=build -s build_type=${{ matrix.build_type }} .
+      - name: Generate build system
+        working-directory: build
+        run: >
+          cmake .. 
+          -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DPROXYFMU_BUILD_EXAMPLES=ON
+          -DPROXYFMU_BUILD_TESTS=ON
+      - name: Build
+        working-directory: build
+        run: cmake --build .
+      - name: Test
+        run: cd build/tests && ctest --output-on-failure --extra-verbose
+      - uses: actions/upload-artifact@v3
+        if: matrix.build_type == 'Release'
+        with:
+          name: proxyfmu
+          path: build/bin/proxyfmu*
+
+  windows:
+    name: Windows
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019]
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
+      - name: Configure Conan
+        run: |
+          conan profile detect
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+      - name: Install dependencies
+        run: conan install --build=missing --output-folder=build -s build_type=${{ matrix.build_type }} .
+      - name: Generate build system
+        working-directory: build
+        shell: bash
+        run: >
+          cmake .. 
+          -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake 
+          -DCMAKE_POLICY_DEFAULT_CMP0091=NEW 
+          -DPROXYFMU_BUILD_EXAMPLES=ON 
+          -DPROXYFMU_BUILD_TESTS=ON
+      - name: Build
+        working-directory: build
+        run: cmake --build . --config ${{ matrix.build_type }}
+      - name: Test
+        run: cd build/tests && ctest -C ${{ matrix.build_type }} --output-on-failure --extra-verbose
+      - uses: actions/upload-artifact@v3
+        if: matrix.build_type == 'Release'
+        with:
+          name: proxyfmu
+          path: build/bin/proxyfmu*

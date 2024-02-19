@@ -1,4 +1,4 @@
-name: Upload conan recipe
+name: Upload Conan packages
 
 env:
   CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
@@ -9,8 +9,8 @@ env:
 on: [push, workflow_dispatch]
 
 jobs:
-  conan-on-linux:
-    name: Conan
+  linux:
+    name: Linux
     runs-on: ${{matrix.os}}
     env:
       CC: gcc-${{ matrix.compiler_version }}
@@ -18,20 +18,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
         build_type: [Debug, Release]
         compiler_version: [9]
         compiler_libcxx: [libstdc++11]
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Install prerequisites
-        run: |
-          sudo apt-get install -y --no-install-recommends g++-8
-          sudo pip3 install --upgrade setuptools pip
-          sudo pip3 install conan
+      - uses: actions/checkout@v4
+      - name: Install compiler
+        run: sudo apt-get install -y --no-install-recommends g++-${{ matrix.compiler_version }}
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
       - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+        run: |
+          conan profile detect
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Conan create
         run: |
           REFNAME="${GITHUB_REF#refs/*/}"
@@ -42,28 +43,36 @@ jobs:
             SHORT_REFNAME="${REFNAME:0:40}"
             CHANNEL="testing-${SHORT_REFNAME//\//_}"
           fi
-          conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} -b missing . osp/${CHANNEL}
+          conan create \
+            -s build_type=${{ matrix.build_type }} \
+            -s compiler.version=${{ matrix.compiler_version }} \
+            -s compiler.libcxx=${{ matrix.compiler_libcxx }} \
+            -b missing \
+            --user=osp \
+            --channel=${CHANNEL} \
+            .
       - name: Conan upload
-        run: conan upload --all --confirm --remote osp 'proxyfmu*'
+        run: conan upload --confirm --remote osp '*'
 
 
-  conan-on-windows:
-    name: Conan
+  windows:
+    name: Windows
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
         os: [windows-2019]
         build_type: [Debug, Release]
+    timeout-minutes: 120
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Install prerequisites
-        run: |
-          pip3 install --upgrade setuptools pip
-          pip3 install conan
+      - uses: actions/checkout@v4
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
       - name: Configure Conan
-        run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+        run:  |
+          conan profile detect 
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Conan create
         shell: bash
         run: |
@@ -75,6 +84,11 @@ jobs:
             SHORT_REFNAME="${REFNAME:0:40}"
             CHANNEL="testing-${SHORT_REFNAME//\//_}"
           fi
-          conan create -s build_type=${{ matrix.build_type }} -b missing . osp/${CHANNEL}
+          conan create \
+            -s build_type=${{ matrix.build_type }} \
+            -b missing \
+            --user=osp \
+            --channel=${CHANNEL} \
+            .
       - name: Conan upload
-        run: conan upload --all --confirm --remote osp 'proxyfmu*'
+        run: conan upload --confirm --remote osp '*'

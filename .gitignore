@@ -4,3 +4,5 @@
 thrift.*
 
 cmake-build-*
+
+CMakeUserPresets.json

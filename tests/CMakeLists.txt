@@ -11,3 +11,11 @@ target_link_libraries(test_controlled_temp PRIVATE proxyfmu-client)
 
 add_executable(test_mass-spring-damper test_mass-spring-damper.cpp)
 add_test(NAME test_mass-spring-damper COMMAND test_mass-spring-damper)
+
+set_tests_properties(
+        test_identity
+        test_controlled_temp
+        test_mass-spring-damper
+        PROPERTIES
+            ENVIRONMENT "PATH=$<SHELL_PATH:$<TARGET_FILE_DIR:proxyfmu-client>\;>$ENV{PATH}"
+)

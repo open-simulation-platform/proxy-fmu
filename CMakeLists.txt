@@ -26,8 +26,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 set(generatedSourcesDir "${CMAKE_BINARY_DIR}/generated")
 
-set(Boost_USE_STATIC_LIBS ON)
-
 if (MSVC)
     add_definitions("-D_WIN32_WINNT=0x600" "-D_CRT_SECURE_NO_WARNINGS")
     add_compile_options("/wd4996" "/wd4251" "/wd4244" "/wd4267")
@@ -57,27 +55,6 @@ set(PROXYFMU_EXPORT_TARGET "${PROJECT_NAME}-targets")
 # Dependencies
 # ==============================================================================
 
-if (CONAN_EXPORTED) # in conan local cache
-    # standard conan installation, deps will be defined in conanfile.py
-    # and not necessary to call conan again, conan is already running
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup()
-else ()
-
-    include(cmake/conan.cmake)
-    conan_check(REQUIRED)
-
-    conan_cmake_autodetect(settings)
-
-    conan_add_remote(NAME osp URL https://osp.jfrog.io/artifactory/api/conan/conan-local)
-    conan_cmake_run(
-            CONANFILE conanfile.py
-            BUILD missing
-            SETTINGS ${settings}
-            BASIC_SETUP)
-
-endif ()
-
 set(BOOST_COMPONENTS filesystem)
 if (PROXYFMU_BUILD_TESTS)
     Include(FetchContent)
@@ -93,8 +70,8 @@ endif ()
 
 find_package(Boost 1.71 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 find_package(CLI11 REQUIRED)
-find_package(THRIFT REQUIRED)
-find_package(FMILIB REQUIRED)
+find_package(Thrift REQUIRED)
+find_package(FMILIB MODULE REQUIRED)
 
 
 # ==============================================================================
@@ -147,9 +124,7 @@ install(FILES "${versionFile}" DESTINATION "${PROXYFMU_CMAKE_INSTALL_DIR}")
 
 # Install custom find modules
 install(FILES
-        "${CMAKE_SOURCE_DIR}/cmake/FindCLI11.cmake"
         "${CMAKE_SOURCE_DIR}/cmake/FindFMILIB.cmake"
-        "${CMAKE_SOURCE_DIR}/cmake/FindTHRIFT.cmake"
         DESTINATION
         "${PROXYFMU_CMAKE_INSTALL_DIR}"
         )

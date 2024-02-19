@@ -121,7 +121,7 @@ target_include_directories(proxyfmu-client
 target_link_libraries(proxyfmu-client
         PUBLIC
         fmilibwrapper
-        PRIVATE
+        #PRIVATE # Temporarily disabled due to https://github.com/conan-io/conan/issues/13302
         thrift::thrift
         Boost::filesystem
         )
