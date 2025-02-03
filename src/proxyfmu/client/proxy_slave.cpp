@@ -230,4 +230,34 @@ proxy_slave::~proxy_slave()
     proxy_slave::freeInstance();
 }
 
+state_index proxy_slave::save_state()
+{
+    return client_->save_state();
+}
+
+void proxy_slave::save_state(state_index stateIndex)
+{
+    client_->save_state_by_index(stateIndex);
+}
+
+void proxy_slave::restore_state(state_index stateIndex)
+{
+    client_->restore_state(stateIndex);
+}
+
+void proxy_slave::release_state(state_index stateIndex)
+{
+    client_->release_state(stateIndex);
+}
+
+void proxy_slave::export_state(state_index stateIndex, proxyfmu::thrift::ExportedState& es) const
+{
+    client_->export_state(es, stateIndex);
+}
+
+state_index proxy_slave::import_state(const proxyfmu::thrift::ExportedState& exportedState)
+{
+    return client_->import_state(exportedState);
+}
+
 } // namespace proxyfmu::client

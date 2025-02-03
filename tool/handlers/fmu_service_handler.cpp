@@ -122,3 +122,34 @@ void fmu_service_handler::freeInstance()
     std::cout << " done.." << std::endl;
     std::cout << "[proxyfmu] freed";
 }
+
+StateIndex fmu_service_handler::save_state()
+{
+    auto status = slave_->save_state();
+    return status;
+}
+
+void fmu_service_handler::save_state_by_index(StateIndex idx)
+{
+    slave_->save_state(idx);
+}
+
+void fmu_service_handler::restore_state(const ::proxyfmu::thrift::StateIndex idx)
+{
+    slave_->restore_state(idx);
+}
+
+void fmu_service_handler::release_state(const ::proxyfmu::thrift::StateIndex idx)
+{
+    slave_->release_state(idx);
+}
+
+void fmu_service_handler::export_state(ExportedState& _return, const ::proxyfmu::thrift::StateIndex idx)
+{
+    slave_->export_state(idx, _return);
+}
+
+StateIndex fmu_service_handler::import_state(const ExportedState& esin)
+{
+    return slave_->import_state(esin);
+}

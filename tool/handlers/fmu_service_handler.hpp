@@ -44,6 +44,13 @@ public:
     thrift::Status::type write_real(const thrift::ValueReferences& vr, const thrift::RealArray& value) override;
     thrift::Status::type write_string(const thrift::ValueReferences& vr, const thrift::StringArray& value) override;
     thrift::Status::type write_boolean(const thrift::ValueReferences& vr, const thrift::BooleanArray& value) override;
+
+    thrift::StateIndex save_state() override;
+    void save_state_by_index(thrift::StateIndex) override;
+    void restore_state(const ::proxyfmu::thrift::StateIndex state_index) override;
+    void release_state(const ::proxyfmu::thrift::StateIndex state_index) override;
+    void export_state(thrift::ExportedState& _return, const ::proxyfmu::thrift::StateIndex state_index) override;
+    thrift::StateIndex import_state(const thrift::ExportedState& exported_state) override;
 };
 
 } // namespace proxyfmu::server

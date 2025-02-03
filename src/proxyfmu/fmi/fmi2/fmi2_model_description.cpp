@@ -74,6 +74,9 @@ model_description create_model_description(fmi2_import_t* handle)
     md.defaultExperiment.stepSize = fmi2_import_get_default_experiment_step(handle);
     md.defaultExperiment.tolerance = fmi2_import_get_default_experiment_tolerance(handle);
 
+    md.canGetAndSetFMUstate = !!fmi2_import_get_capability(handle, fmi2_cs_canGetAndSetFMUstate);
+    md.canSerializeFMUstate = !!fmi2_import_get_capability(handle, fmi2_cs_canSerializeFMUstate);
+
     const auto varList = fmi2_import_get_variable_list(handle, 0);
     const auto varCount = fmi2_import_get_variable_list_size(varList);
     for (auto i = 0; i < varCount; i++) {

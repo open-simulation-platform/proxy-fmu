@@ -27,7 +27,7 @@ class ProxyFmuConan(ConanFile):
 
     generators = "CMakeDeps", "CMakeToolchain"
     exports = "version.txt"
-    exports_sources = "*"
+    exports_sources = "*", "!cmake-build*", "!.venv", "!.git"
 
     def requirements(self):
         self.tool_requires("cmake/[>=3.15]")
@@ -35,7 +35,7 @@ class ProxyFmuConan(ConanFile):
         self.requires("boost/[~1.81]") # This version is required by Thrift
         self.requires("cli11/[~2.3]")
         self.requires("fmilibrary/[~2.3]")
-        self.requires("thrift/[~0.13]")
+        self.requires("thrift/[~0.13]", transitive_headers=True)
         self.requires("zlib/1.2.13", override=True) # Also required by Thrift
 
     def config_options(self):

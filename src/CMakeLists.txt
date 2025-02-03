@@ -72,8 +72,9 @@ target_include_directories(fmilibwrapper
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${generatedSourcesDir}"
         )
-target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB)
+target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB thrift::thrift)
 if (UNIX)
     target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
 endif ()
@@ -143,6 +144,8 @@ install(
         ${PROXYFMU_INSTALL_DESTINATIONS}
 )
 install(
-        DIRECTORY "${publicHeaderDir}/proxyfmu"
+        DIRECTORY
+            "${publicHeaderDir}/proxyfmu"
+            "${generatedSourcesDir}/proxyfmu"
         DESTINATION "${PROXYFMU_HEADER_INSTALL_DIR}"
 )

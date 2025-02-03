@@ -8,6 +8,7 @@
 #include <fmilib.h>
 #include <proxyfmu/fmi/slave.hpp>
 #include <proxyfmu/temp_dir.hpp>
+#include <proxyfmu/thrift/defs_types.h>
 
 #include <memory>
 
@@ -51,6 +52,13 @@ public:
     bool set_real(const std::vector<value_ref>& vr, const std::vector<double>& values) override;
     bool set_string(const std::vector<value_ref>& vr, const std::vector<std::string>& values) override;
     bool set_boolean(const std::vector<value_ref>& vr, const std::vector<bool>& values) override;
+
+    state_index save_state() override;
+    void save_state(state_index stateIndex) override;
+    void restore_state(state_index stateIndex) override;
+    void release_state(state_index stateIndex) override;
+    void export_state(state_index stateIndex, proxyfmu::thrift::ExportedState& es) const override;
+    state_index import_state(const proxyfmu::thrift::ExportedState& exportedState) override;
 
     ~fmi1_slave() override;
 };
