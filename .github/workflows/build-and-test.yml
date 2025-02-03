@@ -18,6 +18,8 @@ jobs:
         compiler_libcxx: [ libstdc++11 ]
     steps:
       - uses: actions/checkout@v4
+      - name: Install compiler
+        run: sudo apt-get install -y --no-install-recommends g++-${{ matrix.compiler_version }}
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
       - name: Configure Conan
