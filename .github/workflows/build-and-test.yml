@@ -40,7 +40,7 @@ jobs:
         run: cmake --build . --target install
       - name: Test
         run: cd build/tests && ctest --output-on-failure --extra-verbose
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: matrix.build_type == 'Release'
         with:
           name: proxyfmu-linux64-${{ matrix.build_type }}
@@ -81,7 +81,7 @@ jobs:
         run: cmake --build . --config ${{ matrix.build_type }} --target install
       - name: Test
         run: cd build/tests && ctest -C ${{ matrix.build_type }} --output-on-failure --extra-verbose
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: matrix.build_type == 'Release'
         with:
           name: proxyfmu-win64-${{ matrix.build_type }}
