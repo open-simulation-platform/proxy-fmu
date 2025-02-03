@@ -70,9 +70,9 @@ set_target_properties(fmilibwrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(fmilibwrapper
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+        "$<BUILD_INTERFACE:${generatedSourcesDir}>"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
-        "${generatedSourcesDir}"
         )
 target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB thrift::thrift)
 if (UNIX)
