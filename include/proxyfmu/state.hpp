@@ -14,9 +14,9 @@ using fmi2_FMU_state_t = void*;
 
 struct saved_state
 {
-    fmi2_FMU_state_t fmuState;
-    bool setupComplete;
-    bool simStarted;
+    fmi2_FMU_state_t fmuState = nullptr;
+    bool setupComplete = false;
+    bool simStarted = false;
 };
 
 // struct exported_state
