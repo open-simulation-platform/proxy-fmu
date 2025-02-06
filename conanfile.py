@@ -32,10 +32,10 @@ class ProxyFmuConan(ConanFile):
     def requirements(self):
         self.tool_requires("cmake/[>=3.15]")
         self.tool_requires("thrift/[~0.13]")
-        self.requires("boost/[~1.83]") # This version is required by Thrift
+        self.requires("boost/[~1.85]", transitive_headers=True, transitive_libs=True) # This version is required by Thrift
         self.requires("cli11/[~2.3]")
         self.requires("fmilibrary/[~2.3]")
-        self.requires("thrift/[~0.13]", transitive_headers=True)
+        self.requires("thrift/[~0.20]", transitive_headers=True)
         self.requires("zlib/1.2.13", override=True) # Also required by Thrift
 
     def config_options(self):
