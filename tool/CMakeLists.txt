@@ -13,9 +13,10 @@ target_include_directories(proxyfmu
 target_link_libraries(proxyfmu
         PUBLIC
         CLI11::CLI11
+        Boost::system
+        Boost::filesystem
         fmilibwrapper
         thrift::thrift
-        Boost::filesystem
         )
 if (UNIX)
   target_link_libraries(proxyfmu PRIVATE pthread)
