@@ -50,6 +50,7 @@ jobs:
             -b missing \
             --user=osp \
             --channel=${CHANNEL} \
+            --update \
             .
       - name: Conan upload
         run: conan upload --confirm --remote osp '*'
@@ -89,6 +90,7 @@ jobs:
             -b missing \
             --user=osp \
             --channel=${CHANNEL} \
+            --update \
             .
       - name: Conan upload
         run: conan upload --confirm --remote osp '*'
