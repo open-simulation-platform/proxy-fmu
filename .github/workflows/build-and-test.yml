@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04] # Due to link issue with boost 1.81
         build_type: [Debug, Release]
         compiler_version: [ 9 ]
         compiler_libcxx: [ libstdc++11 ]

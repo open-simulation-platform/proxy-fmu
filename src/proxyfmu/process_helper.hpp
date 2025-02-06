@@ -55,7 +55,7 @@ void start_process(
 
     std::cout << "[proxyfmu] Found proxyfmu executable: " << executable << " version: ";
     std::cout.flush();
-    (void)system((execStr + " -v").c_str());
+    system((execStr + " -v").c_str());
     std::cout << "\n";
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
