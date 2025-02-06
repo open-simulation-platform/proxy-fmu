@@ -48,9 +48,9 @@ jobs:
             -s compiler.version=${{ matrix.compiler_version }} \
             -s compiler.libcxx=${{ matrix.compiler_libcxx }} \
             -b missing \
+            --update \
             --user=osp \
             --channel=${CHANNEL} \
-            --update \
             .
       - name: Conan upload
         run: conan upload --confirm --remote osp '*'
@@ -88,9 +88,9 @@ jobs:
           conan create \
             -s build_type=${{ matrix.build_type }} \
             -b missing \
+            --update \
             --user=osp \
             --channel=${CHANNEL} \
-            --update \
             .
       - name: Conan upload
         run: conan upload --confirm --remote osp '*'
