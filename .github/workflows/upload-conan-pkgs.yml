@@ -12,7 +12,7 @@ jobs:
   linux:
     name: Linux
     runs-on: ${{matrix.os}}
-    env:
+#    env:
 #      CC: gcc-${{ matrix.compiler_version }}
 #      CXX: g++-${{ matrix.compiler_version }}
     strategy:
