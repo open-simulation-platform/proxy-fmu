@@ -12,9 +12,9 @@ jobs:
   linux:
     name: Linux
     runs-on: ${{matrix.os}}
-#    env:
-#      CC: gcc-${{ matrix.compiler_version }}
-#      CXX: g++-${{ matrix.compiler_version }}
+    env:
+      CC: gcc-${{ matrix.compiler_version }}
+      CXX: g++-${{ matrix.compiler_version }}
     strategy:
       fail-fast: false
       matrix:
@@ -25,16 +25,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install compiler
-        run: sudo apt-get install -y --no-install-recommends g++-${{ matrix.compiler_version }}
-      - name: Install Conan
-        uses: turtlebrowser/get-conan@main
-      - name: Configure Conan
+      - name: Generate Dockerfile
         run: |
-          conan profile detect
+          mkdir /tmp/osp-builder-docker
+          cat <<'EOF' >/tmp/proxyfmu-builder-docker/Dockerfile
+          FROM conanio/gcc${{ matrix.compiler_version }}-ubuntu16.04
+          COPY entrypoint.sh /
+          ENTRYPOINT /entrypoint.sh
+          EOF
+      - name: Generate entrypoint.sh
+        run: |
+          cat <<'EOF' >/tmp/proxyfmu-builder-docker/entrypoint.sh
+          #!/bin/bash -v
+          set -eu
+          cd /mnt/source
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Conan create
-        run: |
           REFNAME="${GITHUB_REF#refs/*/}"
           VERSION="v$(<version.txt)"
           if [[ $GITHUB_REF == refs/tags/* ]] && [[ $REFNAME == $VERSION ]]; then CHANNEL="stable"
@@ -52,8 +57,14 @@ jobs:
             --user=osp \
             --channel=${CHANNEL} \
             .
-      - name: Conan upload
-        run: conan upload --confirm --remote osp '*'
+          conan upload --confirm --remote=osp '*'
+          EOF
+          chmod 0755 /tmp/proxyfmu-builder-docker/entrypoint.sh
+      - name: Build Docker image
+        run:  docker build -t proxyfmu-builder /tmp/proxyfmu-builder-docker/
+      - name: Build cosim
+        run: |
+          docker run --rm --env GITHUB_REF="$GITHUB_REF" -v $(pwd):/mnt/source:ro proxyfmu-builder
 
 
   windows:
