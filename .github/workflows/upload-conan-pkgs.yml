@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Generate Dockerfile
         run: |
-          mkdir /tmp/osp-builder-docker
+          mkdir /tmp/proxyfmu-builder-docker
           cat <<'EOF' >/tmp/proxyfmu-builder-docker/Dockerfile
           FROM conanio/gcc${{ matrix.compiler_version }}-ubuntu16.04
           COPY entrypoint.sh /
