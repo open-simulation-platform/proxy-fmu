@@ -84,7 +84,7 @@ bool fmi2_slave::enter_initialization_mode()
 
 bool fmi2_slave::exit_initialization_mode()
 {
-    assert(setupComlete_);
+    assert(setupComplete_);
     assert(!simStarted_);
     auto status = fmi2_import_exit_initialization_mode(handle_);
     auto is_okay = status == fmi2_status_ok;
