@@ -27,7 +27,8 @@ class ProxyFmuConan(ConanFile):
 
     generators = "CMakeDeps", "CMakeToolchain"
     exports = "version.txt"
-    exports_sources = "*", "!cmake-build*", "!.venv", "!.git"
+    exports_sources = ("cmake/*", "data/*", "examples/*", "include/*", "src/*", "tests/*", "tool/*",
+                       "conanfile.py", "CMakeLists.txt", "LICENSE", "README.md", "version.txt")
 
     def requirements(self):
         self.tool_requires("cmake/[>=3.15]")

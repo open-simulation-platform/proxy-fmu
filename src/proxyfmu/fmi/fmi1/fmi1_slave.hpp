@@ -8,7 +8,6 @@
 #include <fmilib.h>
 #include <proxyfmu/fmi/slave.hpp>
 #include <proxyfmu/temp_dir.hpp>
-#include <proxyfmu/thrift/defs_types.h>
 
 #include <memory>
 

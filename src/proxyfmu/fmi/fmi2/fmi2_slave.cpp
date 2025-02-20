@@ -63,6 +63,7 @@ const model_description& fmi2_slave::get_model_description() const
 
 bool fmi2_slave::setup_experiment(double start_time, double stop_time, double tolerance)
 {
+    assert(!setupComplete_);
     fmi2_boolean_t stop_defined = (stop_time > 0) ? fmi2_true : fmi2_false;
     fmi2_boolean_t tolerance_defined = (tolerance > 0) ? fmi2_true : fmi2_false;
     auto status = fmi2_import_setup_experiment(handle_, tolerance_defined, tolerance, start_time, stop_defined, stop_time);
@@ -72,24 +73,41 @@ bool fmi2_slave::setup_experiment(double start_time, double stop_time, double to
 bool fmi2_slave::enter_initialization_mode()
 {
     auto status = fmi2_import_enter_initialization_mode(handle_);
-    return status == fmi2_status_ok;
+    auto is_okay = status == fmi2_status_ok;
+
+    if (is_okay) {
+        setupComplete_ = true;
+    }
+
+    return is_okay;
 }
 
 bool fmi2_slave::exit_initialization_mode()
 {
+    assert(setupComlete_);
+    assert(!simStarted_);
     auto status = fmi2_import_exit_initialization_mode(handle_);
-    return status == fmi2_status_ok;
+    auto is_okay = status == fmi2_status_ok;
+
+    if (is_okay) {
+        simStarted_ = true;
+    }
+
+    return is_okay;
 }
 
 bool fmi2_slave::step(double current_time, double step_size)
 {
+    assert(simStarted_);
     auto status = fmi2_import_do_step(handle_, current_time, step_size, fmi2_true);
     return status == fmi2_status_ok;
 }
 
 bool fmi2_slave::terminate()
 {
+    assert(simStarted_);
     auto status = fmi2_import_terminate(handle_);
+    simStarted_ = false;
     return status == fmi2_status_ok;
 }
 
