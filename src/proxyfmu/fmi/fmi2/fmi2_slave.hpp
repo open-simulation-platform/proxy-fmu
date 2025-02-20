@@ -23,7 +23,7 @@ private:
     const model_description md_;
     std::shared_ptr<fmicontext> ctx_;
     std::shared_ptr<temp_dir> tmpDir_;
-    const std::string& instanceName_;
+    const std::string instanceName_;
 
     bool freed = false;
     bool setupComplete_{};
