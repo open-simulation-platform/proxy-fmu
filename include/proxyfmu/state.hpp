@@ -19,15 +19,6 @@ struct saved_state
     bool simStarted = false;
 };
 
-// struct exported_state
-// {
-//     std::int32_t schemeVersion;
-//     std::string uuid;
-//     std::string fmuState;
-//     bool setupComplete;
-//     bool simStarted;
-// };
-
 }
 
 

@@ -25,7 +25,7 @@ service FmuService {
     defs.Status write_string(1: defs.ValueReferences vr, 2: defs.StringArray value) throws (1: defs.NoSuchInstanceException ex1, 2: defs.NoSuchVariableException ex2)
     defs.Status write_boolean(1: defs.ValueReferences vr, 2: defs.BooleanArray value) throws (1: defs.NoSuchInstanceException ex1, 2: defs.NoSuchVariableException ex2)
 
-    defs.StateIndex save_state() throws (1: defs.NoSuchInstanceException ex1, 2: defs.NoSuchVariableException ex2)
+    defs.StateIndex save_state() throws (1: defs.UnsupportedOperationException ex1, 2: defs.NoSuchVariableException ex2)
     void save_state_by_index(1: defs.StateIndex state_index) throws (1: defs.NoSuchInstanceException ex1, 2: defs.NoSuchVariableException ex2)
     void restore_state(1: defs.StateIndex state_index) throws (1: defs.NoSuchInstanceException ex1, 2: defs.NoSuchVariableException ex2)
     void release_state(1: defs.StateIndex state_index) throws (1: defs.NoSuchInstanceException ex1, 2: defs.NoSuchVariableException ex2)

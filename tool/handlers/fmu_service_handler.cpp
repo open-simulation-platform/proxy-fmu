@@ -125,8 +125,7 @@ void fmu_service_handler::freeInstance()
 
 StateIndex fmu_service_handler::save_state()
 {
-    auto status = slave_->save_state();
-    return status;
+    return slave_->save_state();
 }
 
 void fmu_service_handler::save_state_by_index(StateIndex idx)
@@ -134,17 +133,17 @@ void fmu_service_handler::save_state_by_index(StateIndex idx)
     slave_->save_state(idx);
 }
 
-void fmu_service_handler::restore_state(const ::proxyfmu::thrift::StateIndex idx)
+void fmu_service_handler::restore_state(const StateIndex idx)
 {
     slave_->restore_state(idx);
 }
 
-void fmu_service_handler::release_state(const ::proxyfmu::thrift::StateIndex idx)
+void fmu_service_handler::release_state(const StateIndex idx)
 {
     slave_->release_state(idx);
 }
 
-void fmu_service_handler::export_state(ExportedState& _return, const ::proxyfmu::thrift::StateIndex idx)
+void fmu_service_handler::export_state(ExportedState& _return, const StateIndex idx)
 {
     slave_->export_state(idx, _return);
 }
