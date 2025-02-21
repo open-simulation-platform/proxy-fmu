@@ -4,7 +4,6 @@
 
 #include <proxyfmu/fmi/model_description.hpp>
 #include <proxyfmu/state.hpp>
-#include <proxyfmu/thrift/defs_types.h>
 
 #include <memory>
 #include <vector>
@@ -47,8 +46,8 @@ public:
     virtual void save_state(state_index stateIndex) = 0;
     virtual void restore_state(state_index stateIndex) = 0;
     virtual void release_state(state_index stateIndex) = 0;
-    virtual void export_state(state_index stateIndex, proxyfmu::thrift::ExportedState& exportedState) const = 0;
-    virtual state_index import_state(const proxyfmu::thrift::ExportedState& exportedState) = 0;
+    virtual void export_state(state_index stateIndex, state::exported_state& exportedState) const = 0;
+    virtual state_index import_state(const state::exported_state& exportedState) = 0;
 
     virtual ~slave() = default;
 };

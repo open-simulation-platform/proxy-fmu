@@ -145,10 +145,26 @@ void fmu_service_handler::release_state(const StateIndex idx)
 
 void fmu_service_handler::export_state(ExportedState& _return, const StateIndex idx)
 {
-    slave_->export_state(idx, _return);
+    proxyfmu::state::exported_state es;
+
+    slave_->export_state(idx, es);
+
+    _return.schemeVersion = es.schemeVersion;
+    _return.fmuState = es.fmuState;
+    _return.setupComplete = es.setupComplete;
+    _return.simStarted = es.simStarted;
+    _return.uuid = es.uuid;
 }
 
 StateIndex fmu_service_handler::import_state(const ExportedState& esin)
 {
-    return slave_->import_state(esin);
+    proxyfmu::state::exported_state es;
+
+    es.schemeVersion = esin.schemeVersion;
+    es.fmuState = esin.fmuState;
+    es.setupComplete = esin.setupComplete;
+    es.simStarted = esin.simStarted;
+    es.uuid = esin.uuid;
+
+    return slave_->import_state(es);
 }

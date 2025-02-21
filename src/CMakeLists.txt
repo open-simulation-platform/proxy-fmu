@@ -70,11 +70,10 @@ set_target_properties(fmilibwrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(fmilibwrapper
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-        "$<BUILD_INTERFACE:${generatedSourcesDir}>"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
-target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB PUBLIC thrift::thrift)
+target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB)
 if (UNIX)
     target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
 endif ()
@@ -117,11 +116,13 @@ target_include_directories(proxyfmu-client
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${generatedSourcesDir}"
         )
 target_link_libraries(proxyfmu-client
         PUBLIC
         fmilibwrapper
         #PRIVATE # Temporarily disabled due to https://github.com/conan-io/conan/issues/13302
+        thrift::thrift
         Boost::filesystem
         )
 if (UNIX)
@@ -142,8 +143,6 @@ install(
         ${PROXYFMU_INSTALL_DESTINATIONS}
 )
 install(
-        DIRECTORY
-            "${publicHeaderDir}/proxyfmu"
-            "${generatedSourcesDir}/proxyfmu"
+        DIRECTORY "${publicHeaderDir}/proxyfmu"
         DESTINATION "${PROXYFMU_HEADER_INSTALL_DIR}"
 )

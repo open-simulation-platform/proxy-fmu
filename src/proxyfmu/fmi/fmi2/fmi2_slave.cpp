@@ -3,6 +3,7 @@
 
 #include <fmilib.h>
 
+#include <cassert>
 #include <exception>
 #include <memory>
 
@@ -251,7 +252,7 @@ void fmi2_slave::release_state(state_index state)
 
 }
 
-void fmi2_slave::export_state(state_index stateIndex, proxyfmu::thrift::ExportedState& es) const
+void fmi2_slave::export_state(state_index stateIndex, state::exported_state& es) const
 {
     const auto& savedState = savedStates_.at(stateIndex);
 
@@ -283,7 +284,7 @@ void fmi2_slave::export_state(state_index stateIndex, proxyfmu::thrift::Exported
     es.simStarted = savedState.simStarted;
 }
 
-state_index fmi2_slave::import_state(const proxyfmu::thrift::ExportedState& exportedState)
+state_index fmi2_slave::import_state(const state::exported_state& exportedState)
 {
     saved_state savedState;
     // First some sanity checks

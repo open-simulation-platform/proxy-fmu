@@ -65,8 +65,8 @@ public:
     void save_state(state_index stateIndex) override;
     void restore_state(state_index stateIndex) override;
     void release_state(state_index stateIndex) override;
-    void export_state(state_index stateIndex, proxyfmu::thrift::ExportedState& es) const override;
-    state_index import_state(const proxyfmu::thrift::ExportedState& exportedState) override;
+    void export_state(state_index stateIndex, state::exported_state& es) const override;
+    state_index import_state(const state::exported_state& exportedState) override;
 
     ~fmi2_slave() override;
 };

@@ -192,12 +192,12 @@ void fmi1_slave::release_state(state_index)
     throw std::runtime_error("State saving API is not supported for FMI 1.0");
 }
 
-void fmi1_slave::export_state(state_index, proxyfmu::thrift::ExportedState&) const
+void fmi1_slave::export_state(state_index, state::exported_state&) const
 {
     throw std::runtime_error("State saving API is not supported for FMI 1.0");
 }
 
-state_index fmi1_slave::import_state(const proxyfmu::thrift::ExportedState&)
+state_index fmi1_slave::import_state(const state::exported_state&)
 {
     throw std::runtime_error("State saving API is not supported for FMI 1.0");
 }

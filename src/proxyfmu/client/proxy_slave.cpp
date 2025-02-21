@@ -250,14 +250,28 @@ void proxy_slave::release_state(state_index stateIndex)
     client_->release_state(stateIndex);
 }
 
-void proxy_slave::export_state(state_index stateIndex, proxyfmu::thrift::ExportedState& es) const
+void proxy_slave::export_state(state_index stateIndex, state::exported_state& es) const
 {
-    client_->export_state(es, stateIndex);
+    ExportedState es_;
+    es_.simStarted = es.simStarted;
+    es_.setupComplete = es.setupComplete;
+    es_.fmuState = es.fmuState;
+    es_.schemeVersion = es.schemeVersion;
+    es_.uuid = es.uuid;
+
+    client_->export_state(es_, stateIndex);
 }
 
-state_index proxy_slave::import_state(const proxyfmu::thrift::ExportedState& exportedState)
+state_index proxy_slave::import_state(const state::exported_state& exportedState)
 {
-    return client_->import_state(exportedState);
+    ExportedState es_;
+    es_.simStarted = exportedState.simStarted;
+    es_.setupComplete = exportedState.setupComplete;
+    es_.fmuState = exportedState.fmuState;
+    es_.schemeVersion = exportedState.schemeVersion;
+    es_.uuid = exportedState.uuid;
+
+    return client_->import_state(es_);
 }
 
 } // namespace proxyfmu::client
