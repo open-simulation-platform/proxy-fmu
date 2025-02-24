@@ -3,6 +3,7 @@
 #define PROXY_FMU_SLAVE_HPP
 
 #include <proxyfmu/fmi/model_description.hpp>
+#include <proxyfmu/state.hpp>
 
 #include <memory>
 #include <vector>
@@ -10,6 +11,7 @@
 namespace proxyfmu::fmi
 {
 
+using namespace proxyfmu::state;
 using value_ref = unsigned int;
 
 class slave
@@ -39,6 +41,13 @@ public:
     virtual bool set_real(const std::vector<value_ref>& vr, const std::vector<double>& values) = 0;
     virtual bool set_string(const std::vector<value_ref>& vr, const std::vector<std::string>& values) = 0;
     virtual bool set_boolean(const std::vector<value_ref>& vr, const std::vector<bool>& values) = 0;
+
+    virtual state_index save_state() = 0;
+    virtual void save_state(state_index stateIndex) = 0;
+    virtual void restore_state(state_index stateIndex) = 0;
+    virtual void release_state(state_index stateIndex) = 0;
+    virtual void export_state(state_index stateIndex, state::exported_state& exportedState) const = 0;
+    virtual state_index import_state(const state::exported_state& exportedState) = 0;
 
     virtual ~slave() = default;
 };

@@ -31,6 +31,9 @@ struct model_description
 
     model_variables modelVariables;
     default_experiment defaultExperiment;
+
+    bool canGetAndSetFMUstate;
+    bool canSerializeFMUstate;
 };
 
 } // namespace proxyfmu::fmi

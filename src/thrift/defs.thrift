@@ -11,6 +11,7 @@ typedef list<i32> IntArray
 typedef list<double> RealArray
 typedef list<string> StringArray
 typedef list<bool> BooleanArray
+typedef i32 StateIndex
 
 enum Status {
     OK_STATUS = 0,
@@ -93,6 +94,17 @@ struct ModelDescription {
     8: string generation_date_and_time,
     9: optional DefaultExperiment default_experiment,
     10: ModelVariables model_variables,
+    11: bool can_get_and_set_fmu_state,
+    12: bool can_serialize_fmu_state,
+}
+
+struct ExportedState
+{
+    1: i32 schemeVersion,
+    2: string uuid,
+    3: binary fmuState,
+    4: bool setupComplete,
+    5: bool simStarted,
 }
 
 exception NoSuchFileException {

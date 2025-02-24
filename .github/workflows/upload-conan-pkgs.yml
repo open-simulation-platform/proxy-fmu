@@ -25,16 +25,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install compiler
-        run: sudo apt-get install -y --no-install-recommends g++-${{ matrix.compiler_version }}
-      - name: Install Conan
-        uses: turtlebrowser/get-conan@main
-      - name: Configure Conan
+      - name: Generate Dockerfile
         run: |
-          conan profile detect
+          mkdir /tmp/proxyfmu-builder-docker
+          cat <<'EOF' >/tmp/proxyfmu-builder-docker/Dockerfile
+          FROM conanio/gcc${{ matrix.compiler_version }}-ubuntu16.04
+          ENV CONAN_LOGIN_USERNAME_OSP=${{ secrets.osp_artifactory_usr }}
+          ENV CONAN_PASSWORD_OSP=${{ secrets.osp_artifactory_pwd }}
+          ENV LIBCOSIM_RUN_TESTS_ON_CONAN_BUILD=1
+          COPY entrypoint.sh /
+          ENTRYPOINT /entrypoint.sh
+          EOF
+      - name: Generate entrypoint.sh
+        run: |
+          cat <<'EOF' >/tmp/proxyfmu-builder-docker/entrypoint.sh
+          #!/bin/bash -v
+          set -eu
+          cd /mnt/source
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - name: Conan create
-        run: |
           REFNAME="${GITHUB_REF#refs/*/}"
           VERSION="v$(<version.txt)"
           if [[ $GITHUB_REF == refs/tags/* ]] && [[ $REFNAME == $VERSION ]]; then CHANNEL="stable"
@@ -48,11 +56,18 @@ jobs:
             -s compiler.version=${{ matrix.compiler_version }} \
             -s compiler.libcxx=${{ matrix.compiler_libcxx }} \
             -b missing \
+            --update \
             --user=osp \
             --channel=${CHANNEL} \
             .
-      - name: Conan upload
-        run: conan upload --confirm --remote osp '*'
+          conan upload --confirm --remote=osp '*'
+          EOF
+          chmod 0755 /tmp/proxyfmu-builder-docker/entrypoint.sh
+      - name: Build Docker image
+        run:  docker build -t proxyfmu-builder /tmp/proxyfmu-builder-docker/
+      - name: Build cosim
+        run: |
+          docker run --rm --env GITHUB_REF="$GITHUB_REF" -v $(pwd):/mnt/source:ro proxyfmu-builder
 
 
   windows:
@@ -87,6 +102,7 @@ jobs:
           conan create \
             -s build_type=${{ matrix.build_type }} \
             -b missing \
+            --update \
             --user=osp \
             --channel=${CHANNEL} \
             .

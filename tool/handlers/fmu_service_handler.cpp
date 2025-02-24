@@ -122,3 +122,49 @@ void fmu_service_handler::freeInstance()
     std::cout << " done.." << std::endl;
     std::cout << "[proxyfmu] freed";
 }
+
+StateIndex fmu_service_handler::save_state()
+{
+    return slave_->save_state();
+}
+
+void fmu_service_handler::save_state_by_index(StateIndex idx)
+{
+    slave_->save_state(idx);
+}
+
+void fmu_service_handler::restore_state(const StateIndex idx)
+{
+    slave_->restore_state(idx);
+}
+
+void fmu_service_handler::release_state(const StateIndex idx)
+{
+    slave_->release_state(idx);
+}
+
+void fmu_service_handler::export_state(ExportedState& _return, const StateIndex idx)
+{
+    proxyfmu::state::exported_state es;
+
+    slave_->export_state(idx, es);
+
+    _return.schemeVersion = es.schemeVersion;
+    _return.fmuState = es.fmuState;
+    _return.setupComplete = es.setupComplete;
+    _return.simStarted = es.simStarted;
+    _return.uuid = es.uuid;
+}
+
+StateIndex fmu_service_handler::import_state(const ExportedState& esin)
+{
+    proxyfmu::state::exported_state es;
+
+    es.schemeVersion = esin.schemeVersion;
+    es.fmuState = esin.fmuState;
+    es.setupComplete = esin.setupComplete;
+    es.simStarted = esin.simStarted;
+    es.uuid = esin.uuid;
+
+    return slave_->import_state(es);
+}

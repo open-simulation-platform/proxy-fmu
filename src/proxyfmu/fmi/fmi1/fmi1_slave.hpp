@@ -52,6 +52,13 @@ public:
     bool set_string(const std::vector<value_ref>& vr, const std::vector<std::string>& values) override;
     bool set_boolean(const std::vector<value_ref>& vr, const std::vector<bool>& values) override;
 
+    state_index save_state() override;
+    void save_state(state_index stateIndex) override;
+    void restore_state(state_index stateIndex) override;
+    void release_state(state_index stateIndex) override;
+    void export_state(state_index stateIndex, state::exported_state& es) const override;
+    state_index import_state(const state::exported_state& exportedState) override;
+
     ~fmi1_slave() override;
 };
 

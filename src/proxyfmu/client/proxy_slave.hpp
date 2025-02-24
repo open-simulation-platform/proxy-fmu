@@ -16,6 +16,8 @@ using namespace apache::thrift::transport;
 namespace proxyfmu::client
 {
 
+using namespace proxyfmu::state;
+
 class proxy_slave : public fmi::slave
 {
 
@@ -54,6 +56,13 @@ public:
     bool set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values) override;
     bool set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values) override;
     bool set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values) override;
+
+    state_index save_state() override;
+    void save_state(state_index stateIndex) override;
+    void restore_state(state_index stateIndex) override;
+    void release_state(state_index stateIndex) override;
+    void export_state(state_index stateIndex, state::exported_state& exportedState) const override;
+    state_index import_state(const state::exported_state& exportedState) override;
 
     ~proxy_slave() override;
 };
