@@ -31,7 +31,7 @@ class ProxyFmuConan(ConanFile):
                        "conanfile.py", "CMakeLists.txt", "LICENSE", "README.md", "version.txt")
 
     def requirements(self):
-        self.tool_requires("cmake/[>=3.15]")
+        self.tool_requires("cmake/[>=3.15 <4.0]")
         self.tool_requires("thrift/[~0.20]")
         self.requires("cli11/[~2.3]")
         self.requires("fmilibrary/[~2.3]")
