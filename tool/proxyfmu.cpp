@@ -42,7 +42,6 @@ public:
     }
 };
 
-
 class ProxyFMUFramedTransportFactory : public TTransportFactory
 {
 public:
@@ -52,7 +51,9 @@ public:
 
     std::shared_ptr<TTransport> getTransport(std::shared_ptr<TTransport> trans) override
     {
-        return std::shared_ptr<TTransport>(new TFramedTransport(trans, maxFrameSize_));
+        auto t_config = std::make_shared<TConfiguration>();
+        t_config->setMaxFrameSize(maxFrameSize_);
+        return std::shared_ptr<TTransport>(new TFramedTransport(trans, t_config));
     }
 
 private:
@@ -61,13 +62,14 @@ private:
 
 const int port_range_min = 49152;
 const int port_range_max = 65535;
+const int MAX_FRAME_SIZE = 50 * 1024 * 1024;
+
 
 const int max_port_retries = 10;
 
 const int SUCCESS = 0;
 const int COMMANDLINE_ERROR = 1;
 const int UNHANDLED_ERROR = 2;
-const int MAX_FRAME_SIZE = 50 * 1024 * 1024;
 
 
 void wait_for_input()
