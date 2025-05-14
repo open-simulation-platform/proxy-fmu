@@ -45,6 +45,7 @@ namespace proxyfmu::client
 
 const int max_retries = 600;
 const int retry_interval = 500;
+const int MAX_FRAME_SIZE = 50 * 1024 * 1024;
 
 proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& instanceName, fmi::model_description modelDescription, const std::optional<remote_info>& remote)
     : modelDescription_(std::move(modelDescription))
@@ -62,7 +63,9 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
     } else {
         host = remote->host();
         std::shared_ptr<TTransport> socket(new TSocket(host, remote->port()));
-        auto transport = std::make_shared<TFramedTransport>(socket);
+        auto t_config = std::make_shared<TConfiguration>();
+        t_config->setMaxFrameSize(MAX_FRAME_SIZE);
+        auto transport = std::make_shared<TFramedTransport>(socket, t_config);
         std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
         auto client = std::make_shared<BootServiceClient>(protocol);
 
@@ -94,7 +97,9 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
     }
 
     std::shared_ptr<TTransport> socket(new TSocket(host, port));
-    transport_ = std::make_shared<TFramedTransport>(socket);
+    auto t_config = std::make_shared<TConfiguration>();
+    t_config->setMaxFrameSize(MAX_FRAME_SIZE);
+    transport_ = std::make_shared<TFramedTransport>(socket, t_config);
     std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport_));
     client_ = std::make_shared<FmuServiceClient>(protocol);
     transport_->open();

@@ -42,8 +42,28 @@ public:
     }
 };
 
+class ProxyFMUFramedTransportFactory : public TTransportFactory
+{
+public:
+    explicit ProxyFMUFramedTransportFactory(uint32_t maxFrameSize)
+        : maxFrameSize_(maxFrameSize)
+    { }
+
+    std::shared_ptr<TTransport> getTransport(std::shared_ptr<TTransport> trans) override
+    {
+        auto t_config = std::make_shared<TConfiguration>();
+        t_config->setMaxFrameSize(maxFrameSize_);
+        return std::shared_ptr<TTransport>(new TFramedTransport(trans, t_config));
+    }
+
+private:
+    uint32_t maxFrameSize_;
+};
+
 const int port_range_min = 49152;
 const int port_range_max = 65535;
+const int MAX_FRAME_SIZE = 50 * 1024 * 1024;
+
 
 const int max_port_retries = 10;
 
@@ -68,7 +88,7 @@ int run_booter_application(const int port)
     std::shared_ptr<boot_service_handler> handler(new boot_service_handler());
     std::shared_ptr<TProcessor> processor(new BootServiceProcessor(handler));
 
-    std::shared_ptr<TTransportFactory> transportFactory(new TFramedTransportFactory());
+    std::shared_ptr<TTransportFactory> transportFactory(new ProxyFMUFramedTransportFactory(MAX_FRAME_SIZE));
     std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
     std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
@@ -93,7 +113,7 @@ int run_application(const std::string& fmu, const std::string& instanceName)
     std::shared_ptr<fmu_service_handler> handler(new fmu_service_handler(fmu, instanceName, stop));
     std::shared_ptr<TProcessor> processor(new FmuServiceProcessor(handler));
 
-    std::shared_ptr<TTransportFactory> transportFactory(new TFramedTransportFactory());
+    std::shared_ptr<TTransportFactory> transportFactory(new ProxyFMUFramedTransportFactory(MAX_FRAME_SIZE));
     std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
     proxyfmu::fixed_range_random_generator rng(port_range_min, port_range_max);
