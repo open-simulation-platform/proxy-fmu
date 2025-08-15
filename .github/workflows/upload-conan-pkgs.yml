@@ -29,7 +29,7 @@ jobs:
         run: |
           mkdir /tmp/proxyfmu-builder-docker
           cat <<'EOF' >/tmp/proxyfmu-builder-docker/Dockerfile
-          FROM conanio/gcc${{ matrix.compiler_version }}-ubuntu16.04:2.9.1
+          FROM conanio/gcc${{ matrix.compiler_version }}:2.9.1
           ENV CONAN_LOGIN_USERNAME_OSP=${{ secrets.osp_artifactory_usr }}
           ENV CONAN_PASSWORD_OSP=${{ secrets.osp_artifactory_pwd }}
           ENV LIBCOSIM_RUN_TESTS_ON_CONAN_BUILD=1
