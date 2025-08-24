@@ -29,7 +29,7 @@ jobs:
         run: |
           mkdir /tmp/proxyfmu-builder-docker
           cat <<'EOF' >/tmp/proxyfmu-builder-docker/Dockerfile
-          FROM conanio/gcc${{ matrix.compiler_version }}-ubuntu16.04
+          FROM conanio/gcc${{ matrix.compiler_version }}:2.9.1
           ENV CONAN_LOGIN_USERNAME_OSP=${{ secrets.osp_artifactory_usr }}
           ENV CONAN_PASSWORD_OSP=${{ secrets.osp_artifactory_pwd }}
           ENV LIBCOSIM_RUN_TESTS_ON_CONAN_BUILD=1
@@ -43,6 +43,7 @@ jobs:
           set -eu
           cd /mnt/source
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+          conan profile detect --force
           REFNAME="${GITHUB_REF#refs/*/}"
           VERSION="v$(<version.txt)"
           if [[ $GITHUB_REF == refs/tags/* ]] && [[ $REFNAME == $VERSION ]]; then CHANNEL="stable"
@@ -76,7 +77,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019]
+        os: [windows-2025]
         build_type: [Debug, Release]
     timeout-minutes: 120
 
