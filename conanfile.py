@@ -36,7 +36,7 @@ class ProxyFmuConan(ConanFile):
         self.requires("cli11/[~2.3]")
         self.requires("fmilibrary/[~2.3]")
         self.requires("boost/[~1.85]") # Required by Thrift
-        self.requires("thrift/[~0.20]", transitive_headers=True)
+        self.requires("thrift/[~0.21]", transitive_headers=True)
 
     def config_options(self):
         if self.settings.os == "Windows":
