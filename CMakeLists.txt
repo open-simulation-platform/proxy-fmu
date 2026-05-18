@@ -37,11 +37,7 @@ endif ()
 
 # Prepare for export and installation.
 set(PROXYFMU_HEADER_INSTALL_DIR "include")
-if (WIN32)
-    set(PROXYFMU_CMAKE_INSTALL_DIR "cmake")
-else ()
-    set(PROXYFMU_CMAKE_INSTALL_DIR "share/${PROJECT_NAME}/cmake")
-endif ()
+set(PROXYFMU_CMAKE_INSTALL_DIR "lib/cmake/${PROJECT_NAME}")
 
 set(PROXYFMU_INSTALL_DESTINATIONS
         ARCHIVE DESTINATION "lib"
