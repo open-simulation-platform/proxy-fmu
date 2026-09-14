@@ -7,7 +7,7 @@ jobs:
     name: Linux
     runs-on: ${{ matrix.os }}
     container:
-      image: gcc:14-bookworm
+      image: "gcc:${{ matrix.compiler_version }}-${{ matrix.distro }}"
     env:
       CC: gcc
       CXX: g++
@@ -17,6 +17,9 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         build_type: [Debug, Release]
+        include:
+          - compiler_version: 14
+            distro: bookworm
     steps:
       - uses: actions/checkout@v4
       - name: Install build tools

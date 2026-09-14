@@ -74,6 +74,9 @@ target_include_directories(fmilibwrapper
         "${CMAKE_CURRENT_SOURCE_DIR}"
         )
 target_link_libraries(fmilibwrapper PRIVATE FMILIB::FMILIB)
+if (WIN32)
+    target_link_libraries(fmilibwrapper PRIVATE Shlwapi)
+endif ()
 if (UNIX)
     target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
 endif ()

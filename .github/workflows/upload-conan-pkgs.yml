@@ -13,7 +13,7 @@ jobs:
     name: Linux
     runs-on: ${{matrix.os}}
     container:
-      image: gcc:14-bookworm
+      image: "gcc:${{ matrix.compiler_version }}-${{ matrix.distro }}"
     env:
       CC: gcc
       CXX: g++
@@ -24,8 +24,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         build_type: [Debug, Release]
-        compiler_version: [14]
         compiler_libcxx: [libstdc++11]
+        include:
+          - compiler_version: 14
+            distro: bookworm
 
     steps:
       - uses: actions/checkout@v4
