@@ -34,5 +34,9 @@ if (FMILIB_FOUND)
     set_property(TARGET FMILIB::FMILIB APPEND PROPERTY
             IMPORTED_LOCATION "${FMILIB_LIBRARY}")
   endif ()
+  if (WIN32)
+    set_property(TARGET FMILIB::FMILIB APPEND PROPERTY
+            INTERFACE_LINK_LIBRARIES urlmon)
+  endif ()
 
 endif ()
