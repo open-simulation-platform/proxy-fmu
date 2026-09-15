@@ -26,7 +26,6 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends cmake python3-pip
-          rm -rf /var/lib/apt/lists/*
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
       - name: Configure Conan
