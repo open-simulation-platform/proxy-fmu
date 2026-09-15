@@ -6,20 +6,26 @@ jobs:
   linux:
     name: Linux
     runs-on: ${{ matrix.os }}
+    container:
+      image: "gcc:${{ matrix.compiler_version }}-${{ matrix.distro }}"
     env:
-      CC: gcc-${{ matrix.compiler_version }}
-      CXX: g++-${{ matrix.compiler_version }}
+      CC: gcc
+      CXX: g++
+      PIP_BREAK_SYSTEM_PACKAGES: "1"
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
         build_type: [Debug, Release]
-        compiler_version: [ 9 ]
-        compiler_libcxx: [ libstdc++11 ]
+        include:
+          - compiler_version: 14
+            distro: bookworm
     steps:
       - uses: actions/checkout@v4
-      - name: Install compiler
-        run: sudo apt-get install -y --no-install-recommends g++-${{ matrix.compiler_version }}
+      - name: Install build tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends cmake python3-pip
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
       - name: Configure Conan

@@ -34,7 +34,7 @@ class ProxyFmuConan(ConanFile):
         self.tool_requires("cmake/[>=4.0]")
         self.tool_requires("thrift/[~0.20]")
         self.requires("cli11/[~2.6]")
-        self.requires("fmilibrary/[~2.3]")
+        self.requires("fmilibrary/[~3.0.4]")
         self.requires("boost/[~1.85]") # Required by Thrift
         self.requires("thrift/[~0.20]", transitive_headers=True)
 
