@@ -83,9 +83,10 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
 
     if (!remote) {
         host = "localhost";
+        socketPath_ = unix_socket_path();
         std::mutex mtx;
         std::condition_variable cv;
-        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
+        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, socketPath_, std::ref(port), std::ref(mtx), std::ref(cv));
         std::unique_lock<std::mutex> lck(mtx);
         while (port == -1) cv.wait(lck);
     } else {
@@ -124,7 +125,11 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
     }
 
-    std::shared_ptr<TTransport> socket(new TSocket(host, port));
+    // A local instance listens on a Unix domain socket when one is available,
+    // which has a much lower round-trip latency than TCP over loopback.
+    std::shared_ptr<TTransport> socket = socketPath_.empty()
+        ? std::make_shared<TSocket>(host, port)
+        : std::make_shared<TSocket>(socketPath_);
     auto t_config = std::make_shared<TConfiguration>();
     t_config->setMaxFrameSize(MAX_FRAME_SIZE);
     transport_ = std::make_shared<TFramedTransport>(socket, t_config);
@@ -283,6 +288,11 @@ void proxy_slave::freeInstance()
         freed = true;
         if (client_) client_->freeInstance();
         if (thread_ && thread_->joinable()) thread_->join();
+        if (!socketPath_.empty()) {
+            // The server removes the socket file on exit; this covers the case where it did not.
+            std::error_code ec;
+            filesystem::remove(socketPath_, ec);
+        }
     }
 }
 

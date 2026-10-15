@@ -30,7 +30,7 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
     int port = -1;
     std::mutex mtx;
     std::condition_variable cv;
-    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
+    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::string(), std::ref(port), std::ref(mtx), std::ref(cv));
     processes_.emplace_back(std::move(t));
     dirs_.emplace_back(std::move(tmp));
 

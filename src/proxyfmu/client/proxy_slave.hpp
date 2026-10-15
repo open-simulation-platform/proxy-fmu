@@ -26,6 +26,7 @@ private:
     std::shared_ptr<thrift::FmuServiceClient> client_;
     std::shared_ptr<TTransport> transport_;
     std::unique_ptr<std::thread> thread_;
+    std::string socketPath_; // Unix domain socket of a local instance, empty when using TCP
 
     bool freed = false;
 
