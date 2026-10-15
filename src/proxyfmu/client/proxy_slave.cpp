@@ -84,8 +84,9 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
 
     if (!remote) {
         host = "localhost";
+        socketPath_ = unix_socket_path();
         processState = std::make_shared<process_state>();
-        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, processState);
+        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, socketPath_, processState);
         std::unique_lock<std::mutex> lck(processState->mtx);
         processState->cv.wait(lck, [&processState] { return processState->port != -1; });
         port = processState->port;
@@ -120,14 +121,29 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         transport->close();
     }
 
+    // The destructor does not run if the constructor throws, so remove the
+    // socket file here too if the server did not.
+    const auto removeSocketFile = [this] {
+        if (!socketPath_.empty()) {
+            std::error_code ec;
+            filesystem::remove(socketPath_, ec);
+        }
+    };
+
     if (port == -999) {
         if (thread_) thread_->join();
+        removeSocketFile();
         if (processState && processState->error) std::rethrow_exception(processState->error);
         throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
     }
 
     try {
-        std::shared_ptr<TTransport> socket(new TSocket(host, port));
+        // A local instance listens on a Unix domain socket when one is
+        // available, which has a much lower round-trip latency than TCP over
+        // loopback.
+        std::shared_ptr<TTransport> socket = socketPath_.empty()
+            ? std::make_shared<TSocket>(host, port)
+            : std::make_shared<TSocket>(socketPath_);
         auto t_config = std::make_shared<TConfiguration>();
         t_config->setMaxFrameSize(MAX_FRAME_SIZE);
         transport_ = std::make_shared<TFramedTransport>(socket, t_config);
@@ -148,6 +164,7 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
             if (thread_ && thread_->joinable()) thread_->detach();
         }
         if (thread_ && thread_->joinable()) thread_->join();
+        removeSocketFile();
         throw;
     }
 }
@@ -300,6 +317,11 @@ void proxy_slave::freeInstance()
         freed = true;
         if (client_) client_->freeInstance();
         if (thread_ && thread_->joinable()) thread_->join();
+        if (!socketPath_.empty()) {
+            // The server removes the socket file on exit; this covers the case where it did not.
+            std::error_code ec;
+            filesystem::remove(socketPath_, ec);
+        }
     }
 }
 
