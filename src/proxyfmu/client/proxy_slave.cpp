@@ -37,6 +37,34 @@ void read_data(std::string const& fileName, std::string& data)
     fclose(file);
 }
 
+VariableReferences to_thrift(const proxyfmu::fmi::variable_refs& vr)
+{
+    VariableReferences out;
+    out.integers.assign(vr.integers.begin(), vr.integers.end());
+    out.reals.assign(vr.reals.begin(), vr.reals.end());
+    out.strings.assign(vr.strings.begin(), vr.strings.end());
+    out.booleans.assign(vr.booleans.begin(), vr.booleans.end());
+    return out;
+}
+
+VariableValues to_thrift(const proxyfmu::fmi::variable_values& values)
+{
+    VariableValues out;
+    out.integers = values.integers;
+    out.reals = values.reals;
+    out.strings = values.strings;
+    out.booleans = values.booleans;
+    return out;
+}
+
+void from_thrift(VariableValues&& values, proxyfmu::fmi::variable_values& out)
+{
+    out.integers = std::move(values.integers);
+    out.reals = std::move(values.reals);
+    out.strings = std::move(values.strings);
+    out.booleans = std::move(values.booleans);
+}
+
 } // namespace
 
 
@@ -219,6 +247,34 @@ bool proxy_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std::
     const ValueReferences _vr = std::vector<int64_t>(vr.begin(), vr.end());
     auto status = client_->write_boolean(_vr, values);
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
+}
+
+bool proxy_slave::get_all(const fmi::variable_refs& vr, fmi::variable_values& values)
+{
+    VariablesRead read;
+    client_->read_all(read, to_thrift(vr));
+    from_thrift(std::move(read.values), values);
+    return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
+}
+
+bool proxy_slave::set_all(const fmi::variable_refs& vr, const fmi::variable_values& values)
+{
+    auto status = client_->write_all(to_thrift(vr), to_thrift(values));
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
+}
+
+bool proxy_slave::step_exchange(
+    const fmi::variable_refs& setVr,
+    const fmi::variable_values& setValues,
+    double current_time,
+    double step_size,
+    const fmi::variable_refs& getVr,
+    fmi::variable_values& getValues)
+{
+    VariablesRead read;
+    client_->step_exchange(read, to_thrift(setVr), to_thrift(setValues), current_time, step_size, to_thrift(getVr));
+    from_thrift(std::move(read.values), getValues);
+    return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
 void proxy_slave::freeInstance()

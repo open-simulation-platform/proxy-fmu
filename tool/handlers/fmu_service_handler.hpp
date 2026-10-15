@@ -45,6 +45,16 @@ public:
     thrift::Status::type write_string(const thrift::ValueReferences& vr, const thrift::StringArray& value) override;
     thrift::Status::type write_boolean(const thrift::ValueReferences& vr, const thrift::BooleanArray& value) override;
 
+    void read_all(thrift::VariablesRead& _return, const thrift::VariableReferences& vr) override;
+    thrift::Status::type write_all(const thrift::VariableReferences& vr, const thrift::VariableValues& values) override;
+    void step_exchange(
+        thrift::VariablesRead& _return,
+        const thrift::VariableReferences& writeVr,
+        const thrift::VariableValues& writeValues,
+        double currentTime,
+        double stepSize,
+        const thrift::VariableReferences& readVr) override;
+
     thrift::StateIndex save_state() override;
     void save_state_by_index(thrift::StateIndex) override;
     void restore_state(const ::proxyfmu::thrift::StateIndex state_index) override;
