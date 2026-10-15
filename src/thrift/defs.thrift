@@ -83,6 +83,25 @@ struct BooleanRead {
     2: Status status
 }
 
+struct VariableReferences {
+    1: ValueReferences integers,
+    2: ValueReferences reals,
+    3: ValueReferences strings,
+    4: ValueReferences booleans
+}
+
+struct VariableValues {
+    1: IntArray integers,
+    2: RealArray reals,
+    3: StringArray strings,
+    4: BooleanArray booleans
+}
+
+struct VariablesRead {
+    1: VariableValues values,
+    2: Status status
+}
+
 struct ModelDescription {
     1: string guid,
     2: string author,
