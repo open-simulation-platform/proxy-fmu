@@ -37,6 +37,34 @@ void read_data(std::string const& fileName, std::string& data)
     fclose(file);
 }
 
+VariableReferences to_thrift(const proxyfmu::fmi::variable_refs& vr)
+{
+    VariableReferences out;
+    out.integers.assign(vr.integers.begin(), vr.integers.end());
+    out.reals.assign(vr.reals.begin(), vr.reals.end());
+    out.strings.assign(vr.strings.begin(), vr.strings.end());
+    out.booleans.assign(vr.booleans.begin(), vr.booleans.end());
+    return out;
+}
+
+VariableValues to_thrift(const proxyfmu::fmi::variable_values& values)
+{
+    VariableValues out;
+    out.integers = values.integers;
+    out.reals = values.reals;
+    out.strings = values.strings;
+    out.booleans = values.booleans;
+    return out;
+}
+
+void from_thrift(VariableValues&& values, proxyfmu::fmi::variable_values& out)
+{
+    out.integers = std::move(values.integers);
+    out.reals = std::move(values.reals);
+    out.strings = std::move(values.strings);
+    out.booleans = std::move(values.booleans);
+}
+
 } // namespace
 
 
@@ -55,9 +83,10 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
 
     if (!remote) {
         host = "localhost";
+        socketPath_ = unix_socket_path();
         std::mutex mtx;
         std::condition_variable cv;
-        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
+        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, socketPath_, std::ref(port), std::ref(mtx), std::ref(cv));
         std::unique_lock<std::mutex> lck(mtx);
         while (port == -1) cv.wait(lck);
     } else {
@@ -96,7 +125,11 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
     }
 
-    std::shared_ptr<TTransport> socket(new TSocket(host, port));
+    // A local instance listens on a Unix domain socket when one is available,
+    // which has a much lower round-trip latency than TCP over loopback.
+    std::shared_ptr<TTransport> socket = socketPath_.empty()
+        ? std::make_shared<TSocket>(host, port)
+        : std::make_shared<TSocket>(socketPath_);
     auto t_config = std::make_shared<TConfiguration>();
     t_config->setMaxFrameSize(MAX_FRAME_SIZE);
     transport_ = std::make_shared<TFramedTransport>(socket, t_config);
@@ -221,12 +254,45 @@ bool proxy_slave::set_boolean(const std::vector<fmi::value_ref>& vr, const std::
     return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
 }
 
+bool proxy_slave::get_all(const fmi::variable_refs& vr, fmi::variable_values& values)
+{
+    VariablesRead read;
+    client_->read_all(read, to_thrift(vr));
+    from_thrift(std::move(read.values), values);
+    return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
+}
+
+bool proxy_slave::set_all(const fmi::variable_refs& vr, const fmi::variable_values& values)
+{
+    auto status = client_->write_all(to_thrift(vr), to_thrift(values));
+    return status == ::proxyfmu::thrift::Status::type::OK_STATUS;
+}
+
+bool proxy_slave::step_exchange(
+    const fmi::variable_refs& setVr,
+    const fmi::variable_values& setValues,
+    double current_time,
+    double step_size,
+    const fmi::variable_refs& getVr,
+    fmi::variable_values& getValues)
+{
+    VariablesRead read;
+    client_->step_exchange(read, to_thrift(setVr), to_thrift(setValues), current_time, step_size, to_thrift(getVr));
+    from_thrift(std::move(read.values), getValues);
+    return read.status == ::proxyfmu::thrift::Status::type::OK_STATUS;
+}
+
 void proxy_slave::freeInstance()
 {
     if (!freed) {
         freed = true;
         if (client_) client_->freeInstance();
         if (thread_ && thread_->joinable()) thread_->join();
+        if (!socketPath_.empty()) {
+            // The server removes the socket file on exit; this covers the case where it did not.
+            std::error_code ec;
+            filesystem::remove(socketPath_, ec);
+        }
     }
 }
 

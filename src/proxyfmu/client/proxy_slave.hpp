@@ -26,6 +26,7 @@ private:
     std::shared_ptr<thrift::FmuServiceClient> client_;
     std::shared_ptr<TTransport> transport_;
     std::unique_ptr<std::thread> thread_;
+    std::string socketPath_; // Unix domain socket of a local instance, empty when using TCP
 
     bool freed = false;
 
@@ -56,6 +57,16 @@ public:
     bool set_real(const std::vector<fmi::value_ref>& vr, const std::vector<double>& values) override;
     bool set_string(const std::vector<fmi::value_ref>& vr, const std::vector<std::string>& values) override;
     bool set_boolean(const std::vector<fmi::value_ref>& vr, const std::vector<bool>& values) override;
+
+    bool get_all(const fmi::variable_refs& vr, fmi::variable_values& values) override;
+    bool set_all(const fmi::variable_refs& vr, const fmi::variable_values& values) override;
+    bool step_exchange(
+        const fmi::variable_refs& setVr,
+        const fmi::variable_values& setValues,
+        double current_time,
+        double step_size,
+        const fmi::variable_refs& getVr,
+        fmi::variable_values& getValues) override;
 
     state_index save_state() override;
     void save_state(state_index stateIndex) override;

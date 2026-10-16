@@ -27,7 +27,7 @@ jobs:
         compiler_libcxx: [libstdc++11]
         include:
           - compiler_version: 14
-            distro: bookworm
+            distro: trixie
 
     steps:
       - uses: actions/checkout@v4

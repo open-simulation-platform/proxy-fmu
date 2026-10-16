@@ -8,6 +8,33 @@
 using namespace proxyfmu::thrift;
 using namespace proxyfmu::server;
 
+namespace
+{
+
+proxyfmu::fmi::variable_refs to_variable_refs(const VariableReferences& vr)
+{
+    return {
+        {vr.integers.begin(), vr.integers.end()},
+        {vr.reals.begin(), vr.reals.end()},
+        {vr.strings.begin(), vr.strings.end()},
+        {vr.booleans.begin(), vr.booleans.end()}};
+}
+
+proxyfmu::fmi::variable_values to_variable_values(const VariableValues& values)
+{
+    return {values.integers, values.reals, values.strings, values.booleans};
+}
+
+void from_variable_values(proxyfmu::fmi::variable_values&& values, VariableValues& out)
+{
+    out.integers = std::move(values.integers);
+    out.reals = std::move(values.reals);
+    out.strings = std::move(values.strings);
+    out.booleans = std::move(values.booleans);
+}
+
+} // namespace
+
 fmu_service_handler::fmu_service_handler(const std::string& fmuPath, const std::string& instanceName, std::function<void()> stop)
     : fmuPath_(fmuPath)
     , instanceName_(instanceName)
@@ -113,6 +140,37 @@ Status::type fmu_service_handler::write_boolean(const ValueReferences& vr, const
     return status ? Status::OK_STATUS : Status::ERROR_STATUS;
 }
 
+
+void fmu_service_handler::read_all(VariablesRead& _return, const VariableReferences& vr)
+{
+    fmi::variable_values values;
+    auto status = slave_->get_all(to_variable_refs(vr), values);
+    from_variable_values(std::move(values), _return.values);
+    _return.status = status ? Status::OK_STATUS : Status::ERROR_STATUS;
+}
+
+Status::type fmu_service_handler::write_all(const VariableReferences& vr, const VariableValues& values)
+{
+    auto status = slave_->set_all(to_variable_refs(vr), to_variable_values(values));
+    return status ? Status::OK_STATUS : Status::ERROR_STATUS;
+}
+
+void fmu_service_handler::step_exchange(
+    VariablesRead& _return,
+    const VariableReferences& writeVr,
+    const VariableValues& writeValues,
+    const double currentTime,
+    const double stepSize,
+    const VariableReferences& readVr)
+{
+    fmi::variable_values values;
+    auto status = slave_->step_exchange(
+        to_variable_refs(writeVr), to_variable_values(writeValues),
+        currentTime, stepSize,
+        to_variable_refs(readVr), values);
+    from_variable_values(std::move(values), _return.values);
+    _return.status = status ? Status::OK_STATUS : Status::ERROR_STATUS;
+}
 
 void fmu_service_handler::freeInstance()
 {

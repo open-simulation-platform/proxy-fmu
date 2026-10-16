@@ -104,7 +104,7 @@ int run_booter_application(const int port)
     return 0;
 }
 
-int run_application(const std::string& fmu, const std::string& instanceName)
+int run_application(const std::string& fmu, const std::string& instanceName, const std::string& socketPath)
 {
     std::unique_ptr<TSimpleServer> server;
     auto stop = [&]() {
@@ -115,6 +115,27 @@ int run_application(const std::string& fmu, const std::string& instanceName)
 
     std::shared_ptr<TTransportFactory> transportFactory(new ProxyFMUFramedTransportFactory(MAX_FRAME_SIZE));
     std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+
+    if (!socketPath.empty()) {
+        std::error_code ec;
+        proxyfmu::filesystem::remove(socketPath, ec);
+
+        std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(socketPath));
+        server = std::make_unique<TSimpleServer>(processor, serverTransport, transportFactory, protocolFactory);
+        server->setServerEventHandler(std::make_shared<ServerReadyEventHandler>([&socketPath] {
+            std::cout << "[proxyfmu] socket=" << socketPath << std::endl;
+        }));
+
+        int status = 0;
+        try {
+            server->serve();
+        } catch (TTransportException& ex) {
+            std::cerr << "[proxyfmu] " << ex.what() << ". Failed to bind to socket " << socketPath << std::endl;
+            status = 1;
+        }
+        proxyfmu::filesystem::remove(socketPath, ec);
+        return status;
+    }
 
     proxyfmu::fixed_range_random_generator rng(port_range_min, port_range_max);
 
@@ -177,6 +198,7 @@ int main(int argc, char** argv)
     app.set_version_flag("-v,--version", version());
     app.add_option("--fmu", "Location of the fmu to load.");
     app.add_option("--instanceName", "Name of the slave instance.");
+    app.add_option("--unixSocket", "Listen on this Unix domain socket path instead of a random TCP port.");
 
     CLI::App* sub = app.add_subcommand("boot");
     sub->add_option("--port", "Specify port to use.");
@@ -204,7 +226,9 @@ int main(int argc, char** argv)
            }
 
            const auto instanceName = app["--instanceName"]->as<std::string>();
-           return run_application(fmu, instanceName);
+           const auto unixSocket = app["--unixSocket"];
+           const auto socketPath = unixSocket->count() > 0 ? unixSocket->as<std::string>() : std::string();
+           return run_application(fmu, instanceName, socketPath);
 
         }
 

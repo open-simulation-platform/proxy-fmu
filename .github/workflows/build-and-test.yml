@@ -19,7 +19,7 @@ jobs:
         build_type: [Debug, Release]
         include:
           - compiler_version: 14
-            distro: bookworm
+            distro: trixie
     steps:
       - uses: actions/checkout@v4
       - name: Install build tools
