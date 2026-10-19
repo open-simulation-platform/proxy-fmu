@@ -1,3 +1,5 @@
+include(ExternalProject)
+
 add_compile_definitions(PROXYFMU_DATA_DIR="${CMAKE_SOURCE_DIR}/data")
 link_libraries(proxyfmu-client Catch2::Catch2)
 
@@ -11,6 +13,43 @@ target_link_libraries(test_controlled_temp PRIVATE proxyfmu-client)
 
 add_executable(test_mass-spring-damper test_mass-spring-damper.cpp)
 add_test(NAME test_mass-spring-damper COMMAND test_mass-spring-damper)
+
+# Reference FMUs are built from source, so that we have test FMUs for every
+# platform we build on.
+set(REFERENCE_FMUS_REPOSITORY
+        "https://github.com/open-simulation-platform/Reference-FMUs.git"
+        CACHE STRING "Reference-FMUs repository used by tests")
+set(REFERENCE_FMUS_VERSION
+        "v0.0.41"
+        CACHE STRING "Reference-FMUs release tag used by tests")
+set(referenceFmusBinaryDir "${CMAKE_CURRENT_BINARY_DIR}/reference-fmus")
+
+set(referenceFmusArgs
+        "-DFMI_VERSION=2"
+        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+    # Reference-FMUs v0.0.41 refuses to build FMI 2 FMUs for Apple silicon.
+    # As a stopgap, build them for x86_64 ("darwin64") but as universal
+    # binaries. They then load on Apple silicon through the fallback from
+    # "aarch64-darwin" to "darwin64" in loadFmu(), which this also tests.
+    list(APPEND referenceFmusArgs
+            "-DFMI_ARCHITECTURE=x86_64"
+            "-DCMAKE_C_FLAGS=-arch arm64")
+endif ()
+
+ExternalProject_Add(reference_fmus
+        GIT_REPOSITORY "${REFERENCE_FMUS_REPOSITORY}"
+        GIT_TAG "${REFERENCE_FMUS_VERSION}"
+        GIT_SHALLOW ON
+        BINARY_DIR "${referenceFmusBinaryDir}"
+        CMAKE_ARGS ${referenceFmusArgs}
+        INSTALL_COMMAND ""
+        TEST_COMMAND "")
+
+add_executable(test_dahlquist test_dahlquist.cpp)
+add_dependencies(test_dahlquist reference_fmus)
+target_compile_definitions(test_dahlquist PRIVATE REFERENCE_FMUS_DIR="${referenceFmusBinaryDir}/fmus")
+add_test(NAME test_dahlquist COMMAND test_dahlquist)
 
 # A copy of ControlledTemperature.fmu without its binaries
 set(noBinariesFmu "${CMAKE_CURRENT_BINARY_DIR}/NoBinaries.fmu")
@@ -48,6 +87,7 @@ set_tests_properties(
         test_identity
         test_controlled_temp
         test_mass-spring-damper
+        test_dahlquist
         test_load_failure
         test_missing_executable
         PROPERTIES
