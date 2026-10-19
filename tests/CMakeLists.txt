@@ -3,17 +3,6 @@ include(ExternalProject)
 add_compile_definitions(PROXYFMU_DATA_DIR="${CMAKE_SOURCE_DIR}/data")
 link_libraries(proxyfmu-client Catch2::Catch2)
 
-add_executable(test_identity test_identity.cpp)
-add_test(NAME test_identity COMMAND test_identity)
-target_link_libraries(test_identity PRIVATE proxyfmu-client)
-
-add_executable(test_controlled_temp test_controlled_temp.cpp)
-add_test(NAME test_controlled_temp COMMAND test_controlled_temp)
-target_link_libraries(test_controlled_temp PRIVATE proxyfmu-client)
-
-add_executable(test_mass-spring-damper test_mass-spring-damper.cpp)
-add_test(NAME test_mass-spring-damper COMMAND test_mass-spring-damper)
-
 # Reference FMUs are built from source, so that we have test FMUs for every
 # platform we build on.
 set(REFERENCE_FMUS_REPOSITORY
@@ -50,6 +39,27 @@ add_executable(test_dahlquist test_dahlquist.cpp)
 add_dependencies(test_dahlquist reference_fmus)
 target_compile_definitions(test_dahlquist PRIVATE REFERENCE_FMUS_DIR="${referenceFmusBinaryDir}/fmus")
 add_test(NAME test_dahlquist COMMAND test_dahlquist)
+set(tests test_dahlquist)
+
+# The following tests use FMUs which only contain binaries for Linux and
+# Windows.
+if (NOT APPLE)
+    add_executable(test_identity test_identity.cpp)
+    add_test(NAME test_identity COMMAND test_identity)
+    target_link_libraries(test_identity PRIVATE proxyfmu-client)
+
+    add_executable(test_controlled_temp test_controlled_temp.cpp)
+    add_test(NAME test_controlled_temp COMMAND test_controlled_temp)
+    target_link_libraries(test_controlled_temp PRIVATE proxyfmu-client)
+
+    add_executable(test_mass-spring-damper test_mass-spring-damper.cpp)
+    add_test(NAME test_mass-spring-damper COMMAND test_mass-spring-damper)
+
+    list(APPEND tests
+            test_identity
+            test_controlled_temp
+            test_mass-spring-damper)
+endif ()
 
 # A copy of ControlledTemperature.fmu without its binaries
 set(noBinariesFmu "${CMAKE_CURRENT_BINARY_DIR}/NoBinaries.fmu")
@@ -83,13 +93,12 @@ set_target_properties(test_missing_executable PROPERTIES
 add_test(NAME test_missing_executable COMMAND test_missing_executable WORKING_DIRECTORY "${noExecutableDir}")
 set_tests_properties(test_missing_executable PROPERTIES TIMEOUT 60)
 
-set_tests_properties(
-        test_identity
-        test_controlled_temp
-        test_mass-spring-damper
-        test_dahlquist
+list(APPEND tests
         test_load_failure
-        test_missing_executable
+        test_missing_executable)
+
+set_tests_properties(
+        ${tests}
         PROPERTIES
             ENVIRONMENT "PATH=$<SHELL_PATH:$<TARGET_FILE_DIR:proxyfmu-client>\;>$ENV{PATH}"
 )
