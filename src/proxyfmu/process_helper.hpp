@@ -35,10 +35,10 @@ void run_process(
 {
 
     proxyfmu::filesystem::path executable;
-#ifdef __linux__
-    executable = "proxyfmu";
-#else
+#ifdef _WIN32
     executable = "proxyfmu.exe";
+#else
+    executable = "proxyfmu";
 #endif
 
     if (!proxyfmu::filesystem::exists(executable)) {
@@ -57,7 +57,7 @@ void run_process(
     }
 
     std::string execStr = executable.string();
-#ifdef __linux__
+#ifndef _WIN32
     if (!executable.is_absolute()) {
         execStr.insert(0, "./");
     }
