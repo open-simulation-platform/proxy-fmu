@@ -35,6 +35,14 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif ()
 
+# Let the installed proxyfmu executable and libraries find each other
+# without relying on (DY)LD_LIBRARY_PATH.
+if (APPLE)
+    set(CMAKE_INSTALL_RPATH "@loader_path/../lib")
+elseif (UNIX)
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+endif ()
+
 # Prepare for export and installation.
 set(PROXYFMU_HEADER_INSTALL_DIR "include")
 set(PROXYFMU_CMAKE_INSTALL_DIR "lib/cmake/${PROJECT_NAME}")
