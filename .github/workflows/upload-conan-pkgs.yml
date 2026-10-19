@@ -112,10 +112,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-15]
+        arch: [armv8, x86_64]
         build_type: [Debug, Release]
+        exclude:
+          # x86_64 is legacy on macOS, so only build it in Release
+          - arch: x86_64
+            build_type: Debug
 
     steps:
       - uses: actions/checkout@v6
+      - name: Install Rosetta
+        if: matrix.arch == 'x86_64'
+        run: /usr/bin/pgrep -q oahd || sudo softwareupdate --install-rosetta --agree-to-license
       - name: Install Conan
         # get-conan pip-installs into Homebrew's Python, which refuses that
         # (PEP 668), so install Conan with pipx as conan-fmilibrary does
@@ -136,6 +144,7 @@ jobs:
             CHANNEL="testing-${SHORT_REFNAME//\//_}"
           fi
           conan create \
+            -s:h arch=${{ matrix.arch }} \
             -s build_type=${{ matrix.build_type }} \
             -b missing \
             --update \

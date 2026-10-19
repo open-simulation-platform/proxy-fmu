@@ -102,9 +102,17 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-15]
+        arch: [armv8, x86_64]
         build_type: [Debug, Release]
+        exclude:
+          # x86_64 is legacy on macOS, so only build it in Release
+          - arch: x86_64
+            build_type: Debug
     steps:
       - uses: actions/checkout@v6
+      - name: Install Rosetta
+        if: matrix.arch == 'x86_64'
+        run: /usr/bin/pgrep -q oahd || sudo softwareupdate --install-rosetta --agree-to-license
       - name: Install Conan
         # get-conan pip-installs into Homebrew's Python, which refuses that
         # (PEP 668), so install Conan with pipx as conan-fmilibrary does
@@ -114,7 +122,7 @@ jobs:
           conan profile detect
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - name: Install dependencies
-        run: conan install --build=missing --output-folder=build -s build_type=${{ matrix.build_type }} .
+        run: conan install --build=missing --output-folder=build -s:h arch=${{ matrix.arch }} -s build_type=${{ matrix.build_type }} .
       - name: Generate build system
         working-directory: build
         run: >
@@ -132,7 +140,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: matrix.build_type == 'Release'
         with:
-          name: proxyfmu-macos-arm64-${{ matrix.build_type }}
+          name: proxyfmu-macos-${{ matrix.arch }}-${{ matrix.build_type }}
           path: |
             build/install/bin
             build/install/lib
