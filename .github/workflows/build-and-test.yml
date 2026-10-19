@@ -94,3 +94,43 @@ jobs:
         with:
           name: proxyfmu-win64-${{ matrix.build_type }}
           path: build/install/bin
+
+  macos:
+    name: macOS
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15]
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
+      - name: Configure Conan
+        run: |
+          conan profile detect
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+      - name: Install dependencies
+        run: conan install --build=missing --output-folder=build -s build_type=${{ matrix.build_type }} .
+      - name: Generate build system
+        working-directory: build
+        run: >
+          cmake ..
+          -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DPROXYFMU_BUILD_EXAMPLES=ON
+          -DPROXYFMU_BUILD_TESTS=ON
+          -DCMAKE_INSTALL_PREFIX=install
+      - name: Build
+        working-directory: build
+        run: cmake --build . --target install
+      - name: Test
+        run: cd build/tests && ctest --output-on-failure --extra-verbose
+      - uses: actions/upload-artifact@v7
+        if: matrix.build_type == 'Release'
+        with:
+          name: proxyfmu-macos-arm64-${{ matrix.build_type }}
+          path: |
+            build/install/bin
+            build/install/lib
