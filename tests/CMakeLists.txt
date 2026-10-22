@@ -38,6 +38,28 @@ ExternalProject_Add(reference_fmus
 add_executable(test_dahlquist test_dahlquist.cpp)
 add_dependencies(test_dahlquist reference_fmus)
 target_compile_definitions(test_dahlquist PRIVATE REFERENCE_FMUS_DIR="${referenceFmusBinaryDir}/fmus")
+if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+    # A copy of the universal Dahlquist FMU with only x86_64 code, to check
+    # that loadFmu() only falls back to darwin64 binaries with arm64 code.
+    set(dahlquistX86Fmu "${referenceFmusBinaryDir}/fmus/Dahlquist_x86_64.fmu")
+    set(dahlquistX86Dir "${CMAKE_CURRENT_BINARY_DIR}/dahlquist-x86_64")
+    set(dahlquistX86Library "${dahlquistX86Dir}/binaries/darwin64/Dahlquist.dylib")
+    add_custom_command(
+            OUTPUT "${dahlquistX86Fmu}"
+            COMMAND "${CMAKE_COMMAND}" -E rm -rf "${dahlquistX86Dir}"
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${dahlquistX86Dir}"
+            COMMAND "${CMAKE_COMMAND}" -E chdir "${dahlquistX86Dir}"
+                "${CMAKE_COMMAND}" -E tar xf "${referenceFmusBinaryDir}/fmus/Dahlquist.fmu"
+            COMMAND lipo "${dahlquistX86Library}" -thin x86_64 -output "${dahlquistX86Library}.thin"
+            COMMAND "${CMAKE_COMMAND}" -E rename "${dahlquistX86Library}.thin" "${dahlquistX86Library}"
+            COMMAND "${CMAKE_COMMAND}" -E chdir "${dahlquistX86Dir}"
+                "${CMAKE_COMMAND}" -E tar cf "${dahlquistX86Fmu}" --format=zip modelDescription.xml binaries
+            DEPENDS reference_fmus "${referenceFmusBinaryDir}/fmus/Dahlquist.fmu"
+            VERBATIM)
+    add_custom_target(dahlquist_x86_64_fmu DEPENDS "${dahlquistX86Fmu}")
+    add_dependencies(test_dahlquist dahlquist_x86_64_fmu)
+    target_compile_definitions(test_dahlquist PRIVATE FMU_WITHOUT_NATIVE_CODE="${dahlquistX86Fmu}")
+endif ()
 add_test(NAME test_dahlquist COMMAND test_dahlquist)
 set(tests test_dahlquist)
 
