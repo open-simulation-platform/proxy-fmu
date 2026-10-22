@@ -14,7 +14,7 @@ In short, this solution allows you to:
 
 The solution is written in C++ and the static library and bundled executables have no dependencies.
 
-Windows, Linux and macOS (Apple silicon) are supported.
+Windows, Linux (x86_64 and 64-bit ARM) and macOS (Apple silicon) are supported.
 
 ### Building
 
