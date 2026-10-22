@@ -59,6 +59,11 @@ if (APPLE AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
     set(referenceFmusX86FolderArgs
             "-DFMI_ARCHITECTURE=x86_64"
             "-DCMAKE_OSX_ARCHITECTURES=arm64|x86_64")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+    # On Linux, the architecture only selects the folder, so this puts
+    # 64-bit ARM code in linux64.
+    set(referenceFmusX86Folder "linux64")
+    set(referenceFmusX86FolderArgs "-DFMI_ARCHITECTURE=x86_64")
 endif ()
 if (referenceFmusX86FolderArgs)
     set(referenceFmusX86FolderBinaryDir "${CMAKE_CURRENT_BINARY_DIR}/reference-fmus-${referenceFmusX86Folder}")
@@ -101,13 +106,17 @@ if (APPLE AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
     add_custom_target(dahlquist_x86_64_fmu DEPENDS "${dahlquistX86Fmu}")
     add_dependencies(test_dahlquist dahlquist_x86_64_fmu)
     target_compile_definitions(test_dahlquist PRIVATE FMU_WITHOUT_NATIVE_CODE="${dahlquistX86Fmu}")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+    # ControlledTemperature.fmu's linux64 library is x86_64 code.
+    target_compile_definitions(test_dahlquist PRIVATE
+            FMU_WITHOUT_NATIVE_CODE="${CMAKE_SOURCE_DIR}/data/fmus/2.0/20sim/ControlledTemperature.fmu")
 endif ()
 add_test(NAME test_dahlquist COMMAND test_dahlquist)
 set(tests test_dahlquist)
 
-# The following tests use FMUs which only contain binaries for Linux and
+# The following tests use FMUs which only contain binaries for x86 Linux and
 # Windows.
-if (NOT APPLE)
+if (NOT APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)$")
     add_executable(test_identity test_identity.cpp)
     add_test(NAME test_identity COMMAND test_identity)
     target_link_libraries(test_identity PRIVATE proxyfmu-client)
