@@ -60,3 +60,13 @@ TEST_CASE("client_test_dahlquist")
     auto fmu = client::proxy_fmu(fmuPath);
     test(fmu);
 }
+
+#ifdef FMU_WITHOUT_NATIVE_CODE
+// An FMU without binaries for this platform, which has code for another
+// architecture in the corresponding x86 platform folder (e.g. darwin64).
+TEST_CASE("fmi_test_no_native_code")
+{
+    auto fmu = loadFmu(FMU_WITHOUT_NATIVE_CODE);
+    REQUIRE_THROWS(fmu->new_instance("instance"));
+}
+#endif
