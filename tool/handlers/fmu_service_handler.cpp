@@ -116,7 +116,8 @@ Status::type fmu_service_handler::write_boolean(const ValueReferences& vr, const
 
 void fmu_service_handler::freeInstance()
 {
-    slave_->freeInstance();
+    // slave_ is null if instantiate() failed
+    if (slave_) slave_->freeInstance();
     std::cout << "[proxyfmu] Shutting down proxy for '" << modelName_ << "::" << instanceName_ << "'";
     stop_();
     std::cout << " done.." << std::endl;

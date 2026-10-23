@@ -96,15 +96,30 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
         throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
     }
 
-    std::shared_ptr<TTransport> socket(new TSocket(host, port));
-    auto t_config = std::make_shared<TConfiguration>();
-    t_config->setMaxFrameSize(MAX_FRAME_SIZE);
-    transport_ = std::make_shared<TFramedTransport>(socket, t_config);
-    std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport_));
-    client_ = std::make_shared<FmuServiceClient>(protocol);
-    transport_->open();
+    try {
+        std::shared_ptr<TTransport> socket(new TSocket(host, port));
+        auto t_config = std::make_shared<TConfiguration>();
+        t_config->setMaxFrameSize(MAX_FRAME_SIZE);
+        transport_ = std::make_shared<TFramedTransport>(socket, t_config);
+        std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport_));
+        client_ = std::make_shared<FmuServiceClient>(protocol);
+        transport_->open();
 
-    client_->instantiate();
+        client_->instantiate();
+    } catch (...) {
+        // E.g. the FMU could not be loaded in the proxy process. Shut that
+        // process down before passing on the error, so that it isn't left
+        // running, and so that the thread which waits for it can be joined.
+        freed = true;
+        try {
+            if (client_) client_->freeInstance();
+        } catch (...) {
+            // The process can't be reached, so we can't wait for it either.
+            if (thread_ && thread_->joinable()) thread_->detach();
+        }
+        if (thread_ && thread_->joinable()) thread_->join();
+        throw;
+    }
 }
 
 const fmi::model_description& proxy_slave::get_model_description() const
