@@ -34,11 +34,22 @@ target_compile_definitions(test_load_failure PRIVATE NO_BINARIES_FMU="${noBinari
 add_test(NAME test_load_failure COMMAND test_load_failure)
 set_tests_properties(test_load_failure PROPERTIES TIMEOUT 60)
 
+# Built and run in a directory without the proxyfmu executable
+set(noExecutableDir "${CMAKE_CURRENT_BINARY_DIR}/no-proxyfmu")
+add_executable(test_missing_executable test_missing_executable.cpp)
+set_target_properties(test_missing_executable PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${noExecutableDir}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${noExecutableDir}"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${noExecutableDir}")
+add_test(NAME test_missing_executable COMMAND test_missing_executable WORKING_DIRECTORY "${noExecutableDir}")
+set_tests_properties(test_missing_executable PROPERTIES TIMEOUT 60)
+
 set_tests_properties(
         test_identity
         test_controlled_temp
         test_mass-spring-damper
         test_load_failure
+        test_missing_executable
         PROPERTIES
             ENVIRONMENT "PATH=$<SHELL_PATH:$<TARGET_FILE_DIR:proxyfmu-client>\;>$ENV{PATH}"
 )

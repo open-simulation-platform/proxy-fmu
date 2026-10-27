@@ -52,14 +52,15 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
 {
     int port = -1;
     std::string host;
+    std::shared_ptr<process_state> processState;
 
     if (!remote) {
         host = "localhost";
-        std::mutex mtx;
-        std::condition_variable cv;
-        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
-        std::unique_lock<std::mutex> lck(mtx);
-        while (port == -1) cv.wait(lck);
+        processState = std::make_shared<process_state>();
+        thread_ = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, processState);
+        std::unique_lock<std::mutex> lck(processState->mtx);
+        processState->cv.wait(lck, [&processState] { return processState->port != -1; });
+        port = processState->port;
     } else {
         host = remote->host();
         std::shared_ptr<TTransport> socket(new TSocket(host, remote->port()));
@@ -93,6 +94,7 @@ proxy_slave::proxy_slave(const filesystem::path& fmuPath, const std::string& ins
 
     if (port == -999) {
         if (thread_) thread_->join();
+        if (processState && processState->error) std::rethrow_exception(processState->error);
         throw std::runtime_error("[proxyfmu] Unable to bind to external proxy process!");
     }
 

@@ -10,18 +10,28 @@
 #include <condition_variable>
 #include <exception>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <string>
 
 namespace proxyfmu
 {
 
-void start_process(
+// State shared between start_process() and the thread that waits for it to
+// report the port. It is held by both through a shared_ptr, as the thread
+// which runs start_process() may outlive the waiting one.
+struct process_state
+{
+    std::mutex mtx;
+    std::condition_variable cv;
+    int port = -1; // -999 if the process could not be started
+    std::exception_ptr error; // what start_process() threw, if anything
+};
+
+void run_process(
     const proxyfmu::filesystem::path& fmuPath,
     const std::string& instanceName,
-    int& port,
-    std::mutex& mtx,
-    std::condition_variable& cv)
+    process_state& state)
 {
 
     proxyfmu::filesystem::path executable;
@@ -69,11 +79,11 @@ void start_process(
     while (pipe_stream && std::getline(pipe_stream, line)) {
         if (!bound && line.substr(0, 16) == "[proxyfmu] port=") {
             {
-                std::lock_guard<std::mutex> lck(mtx);
-                port = std::stoi(line.substr(16));
-                std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << port << std::endl;
+                std::lock_guard<std::mutex> lck(state.mtx);
+                state.port = std::stoi(line.substr(16));
+                std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << state.port << std::endl;
             }
-            cv.notify_one();
+            state.cv.notify_one();
             bound = true;
         } else if (line.substr(0, 16) == "[proxyfmu] freed") {
             break;
@@ -91,10 +101,28 @@ void start_process(
         std::cerr << "[proxyfmu] External proxy process for instance '"
                   << instanceName << "' returned with status "
                   << std::to_string(status) << ". Unable to bind.." << std::endl;
-        std::lock_guard<std::mutex> lck(mtx);
-        port = -999;
+        std::lock_guard<std::mutex> lck(state.mtx);
+        state.port = -999;
 
-        cv.notify_one();
+        state.cv.notify_one();
+    }
+}
+
+// Starts a proxy process for the FMU, and reports its port through `state`.
+// Meant to run in a separate thread, so exceptions are passed on through
+// `state` instead of ending the thread, which would terminate the program.
+void start_process(
+    const proxyfmu::filesystem::path& fmuPath,
+    const std::string& instanceName,
+    std::shared_ptr<process_state> state)
+{
+    try {
+        run_process(fmuPath, instanceName, *state);
+    } catch (...) {
+        std::lock_guard<std::mutex> lck(state->mtx);
+        state->error = std::current_exception();
+        state->port = -999;
+        state->cv.notify_one();
     }
 }
 

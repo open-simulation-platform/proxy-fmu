@@ -27,17 +27,25 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
 
     write_data(fmuPath, data);
 
-    int port = -1;
-    std::mutex mtx;
-    std::condition_variable cv;
-    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::ref(port), std::ref(mtx), std::ref(cv));
+    auto state = std::make_shared<process_state>();
+    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, state);
     processes_.emplace_back(std::move(t));
     dirs_.emplace_back(std::move(tmp));
 
-    std::unique_lock<std::mutex> lck(mtx);
-    while (port == -1) cv.wait(lck);
+    std::unique_lock<std::mutex> lck(state->mtx);
+    state->cv.wait(lck, [&state] { return state->port != -1; });
+    if (state->error) {
+        // The client only gets the port, so report the reason here.
+        try {
+            std::rethrow_exception(state->error);
+        } catch (const std::exception& e) {
+            std::cerr << "[proxyfmu] Unable to start proxy process: " << e.what() << std::endl;
+        } catch (...) {
+            std::cerr << "[proxyfmu] Unable to start proxy process" << std::endl;
+        }
+    }
 
-    return port;
+    return state->port;
 }
 
 boot_service_handler::~boot_service_handler()
