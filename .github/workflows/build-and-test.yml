@@ -15,13 +15,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
         build_type: [Debug, Release]
         include:
           - compiler_version: 14
-            distro: bookworm
+            distro: trixie
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install build tools
         run: |
           apt-get update
@@ -48,7 +48,7 @@ jobs:
         run: cmake --build . --target install
       - name: Test
         run: cd build/tests && ctest --output-on-failure --extra-verbose
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: matrix.build_type == 'Release'
         with:
           name: proxyfmu-linux64-${{ matrix.build_type }}
@@ -65,7 +65,7 @@ jobs:
         os: [windows-2025]
         build_type: [Debug, Release]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
       - name: Configure Conan
@@ -89,7 +89,7 @@ jobs:
         run: cmake --build . --config ${{ matrix.build_type }} --target install
       - name: Test
         run: cd build/tests && ctest -C ${{ matrix.build_type }} --output-on-failure --extra-verbose
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: matrix.build_type == 'Release'
         with:
           name: proxyfmu-win64-${{ matrix.build_type }}
