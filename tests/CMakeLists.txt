@@ -186,7 +186,11 @@ set_target_properties(test_executable_next_to_client PROPERTIES
         SKIP_BUILD_RPATH ON)
 add_custom_command(TARGET test_executable_next_to_client POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${bundleDir}"
-        COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:proxyfmu-client>" "$<TARGET_FILE:proxyfmu>" "${bundleDir}")
+        # The client library with the libraries it needs from this project,
+        # and the executable.
+        COMMAND "${CMAKE_COMMAND}" -E copy
+            "$<TARGET_FILE:proxyfmu-client>" "$<TARGET_FILE:fmilibwrapper>" "$<TARGET_FILE:proxyfmu>"
+            "${bundleDir}")
 add_test(NAME test_executable_next_to_client COMMAND test_executable_next_to_client WORKING_DIRECTORY "${bundleUserDir}")
 if (WIN32)
     set(bundlePathVariable "PATH")
