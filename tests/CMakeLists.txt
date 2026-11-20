@@ -170,6 +170,35 @@ list(APPEND tests
         test_load_failure
         test_missing_executable)
 
+# Run in a directory without the proxyfmu executable, with the
+# proxyfmu-client library loaded from a directory that also contains the
+# executable: the executable is found next to the library.
+set(bundleDir "${CMAKE_CURRENT_BINARY_DIR}/client-bundle")
+set(bundleUserDir "${CMAKE_CURRENT_BINARY_DIR}/client-bundle-user")
+add_executable(test_executable_next_to_client test_executable_next_to_client.cpp)
+add_dependencies(test_executable_next_to_client reference_fmus proxyfmu)
+target_compile_definitions(test_executable_next_to_client PRIVATE REFERENCE_FMUS_DIR="${referenceFmusBinaryDir}/fmus")
+set_target_properties(test_executable_next_to_client PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${bundleUserDir}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${bundleUserDir}"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${bundleUserDir}"
+        # The library must come from the bundle directory, not the build tree.
+        SKIP_BUILD_RPATH ON)
+add_custom_command(TARGET test_executable_next_to_client POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${bundleDir}"
+        COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:proxyfmu-client>" "$<TARGET_FILE:proxyfmu>" "${bundleDir}")
+add_test(NAME test_executable_next_to_client COMMAND test_executable_next_to_client WORKING_DIRECTORY "${bundleUserDir}")
+if (WIN32)
+    set(bundlePathVariable "PATH")
+elseif (APPLE)
+    set(bundlePathVariable "DYLD_LIBRARY_PATH")
+else ()
+    set(bundlePathVariable "LD_LIBRARY_PATH")
+endif ()
+set_tests_properties(test_executable_next_to_client PROPERTIES
+        TIMEOUT 60
+        ENVIRONMENT_MODIFICATION "${bundlePathVariable}=path_list_prepend:${bundleDir}")
+
 set_tests_properties(
         ${tests}
         PROPERTIES

@@ -7,12 +7,14 @@
 #include <boost/dll/runtime_symbol_info.hpp>
 #include <boost/process.hpp>
 
+#include <algorithm>
 #include <condition_variable>
 #include <exception>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
 namespace proxyfmu
 {
@@ -41,20 +43,43 @@ void run_process(
     executable = "proxyfmu";
 #endif
 
-    if (!proxyfmu::filesystem::exists(executable)) {
+    // Where to look for the executable, in this order:
+    //  1. the current directory;
+    //  2. the directory of this library (proxyfmu-client, or the module it is
+    //     linked into), and its ../bin (an installed lib/ + bin/ layout): this
+    //     finds an executable shipped with a library that embeds proxyfmu,
+    //     whatever program loads it (e.g. a Python or Java interpreter);
+    //  3. the directory of the running program.
+    std::vector<proxyfmu::filesystem::path> candidates{executable};
+    {
         boost::dll::fs::error_code ec;
-        boost::dll::fs::path loc = boost::dll::program_location(ec);
-        if (!ec.failed()) {
-            executable = loc.parent_path().string() / executable;
+        const auto library = boost::dll::symbol_location_ptr(reinterpret_cast<const void*>(&run_process), ec);
+        if (!ec) {
+            const auto dir = proxyfmu::filesystem::path(library.parent_path().string());
+            candidates.push_back(dir / executable);
+            candidates.push_back(dir.parent_path() / "bin" / executable);
+        }
+    }
+    {
+        boost::dll::fs::error_code ec;
+        const auto program = boost::dll::program_location(ec);
+        if (!ec) {
+            candidates.push_back(proxyfmu::filesystem::path(program.parent_path().string()) / executable);
         } else {
             std::cerr << "[proxyfmu] Error, unable to locate parent executable" << std::endl;
         }
     }
-
-    if (!proxyfmu::filesystem::exists(executable)) {
-        auto execPath = proxyfmu::filesystem::absolute(executable).string();
-        throw std::runtime_error("[proxyfmu] No proxyfmu executable found. " + execPath + " does not exist!");
+    const auto found = std::find_if(candidates.begin(), candidates.end(), [](const auto& candidate) {
+        return proxyfmu::filesystem::exists(candidate);
+    });
+    if (found == candidates.end()) {
+        std::string searched;
+        for (const auto& candidate : candidates) {
+            searched += (searched.empty() ? "" : ", ") + proxyfmu::filesystem::absolute(candidate).string();
+        }
+        throw std::runtime_error("[proxyfmu] No proxyfmu executable found. Searched: " + searched);
     }
+    executable = *found;
 
     std::string execStr = executable.string();
 #ifndef _WIN32
