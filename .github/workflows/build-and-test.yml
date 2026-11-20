@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04]
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         build_type: [Debug, Release]
         include:
           - compiler_version: 14
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: matrix.build_type == 'Release'
         with:
-          name: proxyfmu-linux64-${{ matrix.build_type }}
+          name: proxyfmu-${{ matrix.os == 'ubuntu-24.04-arm' && 'linux-aarch64' || 'linux64' }}-${{ matrix.build_type }}
           path: |
             build/install/bin
             build/install/lib
@@ -94,3 +94,53 @@ jobs:
         with:
           name: proxyfmu-win64-${{ matrix.build_type }}
           path: build/install/bin
+
+  macos:
+    name: macOS
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15]
+        arch: [armv8, x86_64]
+        build_type: [Debug, Release]
+        exclude:
+          # x86_64 is legacy on macOS, so only build it in Release
+          - arch: x86_64
+            build_type: Debug
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Rosetta
+        if: matrix.arch == 'x86_64'
+        run: /usr/bin/pgrep -q oahd || sudo softwareupdate --install-rosetta --agree-to-license
+      - name: Install Conan
+        # get-conan pip-installs into Homebrew's Python, which refuses that
+        # (PEP 668), so install Conan with pipx as conan-fmilibrary does
+        run: pipx install conan
+      - name: Configure Conan
+        run: |
+          conan profile detect
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+      - name: Install dependencies
+        run: conan install --build=missing --output-folder=build -s:h arch=${{ matrix.arch }} -s build_type=${{ matrix.build_type }} .
+      - name: Generate build system
+        working-directory: build
+        run: >
+          cmake ..
+          -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DPROXYFMU_BUILD_EXAMPLES=ON
+          -DPROXYFMU_BUILD_TESTS=ON
+          -DCMAKE_INSTALL_PREFIX=install
+      - name: Build
+        working-directory: build
+        run: cmake --build . --target install
+      - name: Test
+        run: cd build/tests && ctest --output-on-failure --extra-verbose
+      - uses: actions/upload-artifact@v7
+        if: matrix.build_type == 'Release'
+        with:
+          name: proxyfmu-macos-${{ matrix.arch }}-${{ matrix.build_type }}
+          path: |
+            build/install/bin
+            build/install/lib

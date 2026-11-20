@@ -1,16 +1,138 @@
+include(ExternalProject)
+
 add_compile_definitions(PROXYFMU_DATA_DIR="${CMAKE_SOURCE_DIR}/data")
 link_libraries(proxyfmu-client Catch2::Catch2)
 
-add_executable(test_identity test_identity.cpp)
-add_test(NAME test_identity COMMAND test_identity)
-target_link_libraries(test_identity PRIVATE proxyfmu-client)
+# Reference FMUs are built from source, so that we have test FMUs for every
+# platform we build on.
+set(REFERENCE_FMUS_REPOSITORY
+        "https://github.com/open-simulation-platform/Reference-FMUs.git"
+        CACHE STRING "Reference-FMUs repository used by tests")
+set(REFERENCE_FMUS_VERSION
+        "v0.0.42"
+        CACHE STRING "Reference-FMUs release tag used by tests")
+set(referenceFmusBinaryDir "${CMAKE_CURRENT_BINARY_DIR}/reference-fmus")
 
-add_executable(test_controlled_temp test_controlled_temp.cpp)
-add_test(NAME test_controlled_temp COMMAND test_controlled_temp)
-target_link_libraries(test_controlled_temp PRIVATE proxyfmu-client)
+set(referenceFmusArgs
+        "-DFMI_VERSION=2"
+        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+set(referenceFmusArchitecture "${CMAKE_SYSTEM_PROCESSOR}")
+if (APPLE)
+    # Reference-FMUs picks the architecture of the host, so tell it which
+    # one we build for, e.g. x86_64 on an Apple silicon host.
+    if (CMAKE_OSX_ARCHITECTURES)
+        set(referenceFmusArchitecture "${CMAKE_OSX_ARCHITECTURES}")
+    endif ()
+    if (referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+        list(APPEND referenceFmusArgs
+                "-DFMI_ARCHITECTURE=aarch64"
+                "-DCMAKE_OSX_ARCHITECTURES=arm64")
+    elseif (referenceFmusArchitecture STREQUAL "x86_64")
+        list(APPEND referenceFmusArgs
+                "-DFMI_ARCHITECTURE=x86_64"
+                "-DCMAKE_OSX_ARCHITECTURES=x86_64")
+    else ()
+        message(FATAL_ERROR "No Reference FMUs for macOS on ${referenceFmusArchitecture}")
+    endif ()
+endif ()
 
-add_executable(test_mass-spring-damper test_mass-spring-damper.cpp)
-add_test(NAME test_mass-spring-damper COMMAND test_mass-spring-damper)
+ExternalProject_Add(reference_fmus
+        GIT_REPOSITORY "${REFERENCE_FMUS_REPOSITORY}"
+        GIT_TAG "${REFERENCE_FMUS_VERSION}"
+        GIT_SHALLOW ON
+        BINARY_DIR "${referenceFmusBinaryDir}"
+        CMAKE_ARGS ${referenceFmusArgs}
+        INSTALL_COMMAND ""
+        TEST_COMMAND "")
+
+add_executable(test_dahlquist test_dahlquist.cpp)
+add_dependencies(test_dahlquist reference_fmus)
+target_compile_definitions(test_dahlquist PRIVATE REFERENCE_FMUS_DIR="${referenceFmusBinaryDir}/fmus")
+
+# Many FMI 2 FMUs keep the binaries for other architectures in an x86
+# platform folder, e.g. a universal library in darwin64, and loadFmu() falls
+# back to those. To test this, build the Reference FMUs once more with such
+# binaries.
+set(referenceFmusX86FolderArgs)
+if (APPLE AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+    set(referenceFmusX86Folder "darwin64")
+    set(referenceFmusX86FolderArgs
+            "-DFMI_ARCHITECTURE=x86_64"
+            "-DCMAKE_OSX_ARCHITECTURES=arm64|x86_64")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+    # On Linux, the architecture only selects the folder, so this puts
+    # 64-bit ARM code in linux64.
+    set(referenceFmusX86Folder "linux64")
+    set(referenceFmusX86FolderArgs "-DFMI_ARCHITECTURE=x86_64")
+endif ()
+if (referenceFmusX86FolderArgs)
+    set(referenceFmusX86FolderBinaryDir "${CMAKE_CURRENT_BINARY_DIR}/reference-fmus-${referenceFmusX86Folder}")
+    ExternalProject_Get_Property(reference_fmus SOURCE_DIR)
+    set(referenceFmusSourceDir "${SOURCE_DIR}")
+    ExternalProject_Add(reference_fmus_x86_folder
+            DOWNLOAD_COMMAND ""
+            SOURCE_DIR "${referenceFmusSourceDir}"
+            BINARY_DIR "${referenceFmusX86FolderBinaryDir}"
+            LIST_SEPARATOR "|"
+            CMAKE_ARGS
+                "-DFMI_VERSION=2"
+                "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+                ${referenceFmusX86FolderArgs}
+            INSTALL_COMMAND ""
+            TEST_COMMAND ""
+            DEPENDS reference_fmus)
+    set(dahlquistX86FolderFmu "${referenceFmusX86FolderBinaryDir}/fmus/Dahlquist.fmu")
+    add_dependencies(test_dahlquist reference_fmus_x86_folder)
+    target_compile_definitions(test_dahlquist PRIVATE FMU_WITH_NATIVE_CODE_IN_X86_FOLDER="${dahlquistX86FolderFmu}")
+endif ()
+if (APPLE AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+    # A copy of the universal Dahlquist FMU with only x86_64 code, to check
+    # that loadFmu() only falls back to darwin64 binaries with arm64 code.
+    set(dahlquistX86Fmu "${referenceFmusX86FolderBinaryDir}/fmus/Dahlquist_x86_64.fmu")
+    set(dahlquistX86Dir "${CMAKE_CURRENT_BINARY_DIR}/dahlquist-x86_64")
+    set(dahlquistX86Library "${dahlquistX86Dir}/binaries/darwin64/Dahlquist.dylib")
+    add_custom_command(
+            OUTPUT "${dahlquistX86Fmu}"
+            COMMAND "${CMAKE_COMMAND}" -E rm -rf "${dahlquistX86Dir}"
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${dahlquistX86Dir}"
+            COMMAND "${CMAKE_COMMAND}" -E chdir "${dahlquistX86Dir}"
+                "${CMAKE_COMMAND}" -E tar xf "${dahlquistX86FolderFmu}"
+            COMMAND lipo "${dahlquistX86Library}" -thin x86_64 -output "${dahlquistX86Library}.thin"
+            COMMAND "${CMAKE_COMMAND}" -E rename "${dahlquistX86Library}.thin" "${dahlquistX86Library}"
+            COMMAND "${CMAKE_COMMAND}" -E chdir "${dahlquistX86Dir}"
+                "${CMAKE_COMMAND}" -E tar cf "${dahlquistX86Fmu}" --format=zip modelDescription.xml binaries
+            DEPENDS reference_fmus_x86_folder "${dahlquistX86FolderFmu}"
+            VERBATIM)
+    add_custom_target(dahlquist_x86_64_fmu DEPENDS "${dahlquistX86Fmu}")
+    add_dependencies(test_dahlquist dahlquist_x86_64_fmu)
+    target_compile_definitions(test_dahlquist PRIVATE FMU_WITHOUT_NATIVE_CODE="${dahlquistX86Fmu}")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+    # ControlledTemperature.fmu's linux64 library is x86_64 code.
+    target_compile_definitions(test_dahlquist PRIVATE
+            FMU_WITHOUT_NATIVE_CODE="${CMAKE_SOURCE_DIR}/data/fmus/2.0/20sim/ControlledTemperature.fmu")
+endif ()
+add_test(NAME test_dahlquist COMMAND test_dahlquist)
+set(tests test_dahlquist)
+
+# The following tests use FMUs which only contain binaries for x86 Linux and
+# Windows.
+if (NOT APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)$")
+    add_executable(test_identity test_identity.cpp)
+    add_test(NAME test_identity COMMAND test_identity)
+    target_link_libraries(test_identity PRIVATE proxyfmu-client)
+
+    add_executable(test_controlled_temp test_controlled_temp.cpp)
+    add_test(NAME test_controlled_temp COMMAND test_controlled_temp)
+    target_link_libraries(test_controlled_temp PRIVATE proxyfmu-client)
+
+    add_executable(test_mass-spring-damper test_mass-spring-damper.cpp)
+    add_test(NAME test_mass-spring-damper COMMAND test_mass-spring-damper)
+
+    list(APPEND tests
+            test_identity
+            test_controlled_temp
+            test_mass-spring-damper)
+endif ()
 
 # A copy of ControlledTemperature.fmu without its binaries
 set(noBinariesFmu "${CMAKE_CURRENT_BINARY_DIR}/NoBinaries.fmu")
@@ -44,12 +166,12 @@ set_target_properties(test_missing_executable PROPERTIES
 add_test(NAME test_missing_executable COMMAND test_missing_executable WORKING_DIRECTORY "${noExecutableDir}")
 set_tests_properties(test_missing_executable PROPERTIES TIMEOUT 60)
 
-set_tests_properties(
-        test_identity
-        test_controlled_temp
-        test_mass-spring-damper
+list(APPEND tests
         test_load_failure
-        test_missing_executable
+        test_missing_executable)
+
+set_tests_properties(
+        ${tests}
         PROPERTIES
             ENVIRONMENT "PATH=$<SHELL_PATH:$<TARGET_FILE_DIR:proxyfmu-client>\;>$ENV{PATH}"
 )

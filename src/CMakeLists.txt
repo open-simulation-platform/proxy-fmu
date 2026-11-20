@@ -78,7 +78,11 @@ if (WIN32)
     target_link_libraries(fmilibwrapper PRIVATE Shlwapi)
 endif ()
 if (UNIX)
-    target_link_libraries(fmilibwrapper INTERFACE stdc++fs PRIVATE dl)
+    target_link_libraries(fmilibwrapper PRIVATE dl)
+endif ()
+if (UNIX AND NOT APPLE)
+    # libstdc++ < 9 needs this for std::filesystem
+    target_link_libraries(fmilibwrapper INTERFACE stdc++fs)
 endif ()
 
 # Generate sources from .in files

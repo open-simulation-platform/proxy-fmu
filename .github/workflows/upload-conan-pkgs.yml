@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04]
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         build_type: [Debug, Release]
         compiler_libcxx: [libstdc++11]
         include:
@@ -95,6 +95,56 @@ jobs:
             CHANNEL="testing-${SHORT_REFNAME//\//_}"
           fi
           conan create \
+            -s build_type=${{ matrix.build_type }} \
+            -b missing \
+            --update \
+            --user=osp \
+            --channel=${CHANNEL} \
+            .
+      - name: Conan upload
+        run: conan upload --confirm --remote osp '*'
+
+
+  macos:
+    name: macOS
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15]
+        arch: [armv8, x86_64]
+        build_type: [Debug, Release]
+        exclude:
+          # x86_64 is legacy on macOS, so only build it in Release
+          - arch: x86_64
+            build_type: Debug
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Rosetta
+        if: matrix.arch == 'x86_64'
+        run: /usr/bin/pgrep -q oahd || sudo softwareupdate --install-rosetta --agree-to-license
+      - name: Install Conan
+        # get-conan pip-installs into Homebrew's Python, which refuses that
+        # (PEP 668), so install Conan with pipx as conan-fmilibrary does
+        run: pipx install conan
+      - name: Configure Conan
+        run: |
+          conan profile detect
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+      - name: Conan create
+        shell: bash
+        run: |
+          REFNAME="${GITHUB_REF#refs/*/}"
+          VERSION="v$(<version.txt)"
+          if [[ $GITHUB_REF == refs/tags/* ]] && [[ $REFNAME == $VERSION ]]; then CHANNEL="stable"
+          elif [[ $REFNAME == master ]]; then CHANNEL="testing"
+          else
+            SHORT_REFNAME="${REFNAME:0:40}"
+            CHANNEL="testing-${SHORT_REFNAME//\//_}"
+          fi
+          conan create \
+            -s:h arch=${{ matrix.arch }} \
             -s build_type=${{ matrix.build_type }} \
             -b missing \
             --update \
