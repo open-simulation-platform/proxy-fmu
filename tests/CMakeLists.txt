@@ -9,21 +9,31 @@ set(REFERENCE_FMUS_REPOSITORY
         "https://github.com/open-simulation-platform/Reference-FMUs.git"
         CACHE STRING "Reference-FMUs repository used by tests")
 set(REFERENCE_FMUS_VERSION
-        "v0.0.41"
+        "v0.0.42"
         CACHE STRING "Reference-FMUs release tag used by tests")
 set(referenceFmusBinaryDir "${CMAKE_CURRENT_BINARY_DIR}/reference-fmus")
 
 set(referenceFmusArgs
         "-DFMI_VERSION=2"
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
-    # Reference-FMUs v0.0.41 refuses to build FMI 2 FMUs for Apple silicon.
-    # As a stopgap, build them for x86_64 ("darwin64") but as universal
-    # binaries. They then load on Apple silicon through the fallback from
-    # "aarch64-darwin" to "darwin64" in loadFmu(), which this also tests.
-    list(APPEND referenceFmusArgs
-            "-DFMI_ARCHITECTURE=x86_64"
-            "-DCMAKE_C_FLAGS=-arch arm64")
+set(referenceFmusArchitecture "${CMAKE_SYSTEM_PROCESSOR}")
+if (APPLE)
+    # Reference-FMUs picks the architecture of the host, so tell it which
+    # one we build for, e.g. x86_64 on an Apple silicon host.
+    if (CMAKE_OSX_ARCHITECTURES)
+        set(referenceFmusArchitecture "${CMAKE_OSX_ARCHITECTURES}")
+    endif ()
+    if (referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+        list(APPEND referenceFmusArgs
+                "-DFMI_ARCHITECTURE=aarch64"
+                "-DCMAKE_OSX_ARCHITECTURES=arm64")
+    elseif (referenceFmusArchitecture STREQUAL "x86_64")
+        list(APPEND referenceFmusArgs
+                "-DFMI_ARCHITECTURE=x86_64"
+                "-DCMAKE_OSX_ARCHITECTURES=x86_64")
+    else ()
+        message(FATAL_ERROR "No Reference FMUs for macOS on ${referenceFmusArchitecture}")
+    endif ()
 endif ()
 
 ExternalProject_Add(reference_fmus
@@ -38,10 +48,42 @@ ExternalProject_Add(reference_fmus
 add_executable(test_dahlquist test_dahlquist.cpp)
 add_dependencies(test_dahlquist reference_fmus)
 target_compile_definitions(test_dahlquist PRIVATE REFERENCE_FMUS_DIR="${referenceFmusBinaryDir}/fmus")
-if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+
+# Many FMI 2 FMUs keep the binaries for other architectures in an x86
+# platform folder, e.g. a universal library in darwin64, and loadFmu() falls
+# back to those. To test this, build the Reference FMUs once more with such
+# binaries.
+set(referenceFmusX86FolderArgs)
+if (APPLE AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
+    set(referenceFmusX86Folder "darwin64")
+    set(referenceFmusX86FolderArgs
+            "-DFMI_ARCHITECTURE=x86_64"
+            "-DCMAKE_OSX_ARCHITECTURES=arm64|x86_64")
+endif ()
+if (referenceFmusX86FolderArgs)
+    set(referenceFmusX86FolderBinaryDir "${CMAKE_CURRENT_BINARY_DIR}/reference-fmus-${referenceFmusX86Folder}")
+    ExternalProject_Get_Property(reference_fmus SOURCE_DIR)
+    set(referenceFmusSourceDir "${SOURCE_DIR}")
+    ExternalProject_Add(reference_fmus_x86_folder
+            DOWNLOAD_COMMAND ""
+            SOURCE_DIR "${referenceFmusSourceDir}"
+            BINARY_DIR "${referenceFmusX86FolderBinaryDir}"
+            LIST_SEPARATOR "|"
+            CMAKE_ARGS
+                "-DFMI_VERSION=2"
+                "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+                ${referenceFmusX86FolderArgs}
+            INSTALL_COMMAND ""
+            TEST_COMMAND ""
+            DEPENDS reference_fmus)
+    set(dahlquistX86FolderFmu "${referenceFmusX86FolderBinaryDir}/fmus/Dahlquist.fmu")
+    add_dependencies(test_dahlquist reference_fmus_x86_folder)
+    target_compile_definitions(test_dahlquist PRIVATE FMU_WITH_NATIVE_CODE_IN_X86_FOLDER="${dahlquistX86FolderFmu}")
+endif ()
+if (APPLE AND referenceFmusArchitecture MATCHES "^(arm64|aarch64)$")
     # A copy of the universal Dahlquist FMU with only x86_64 code, to check
     # that loadFmu() only falls back to darwin64 binaries with arm64 code.
-    set(dahlquistX86Fmu "${referenceFmusBinaryDir}/fmus/Dahlquist_x86_64.fmu")
+    set(dahlquistX86Fmu "${referenceFmusX86FolderBinaryDir}/fmus/Dahlquist_x86_64.fmu")
     set(dahlquistX86Dir "${CMAKE_CURRENT_BINARY_DIR}/dahlquist-x86_64")
     set(dahlquistX86Library "${dahlquistX86Dir}/binaries/darwin64/Dahlquist.dylib")
     add_custom_command(
@@ -49,12 +91,12 @@ if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
             COMMAND "${CMAKE_COMMAND}" -E rm -rf "${dahlquistX86Dir}"
             COMMAND "${CMAKE_COMMAND}" -E make_directory "${dahlquistX86Dir}"
             COMMAND "${CMAKE_COMMAND}" -E chdir "${dahlquistX86Dir}"
-                "${CMAKE_COMMAND}" -E tar xf "${referenceFmusBinaryDir}/fmus/Dahlquist.fmu"
+                "${CMAKE_COMMAND}" -E tar xf "${dahlquistX86FolderFmu}"
             COMMAND lipo "${dahlquistX86Library}" -thin x86_64 -output "${dahlquistX86Library}.thin"
             COMMAND "${CMAKE_COMMAND}" -E rename "${dahlquistX86Library}.thin" "${dahlquistX86Library}"
             COMMAND "${CMAKE_COMMAND}" -E chdir "${dahlquistX86Dir}"
                 "${CMAKE_COMMAND}" -E tar cf "${dahlquistX86Fmu}" --format=zip modelDescription.xml binaries
-            DEPENDS reference_fmus "${referenceFmusBinaryDir}/fmus/Dahlquist.fmu"
+            DEPENDS reference_fmus_x86_folder "${dahlquistX86FolderFmu}"
             VERBATIM)
     add_custom_target(dahlquist_x86_64_fmu DEPENDS "${dahlquistX86Fmu}")
     add_dependencies(test_dahlquist dahlquist_x86_64_fmu)
