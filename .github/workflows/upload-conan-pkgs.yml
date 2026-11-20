@@ -37,6 +37,10 @@ jobs:
           apt-get install -y --no-install-recommends cmake python3-pip
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
+      - name: Trust the checkout
+        # The recipe revision comes from git (revision_mode = "scm"), and git
+        # refuses a repository owned by another user, as in this container.
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Configure Conan
         run: |
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force

@@ -14,6 +14,9 @@ class ProxyFmuConan(ConanFile):
     license = "MIT"
     url = "https://github.com/open-simulation-platform/proxy-fmu"
 
+    # Force recipe revision as the git commit, the same on every platform. 
+    revision_mode = "scm"
+
     package_type = "library"
     settings = "os", "compiler", "build_type", "arch"
     options = {
