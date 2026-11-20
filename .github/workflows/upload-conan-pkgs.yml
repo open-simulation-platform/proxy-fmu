@@ -117,7 +117,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install Conan
-        uses: turtlebrowser/get-conan@main
+        # get-conan pip-installs into Homebrew's Python, which refuses that
+        # (PEP 668), so install Conan with pipx as conan-fmilibrary does
+        run: pipx install conan
       - name: Configure Conan
         run: |
           conan profile detect
