@@ -22,15 +22,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
         build_type: [Debug, Release]
         compiler_libcxx: [libstdc++11]
         include:
           - compiler_version: 14
-            distro: bookworm
+            distro: trixie
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install build tools
         run: |
           apt-get update
@@ -76,7 +76,7 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Conan
         uses: turtlebrowser/get-conan@main
       - name: Configure Conan
