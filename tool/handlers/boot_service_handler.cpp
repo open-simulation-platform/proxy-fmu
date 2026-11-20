@@ -28,7 +28,8 @@ int32_t boot_service_handler::loadFromBinaryData(const std::string& fmuName, con
     write_data(fmuPath, data);
 
     auto state = std::make_shared<process_state>();
-    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, state);
+    // Instances started through the boot service are reached remotely, so they use TCP.
+    auto t = std::make_unique<std::thread>(&start_process, fmuPath, instanceName, std::string(), state);
     processes_.emplace_back(std::move(t));
     dirs_.emplace_back(std::move(tmp));
 

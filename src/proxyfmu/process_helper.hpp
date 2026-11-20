@@ -13,11 +13,36 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <random>
+#include <sstream>
 #include <string>
 #include <vector>
 
 namespace proxyfmu
 {
+
+/**
+ * Returns a unique path for a Unix domain socket in the temporary directory,
+ * or an empty string if Unix domain sockets cannot be used, in which case TCP
+ * should be used instead.
+ *
+ * The Thrift build used on Windows lacks AF_UNIX support, so Windows always
+ * gets an empty string.
+ */
+inline std::string unix_socket_path()
+{
+#ifdef _WIN32
+    return {};
+#else
+    std::random_device rd;
+    std::ostringstream name;
+    name << "proxyfmu_" << std::hex << rd() << rd() << ".sock";
+    const auto path = (proxyfmu::filesystem::temp_directory_path() / name.str()).string();
+    // sun_path holds 108 bytes on Linux and 104 on macOS, including the terminating null.
+    constexpr std::size_t maxPathLength = 103;
+    return path.size() <= maxPathLength ? path : std::string();
+#endif
+}
 
 // State shared between start_process() and the thread that waits for it to
 // report the port. It is held by both through a shared_ptr, as the thread
@@ -26,13 +51,21 @@ struct process_state
 {
     std::mutex mtx;
     std::condition_variable cv;
-    int port = -1; // -999 if the process could not be started
+    int port = -1; // 0 if it listens on a Unix domain socket, -999 if it could not be started
     std::exception_ptr error; // what start_process() threw, if anything
 };
 
+/**
+ * Starts a proxyfmu server process for the given FMU and waits for it to exit.
+ *
+ * Once the server is ready, `state.port` is set to its TCP port or, if
+ * `socketPath` is non-empty, to 0 to signal that it listens on that Unix
+ * domain socket. It is set to -999 if the server could not be started.
+ */
 void run_process(
     const proxyfmu::filesystem::path& fmuPath,
     const std::string& instanceName,
+    const std::string& socketPath,
     process_state& state)
 {
 
@@ -95,6 +128,9 @@ void run_process(
     std::cout << "[proxyfmu] Booting FMU instance '" << instanceName << "'.." << std::endl;
 
     std::string cmd(execStr + " --fmu \"" + fmuPath.string() + "\" --instanceName \"" + instanceName + "\"");
+    if (!socketPath.empty()) {
+        cmd += " --unixSocket \"" + socketPath + "\"";
+    }
 
     boost::process::ipstream pipe_stream;
     boost::process::child c(cmd, boost::process::std_out > pipe_stream);
@@ -107,6 +143,14 @@ void run_process(
                 std::lock_guard<std::mutex> lck(state.mtx);
                 state.port = std::stoi(line.substr(16));
                 std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using port " << state.port << std::endl;
+            }
+            state.cv.notify_one();
+            bound = true;
+        } else if (!bound && line.substr(0, 18) == "[proxyfmu] socket=") {
+            {
+                std::lock_guard<std::mutex> lck(state.mtx);
+                state.port = 0;
+                std::cout << "[proxyfmu] FMU instance '" << instanceName << "' instantiated using socket " << line.substr(18) << std::endl;
             }
             state.cv.notify_one();
             bound = true;
@@ -133,16 +177,18 @@ void run_process(
     }
 }
 
-// Starts a proxy process for the FMU, and reports its port through `state`.
-// Meant to run in a separate thread, so exceptions are passed on through
-// `state` instead of ending the thread, which would terminate the program.
+// Starts a proxy process for the FMU, and reports its port through `state`
+// (see run_process()). Meant to run in a separate thread, so exceptions are
+// passed on through `state` instead of ending the thread, which would
+// terminate the program.
 void start_process(
     const proxyfmu::filesystem::path& fmuPath,
     const std::string& instanceName,
+    const std::string& socketPath,
     std::shared_ptr<process_state> state)
 {
     try {
-        run_process(fmuPath, instanceName, *state);
+        run_process(fmuPath, instanceName, socketPath, *state);
     } catch (...) {
         std::lock_guard<std::mutex> lck(state->mtx);
         state->error = std::current_exception();

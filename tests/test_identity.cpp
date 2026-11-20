@@ -69,6 +69,56 @@ void test(fmu& fmu)
     slave->freeInstance();
 }
 
+void test_batched(fmu& fmu)
+{
+    auto slave = fmu.new_instance("instance");
+    REQUIRE(slave->setup_experiment());
+    REQUIRE(slave->enter_initialization_mode());
+    REQUIRE(slave->exit_initialization_mode());
+
+    const variable_refs vr{{0}, {0}, {0}, {0}};
+    variable_values values{{0}, {0.0}, {""}, {false}};
+    variable_values read;
+
+    REQUIRE(slave->get_all(vr, read));
+    CHECK(read.integers == values.integers);
+    CHECK(read.reals == values.reals);
+    CHECK(read.strings == values.strings);
+    CHECK(read.booleans == values.booleans);
+
+    double t = 0.0;
+    double tEnd = 1.0;
+    double dt = 0.1;
+
+    while (t <= tEnd) {
+        values.integers[0] += 1;
+        values.reals[0] += 1.0;
+        values.strings[0] += 'a';
+        values.booleans[0] = !values.booleans[0];
+
+        REQUIRE(slave->step_exchange(vr, values, t, dt, vr, read));
+        CHECK(read.integers == values.integers);
+        CHECK(read.reals == values.reals);
+        CHECK(read.strings == values.strings);
+        CHECK(read.booleans == values.booleans);
+
+        t += dt;
+    }
+
+    values.reals[0] = -1.0;
+    REQUIRE(slave->set_all(vr, values));
+    REQUIRE(slave->get_all(vr, read));
+    CHECK(read.reals == values.reals);
+
+    // Nothing to set and nothing to get.
+    REQUIRE(slave->step_exchange({}, {}, t, dt, {}, read));
+    CHECK(read.reals.empty());
+    CHECK(read.strings.empty());
+
+    REQUIRE(slave->terminate());
+    slave->freeInstance();
+}
+
 } // namespace
 
 TEST_CASE("fmi_test_identity")
@@ -83,4 +133,17 @@ TEST_CASE("client_test_identity")
     std::string fmuPath(std::string(PROXYFMU_DATA_DIR) + "/fmus/1.0/identity.fmu");
     auto fmu = client::proxy_fmu(fmuPath);
     test(fmu);
+}
+TEST_CASE("fmi_test_identity_batched")
+{
+    std::string fmuPath(std::string(PROXYFMU_DATA_DIR) + "/fmus/1.0/identity.fmu");
+    auto fmu = loadFmu(fmuPath);
+    test_batched(*fmu);
+}
+
+TEST_CASE("client_test_identity_batched")
+{
+    std::string fmuPath(std::string(PROXYFMU_DATA_DIR) + "/fmus/1.0/identity.fmu");
+    auto fmu = client::proxy_fmu(fmuPath);
+    test_batched(fmu);
 }
