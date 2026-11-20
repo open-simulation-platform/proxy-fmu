@@ -61,6 +61,23 @@ TEST_CASE("client_test_dahlquist")
     test(fmu);
 }
 
+#ifdef FMU_WITH_NATIVE_CODE_IN_X86_FOLDER
+// An FMU without binaries for this platform, which has code for this
+// architecture in the corresponding x86 platform folder (e.g. a universal
+// library in darwin64).
+TEST_CASE("fmi_test_native_code_in_x86_folder")
+{
+    auto fmu = loadFmu(FMU_WITH_NATIVE_CODE_IN_X86_FOLDER);
+    test(*fmu);
+}
+
+TEST_CASE("client_test_native_code_in_x86_folder")
+{
+    auto fmu = client::proxy_fmu(FMU_WITH_NATIVE_CODE_IN_X86_FOLDER);
+    test(fmu);
+}
+#endif
+
 #ifdef FMU_WITHOUT_NATIVE_CODE
 // An FMU without binaries for this platform, which has code for another
 // architecture in the corresponding x86 platform folder (e.g. darwin64).
