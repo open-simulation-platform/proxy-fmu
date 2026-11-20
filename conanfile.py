@@ -14,10 +14,7 @@ class ProxyFmuConan(ConanFile):
     license = "MIT"
     url = "https://github.com/open-simulation-platform/proxy-fmu"
 
-    # The recipe revision is the git commit, the same on every platform. With
-    # the default ("hash"), Windows checkouts with CRLF line endings gave the
-    # Windows upload a different revision than the Linux and macOS ones, and
-    # the latest revision lacked the other platforms' binaries.
+    # Force recipe revision as the git commit, the same on every platform. 
     revision_mode = "scm"
 
     package_type = "library"
